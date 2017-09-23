@@ -1,0 +1,6 @@
+# No need to host the build, as it can be done simply by running the build command
+**/build
+# Since we are using sass, no css files required in the project
+*.css
+# Everyone is responsible for adding the required dependencies for building.
+node-modules/*
