@@ -3,4 +3,4 @@
 # Since we are using sass, no css files required in the project
 *.css
 # Everyone is responsible for adding the required dependencies for building.
-node-modules/*
+node_modules/*
