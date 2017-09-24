@@ -1,7 +1,8 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 import { Map } from './components/Map.js'
-import { Hello } from './components/HelloWorld.js'
+//import { Hello } from './components/HelloWorld.js'
+import { Fetch } from './components/HelloWorld.js'
 require('./styles/_style.sass');
 
 const aURL =
@@ -13,7 +14,7 @@ const aURL =
 // element in the html file should be called here. Others should be virtual
 // or abstracted.
 ReactDOM.render(
-  <Hello/>,
+  <Fetch />,
   document.getElementById('hello')
 );
 ReactDOM.render(
