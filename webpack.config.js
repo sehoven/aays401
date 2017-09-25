@@ -1,7 +1,3 @@
-// Adapted from:
-// https://github.com/istarkov/google-map-react-examples/blob/master/web/flux/components/examples/x_main/main_map_block.jsx
-// Which also provides good examples for manipulations
-// Most importantly for us, custom markers.
 var HTMLWebpackPlugin = require('html-webpack-plugin');
 var HTMLWebpackPluginConfig = new HTMLWebpackPlugin({
   "template": __dirname + '/src/index.html',
