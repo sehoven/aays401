@@ -1,8 +1,6 @@
-// An example of a component that can query a JSON server for data.
-// No source for this one, but further work can be done with fetch api.
-var React = require('react');
-var ReactDOM = require('react-dom');
-var fetch = require('node-fetch');
+const React = require('react');
+const ReactDOM = require('react-dom');
+const fetch = require('node-fetch');
 
 export class Fetch extends React.Component {
   constructor(props) {
