@@ -8,3 +8,10 @@ export function getNearby(lat, lng, rad) {
       return response.json();
     });
 }
+
+export function searchLists(term) {
+  return fetch(` http://localhost:3000/locations?name=${term}` )
+    .then(function(response) {
+      return response.json();
+    });
+}
