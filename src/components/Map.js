@@ -1,6 +1,6 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import GoogleMap from 'google-map-react';
-import {List} from 'immutable';
+import { List } from 'immutable';
 
 const FloatingComponent = ({ text }) => <div width="50px">{text}</div>;
 
@@ -11,17 +11,16 @@ function onMapReady(maps) {
 export class Map extends Component {
   constructor(props) {
     super(props);
-    this.zoom = 10,
-    this.center = new List([53.5444, -113.4909]),
-    this.apiKey = "AIzaSyB4CMvWi4j-iLXGCKVw_zCIoHrLI18iK4U"
-    this.map = ''
-    this.maps = ''
+    this.zoom = 10;
+    this.center = new List([53.5444, -113.4909]);
+    this.apiKey = "AIzaSyB4CMvWi4j-iLXGCKVw_zCIoHrLI18iK4U";
+    this.map = '';
+    this.maps = '';
   }
 
   onReady(map, maps){
-    this.map = map
-    this.maps = maps
-    //Exposing the Google API
+    this.map = map;
+    this.maps = maps;
   }
 
   render() {
