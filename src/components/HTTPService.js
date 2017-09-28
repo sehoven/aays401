@@ -1,5 +1,3 @@
-const React = require('react');
-const ReactDOM = require('react-dom');
 const fetch = require('node-fetch');
 
 export function getNearby(lat, lng, rad) {
