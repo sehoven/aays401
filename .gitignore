@@ -1,5 +1,7 @@
 # No need to host the build, as it can be done simply by running the build command
 **/build
+# Etienne: I store support scripts in here that are tangentially related to the project. e.g. the cvs -> JSON conversion script
+**/support
 # Since we are using sass, no css files required in the project
 *.css
 # Everyone is responsible for adding the required dependencies for building.
