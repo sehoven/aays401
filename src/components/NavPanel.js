@@ -7,15 +7,27 @@ export default class NavPanel extends Component {
     super(props);
     this.state = {
       typed: '',
+      autocomplete: [],
       list: {ready: false, data:[]}
     };
     this.textInput; //This links to the RAW DOM. Not virtual.
     // We should only need RAW references for the Google API, and sparingly.
     this.handleClick = this.handleClick.bind(this);
     this.onChange = this.onChange.bind(this);
+    this.service;
+    this.getSuggestions = this.getSuggestions.bind(this);
+  }
+
+  getSuggestions(predictions, status){
+    if (status != this.props.index.state.maps.places.PlacesServiceStatus.OK) {
+      console.log(this.props.index.state.maps.places.PlacesServiceStatus.OK);
+      return;
+    }
+    this.state.autocomplete = predictions;
   }
 
   onChange(event){
+    //Reset list
     this.setState({
       typed: event.target.value,
       list: {ready: false, data:[]}
@@ -26,6 +38,13 @@ export default class NavPanel extends Component {
         list: {ready: true, data: array}
       });
     });
+
+    if (!this.service){
+      this.service = new google.maps.places.AutocompleteService();
+    }
+    this.service.getQueryPredictions(
+      { input: event.target.value }
+      , this.getSuggestions);
   }
 
   handleClick(){
@@ -39,7 +58,10 @@ export default class NavPanel extends Component {
           ref={(input) => {this.props.index.state.textInput = input; }} />
         <input type="button" value="Search" id="search-button"
           onClick={this.handleClick} />
-        <NavList data={this.state.list}/>
+        <NavList
+          index={this.props.index}
+          autocomplete={this.state.autocomplete}
+          data={this.state.list} />
     </div>
   }
 }

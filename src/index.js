@@ -10,6 +10,7 @@ export class Index extends Component {
     super(props);
     this.state = {
       map: '',
+      maps: '',
       textInput: '',
       shared: ''
     }
