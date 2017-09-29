@@ -1,6 +1,6 @@
 # AaYS401
 
-aays401 is the project repository for AaYS's flyer mapping system. This system will provide a graphical interface to facilitate division of geographical areas within the city given maximum delivery zone size (in number of residences), and will output a series of zones corresponding to individual flyer routes. It will also provide additional functionality to analyze zone properties such as estimated numbers of buildings of particular type total residence number estimates.
+aays401 is the project repository for AaYS's flyer mapping system. This system will provide a graphical interface to facilitate division of geographical areas within the city given a total delivery zone that can be further partitioned into individual flyer routes. It will also provide additional functionality to analyze zone properties such as estimated total number of units and estimated numbers of buildings of a particular type.
 
 ## Getting Started
 
