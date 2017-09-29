@@ -9,7 +9,7 @@ var neighborhood_data = require('./data/neighborhoods.json');
 var neighborhoods = fs.readFileSync('./data/neighborhoods.json', 'utf8');
 neighborhoods = JSON.parse(neighborhoods);
 neighborhoods = neighborhoods.neighborhoods;
-console.log("Ready. Server Started.");
+console.log("Ready. Listening on port 3000.");
 
 app.use(bodyParser.json());
 
@@ -37,8 +37,6 @@ app.get('/nearby', function(req, res) {
     var a = parseFloat(req.query.lat) - neighborhoods[i].center.lat;
     var b = parseFloat(req.query.lng) - neighborhoods[i].center.lng;
 
-    console.log(a, b, c);
-
     if (Math.sqrt( a*a + b*b ) < c){
         resBody.push(neighborhoods[i]);
     }
@@ -60,13 +58,12 @@ app.get('/locations', function(req, res) {
   }
 
   let searchTerm = req.query.name.toLowerCase();
-  console.log(searchTerm);
   let resBody = [];
-  for (var i = 0; i < dummyLocations.length; i++) {
+  for (var i = 0; i < neighborhoods.length; i++) {
     if (searchTerm) {
-      if (!dummyLocations[i].name.toLowerCase().includes(searchTerm)) continue;
+      if (!neighborhoods[i].name.toLowerCase().includes(searchTerm)) continue;
     }
-    resBody.push(dummyLocations[i]);
+    resBody.push(neighborhoods[i]);
   }
 
   res.writeHead(200, {"Content-Type": "application/json"});
