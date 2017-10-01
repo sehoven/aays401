@@ -8,15 +8,11 @@ require('./styles/_style.sass');
 export class Index extends Component {
   constructor(props){
     super(props);
-    this.state = {
-      map: '',
-      maps: '',
-      textInput: '',
-      shared: ''
-    }
+    this.map = '';
+    this.maps = '';
   }
   render(){
-    return <div id="map"><NavPanel index={this} /><Map index={this} /></div>
+    return <div id="map"><NavPanel index={this} /><Map index={this} /></div>;
   }
 }
 ReactDOM.render(

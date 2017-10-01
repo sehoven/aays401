@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import GoogleMap from 'google-map-react';
 import PropTypes from 'prop-types';
 
+/*================================
+Receives a pointer to the index.js object in props
+================================*/
 export default class Map extends Component {
   constructor(props) {
     super(props);
@@ -9,8 +12,8 @@ export default class Map extends Component {
   }
 
   onReady(map, maps){
-    this.props.index.state.map = map;
-    this.props.index.state.maps = maps;
+    this.props.index.map = map;
+    this.props.index.maps = maps;
   }
 
   render() {

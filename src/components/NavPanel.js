@@ -2,62 +2,52 @@ import React, {Component} from 'react';
 import { NavList } from './NavList.js';
 const HTTPService = require('./HTTPService.js');
 
+/*================================
+Receives a pointer to the index.js object in props
+================================*/
 export default class NavPanel extends Component {
   constructor(props){
     super(props);
     this.state = {
-      typed: '',
       autocomplete: [],
-      list: {ready: false, data:[]}
+      list: {ready: true, data:[]}
     };
-    this.textInput; //This links to the RAW DOM. Not virtual.
-    // We should only need RAW references for the Google API, and sparingly.
-    this.handleClick = this.handleClick.bind(this);
     this.onChange = this.onChange.bind(this);
-    this.service;
-    this.getSuggestions = this.getSuggestions.bind(this);
+    this.AutocompleteService;
   }
 
-  getSuggestions(predictions, status){
-    if (status != this.props.index.state.maps.places.PlacesServiceStatus.OK) {
-      console.log(this.props.index.state.maps.places.PlacesServiceStatus.OK);
-      return;
-    }
-    this.state.autocomplete = predictions;
-  }
-
+  //Fires when the search bar's text changes, unless it is emptied.
   onChange(event){
-    //Reset list
-    this.setState({
-      typed: event.target.value,
-      list: {ready: false, data:[]}
-    });
-    let that = this;
-    HTTPService.searchLists(event.target.value).then(function(array){
-      that.setState({
-        list: {ready: true, data: array}
+    if (event.target.value != ''){
+      this.setState({
+        list: {ready: false, data: []}
       });
-    });
+      let that = this;
+      HTTPService.searchLists(event.target.value).then(function(array){
+        that.setState({
+          list: {ready: true, data: array}
+        });
+      });
 
-    if (!this.service){
-      this.service = new google.maps.places.AutocompleteService();
+      if (!this.AutocompleteService){
+        this.AutocompleteService = new google.maps.places.AutocompleteService();
+      }
+      this.AutocompleteService.getQueryPredictions(
+        { input: event.target.value },
+        function(predictions, status) {
+          let maps = that.props.index.maps;
+          if (status != maps.places.PlacesServiceStatus.OK) {
+            return;
+          }
+          that.state.autocomplete = predictions;
+        });
     }
-    this.service.getQueryPredictions(
-      { input: event.target.value }
-      , this.getSuggestions);
-  }
-
-  handleClick(){
-    this.props.index.state.shared(this.state.typed, this.textInput);
   }
 
   render() {
     return <div id="navpanel">
         <input type="text" name="searchBar" id="search-box"
-          onChange={this.onChange}
-          ref={(input) => {this.props.index.state.textInput = input; }} />
-        <input type="button" value="Search" id="search-button"
-          onClick={this.handleClick} />
+          onChange={this.onChange} />
         <NavList
           index={this.props.index}
           autocomplete={this.state.autocomplete}

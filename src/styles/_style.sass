@@ -1,6 +1,7 @@
 $navbarPadding: 10px
 $navbarWidth: calc(30vw - (2 * #{$navbarPadding}))
 $searchboxHeight: 30px
+$searchbarWidth: 0px
 
 h1
   color: blue
@@ -20,22 +21,11 @@ body
   z-index: 1
 
 #search-box
-  width: calc( #{$navbarWidth} - 150px)
+  width: calc(#{$navbarWidth} - #{$searchbarWidth})
   height: #{$searchboxHeight}
-  margin-right: 10px
+  margin-right: 0px
   font-size: 25px
   vertical-align: bottom
-
-#search-button
-  width: 150px
-  height: calc(#{$searchboxHeight} + 6px)
-  background-color: rgb(118, 141, 135)
-  border: 0px solid rgb(0, 0, 0)
-  color: rgb(230, 230, 230)
-  font-size: 20px
-  font-family: Arial
-  font-weight: bold
-  padding: 8px 2px
 
 #navbar-list
   margin-top: 10px
@@ -89,11 +79,9 @@ body
   background-color: rgb(180,180,180)
 
 #app
-  padding: 0
   height: 100vh
   width: 100vw
 
 #map
-  padding: inherit
   height: inherit
   width: inherit

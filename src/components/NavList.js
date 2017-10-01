@@ -2,6 +2,10 @@ const React = require('react');
 const ReactDOM = require('react-dom');
 const HTTPService = require('./HTTPService.js');
 
+/*================================
+Receives a pointer to the index.js object, and two lists:
+autocomplete, data in props
+================================*/
 class IconCanvas extends React.Component {
     componentDidMount() {
         this.updateCanvas();
@@ -53,7 +57,7 @@ export class NavList extends React.Component {
     if (!this.geocoder){
        this.geocoder = new google.maps.Geocoder;
     }
-    let map = this.props.index.state.map;
+    let map = this.props.index.map;
     this.geocoder.geocode({'placeId': placeid}, function(results, status) {
       if (status !== 'OK') {
         console.log('Geocoder failed due to: ' + status);
@@ -65,8 +69,7 @@ export class NavList extends React.Component {
   }
 
   centerMapByGeocode(center){
-    let map = this.props.index.state.map;
-    let maps = this.props.index.state.maps;
+    let map = this.props.index.map;
     map.setZoom(14);
     map.setCenter(center);
   }
@@ -99,4 +102,4 @@ export class NavList extends React.Component {
       );
     }
   }
-}//git commit -m "Fixed incorrect neighbourhood centers in json data.\nRemoved default google autocomplete.\nAdded neighbourhood polygon previews.\nAdded custom autocomplete above neighbourhood list.\nAdded list scrolling.\nAdded zoom to geocode function to list."
+}
