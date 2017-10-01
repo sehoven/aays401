@@ -8,7 +8,6 @@ Receives a pointer to the index.js object in props
 export default class Map extends Component {
   constructor(props) {
     super(props);
-    this.onReady;
   }
 
   onReady(map, maps){
