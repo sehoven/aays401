@@ -1,6 +1,7 @@
 $navbarPadding: 10px
 $navbarWidth: calc(30vw - (2 * #{$navbarPadding}))
 $searchboxHeight: 30px
+$searchbarWidth: 0px
 
 h1
   color: blue
@@ -20,43 +21,67 @@ body
   z-index: 1
 
 #search-box
-  width: calc( #{$navbarWidth} - 150px)
+  width: calc(#{$navbarWidth} - #{$searchbarWidth})
   height: #{$searchboxHeight}
-  margin-right: 10px
+  margin-right: 0px
   font-size: 25px
   vertical-align: bottom
 
-#search-button
-  width: 150px
-  height: calc(#{$searchboxHeight} + 6px)
-  background-color: rgb(118, 141, 135)
-  border: 0px solid rgb(0, 0, 0)
-  color: rgb(230, 230, 230)
-  font-size: 20px
-  font-family: Arial
-  font-weight: bold
-  padding: 8px 2px
-
 #navbar-list
-  margin-top: 230px
-
-.navbar-list-item
   margin-top: 10px
-  padding-top: 8px
-  font-size: 30px
+  height: calc(90vh - #{$searchboxHeight} - 16px - calc(#{$navbarPadding} * 2))
+  overflow-y: auto
+
+.navbar-list-autocomplete-item
+  height: 60px
   border-top: 1px solid gray
   background-color: white
   transition: background-color 0.1s
+
+.navbar-list-autocomplete-icon
+  display: inline-block
+  width: 100px
+  height: 50px
+
+.navbar-list-autocomplete-text
+  display: inline-block
+  vertical-align: top
+  width: calc(#{$navbarWidth} - 120px)
+  height: 50px
+  margin-left: 10px
+  padding-top: 20px
+  font-size: 15px
+
+.navbar-list-autocomplete-item:hover
+  background-color: rgb(180,180,180)
+
+.navbar-list-item
+  height: 110px
+  border-top: 1px solid gray
+  background-color: white
+  transition: background-color 0.1s
+
+.navbar-list-icon
+  display: inline-block
+  width: 100px
+  height: 100px
+
+.navbar-list-text
+  display: inline-block
+  vertical-align: top
+  width: calc(#{$navbarWidth} - 120px)
+  height: 100px
+  margin-left: 10px
+  padding-top: 10px
+  font-size: 20px
 
 .navbar-list-item:hover
   background-color: rgb(180,180,180)
 
 #app
-  padding: 0
   height: 100vh
   width: 100vw
 
 #map
-  padding: inherit
   height: inherit
   width: inherit
