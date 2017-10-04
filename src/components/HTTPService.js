@@ -12,4 +12,12 @@ export function searchLists(term) {
     .then(function(response) {
       return response.json();
     });
+
+}
+
+export function addresses(poly) {
+  return fetch(` http://localhost:3000/addressCount?poly=${poly}` )
+    .then(function(response) {
+      return response.json();
+    });
 }
