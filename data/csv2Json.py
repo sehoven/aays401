@@ -1,3 +1,6 @@
+# This code was used to convert the CSV file to JSON format
+# http://www.idiotinside.com/2015/09/18/csv-json-pretty-print-python/
+
 import sys, getopt
 import csv
 import json
