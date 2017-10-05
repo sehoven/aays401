@@ -102,7 +102,7 @@ app.get('/addressCount', function(req, res) {
 
   for (i = 0; i < addressess.length; i++) {
     
-    if(inside.polygon(poly,[addressess[i].Latitude,addressess[i].Longitude])){
+    if(inside.polygon(poly,[addressess[i].Latitude,addressess[i].Longitude]) && addressess[i].StreetName != ''){
       count = count+1;
     }
   }
