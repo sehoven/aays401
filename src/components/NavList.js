@@ -51,6 +51,8 @@ export class NavList extends React.Component {
   constructor(props){
     super(props);
     this.geocoder;
+    this.polygon;
+    this.markers = [];
   }
 
   centerMapOnId(placeid){
@@ -68,10 +70,36 @@ export class NavList extends React.Component {
     });
   }
 
-  centerMapByGeocode(center){
+  centerMapByGeocode(center, itemData){
     let map = this.props.index.map;
     map.setZoom(14);
     map.setCenter(center);
+    let that = this;
+    HTTPService.countPolyResidences(itemData).then(function(array){
+      if (that.markers.length > 0){
+        for (let i = 0; i < that.markers.length; i++){
+          that.markers[i].setMap(null);
+        }
+      }
+      for (let i = 0; i < array.length; i++){
+        that.markers[i] = new google.maps.Marker({
+            position: array[i].center,
+            map: map,
+          });
+      }
+    });
+    if (this.polygon){
+      this.polygon.setMap(null);
+    }
+    this.polygon = new google.maps.Polygon({
+          paths: itemData.points,
+          strokeColor: '#FF0000',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#FF0000',
+          fillOpacity: 0.35
+        });
+    this.polygon.setMap(map);
   }
 
   render() {
@@ -93,7 +121,7 @@ export class NavList extends React.Component {
         {this.props.data.data.map((itemData, i) =>
           <div className="navbar-list-item"
           key={i}
-          onClick={() => { this.centerMapByGeocode(itemData.center)}}>
+          onClick={() => { this.centerMapByGeocode(itemData.center, itemData)}}>
             <IconCanvas key={i} item={itemData} />
             <div className="navbar-list-text">{itemData.name}</div>
           </div>

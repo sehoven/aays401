@@ -9,6 +9,12 @@ var neighborhood_data = require('./data/neighborhoods.json');
 var neighborhoods = fs.readFileSync('./data/neighborhoods.json', 'utf8');
 neighborhoods = JSON.parse(neighborhoods);
 neighborhoods = neighborhoods.neighborhoods;
+// Load local neighbourhood data synchronously
+console.log("Loading data into memory...");
+var locations_data = require('./data/locations.json');
+var locations = fs.readFileSync('./data/locations.json', 'utf8');
+locations = JSON.parse(locations);
+locations = locations.addresses;
 console.log("Ready. Listening on port 3000.");
 
 app.use(bodyParser.json());
@@ -45,7 +51,7 @@ app.get('/nearby', function(req, res) {
   res.writeHead(200, {"Content-Type": "application/json"});
   var json = JSON.stringify(resBody);
   res.end(json);
-})
+});
 
 // Handle requests to "/locations"
 // Returns all known locations that match existing query items
@@ -69,6 +75,58 @@ app.get('/locations', function(req, res) {
   res.writeHead(200, {"Content-Type": "application/json"});
   var json = JSON.stringify(resBody);
   res.end(json);
+});
+
+app.post('/addressCount', function(req, res) {
+  console.log("Count request handler invoked");
+  if (!req.body) return res.sendStatus(400);
+  if (!req.body.poly || !req.body.center || !req.body.radius) {
+    return res.sendStatus(400);
+  }
+  if (req.body.poly.length < 2) {
+    res.sendStatus(400);
+    return;
+  }
+  var top = -999,
+      bot = 999,
+      lft = 999,
+      rgt = -999;
+  for (let i = 0; i < req.body.poly.length; i++){
+    top = Math.max(req.body.poly[i].lat, top);
+    bot = Math.min(req.body.poly[i].lat, bot);
+    rgt = Math.max(req.body.poly[i].lng, rgt);
+    lft = Math.min(req.body.poly[i].lng, lft);
+  }
+  console.log("Filtering latitudes between ", bot, "and", top);
+  resBody = locations.sliceRange(bot, top, "lat");
+  console.log("Filtering longitudes between ", lft, "and", rgt);
+  resBody = resBody.sliceRange(lft, rgt, "lng");
+  console.log("Returning", resBody.length, "addresses");
+  res.writeHead(200, {"Content-Type": "application/json"});
+  var json = JSON.stringify(resBody);
+  res.end(json);
 })
 
 app.listen(3000);
+
+Array.prototype.sliceRange = function(min, max, property) {
+    if (min > max) return this.sliceRange(max, min);
+    var l = 0,
+        c = this.length - 1,
+        r = c;
+    while (l < c) {
+        var m = Math.floor(l + (c - l) / 2);
+        if (this[m].center[property] < min)
+            l = m + 1;
+        else
+            c = m;
+    }
+    while (c < r) {
+        var m = Math.ceil(c + (r - c) / 2);
+        if (this[m].center[property] > max)
+            r = m - 1;
+        else
+            c = m;
+    }
+    return this.slice(l, r+1);
+}
