@@ -9,6 +9,7 @@ var neighborhood_data = require('./data/neighborhoods.json');
 var neighborhoods = fs.readFileSync('./data/neighborhoods.json', 'utf8');
 neighborhoods = JSON.parse(neighborhoods);
 neighborhoods = neighborhoods.neighborhoods;
+
 // Load local neighbourhood data synchronously
 console.log("Loading data into memory...");
 var locations_data = require('./data/locations.json');
@@ -16,6 +17,7 @@ var locations = fs.readFileSync('./data/locations.json', 'utf8');
 locations = JSON.parse(locations);
 locations = locations.addresses;
 console.log("Ready. Listening on port 3000.");
+
 
 app.use(bodyParser.json());
 
@@ -105,7 +107,7 @@ app.post('/addressCount', function(req, res) {
   res.writeHead(200, {"Content-Type": "application/json"});
   var json = JSON.stringify(resBody);
   res.end(json);
-})
+});
 
 app.listen(3000);
 

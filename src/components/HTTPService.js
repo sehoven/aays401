@@ -12,6 +12,7 @@ export function searchLists(term) {
     .then(function(response) {
       return response.json();
     });
+
 }
 
 export function countPolyResidences(polyData) {
