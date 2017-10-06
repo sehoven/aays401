@@ -8,11 +8,29 @@ require('./styles/_style.sass');
 export class Index extends Component {
   constructor(props){
     super(props);
-    this.map = '';
-    this.maps = '';
+    this.state = {
+      mapLoaded: false,
+      map: null,
+      maps: null
+    }
+    this.setMapRef = this.setMapRef.bind(this);
   }
+
+  setMapRef(map, maps) {
+    this.setState({
+      mapLoaded: true,
+      map: map,
+      maps: maps
+    });
+  }
+
   render(){
-    return <div id="map"><NavPanel index={this} /><Map index={this} /></div>;
+    return (
+      <div className="fullScreen">
+        { this.state.mapLoaded && <NavPanel index={this.state} /> }
+        <Map setMapRef={this.setMapRef} />
+      </div>
+    )
   }
 }
 ReactDOM.render(

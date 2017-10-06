@@ -7,15 +7,21 @@ export default class Overlay extends Component {
     super(props);
     this.state = {
       selectedPolygon: null,
-      overlay: this
+      overlay: this,
+      visibility: true
     }
-    this.polygonDrawingTools(this.props.map);
     this.selectPolygon = this.selectPolygon.bind(this);
     this.deselectPolygon = this.deselectPolygon.bind(this);
+    this.deletePolygon = this.deletePolygon.bind(this);
+  //  this.handleClick = this.handleClick.bind(this);
+  }
+
+  componentDidMount() {
+    this.setDrawingTools(this.props.map);
   }
 
   renderPolygon(map, coords) {
-    var polygon = new google.maps.Polygon({
+    let polygon = new google.maps.Polygon({
       paths: coords,
       strokeWeight: 0,
       fillOpacity: 0.45
@@ -24,25 +30,27 @@ export default class Overlay extends Component {
   }
 
   selectPolygon(polygon) {
-    //console.log("Select Polygon");
     this.deselectPolygon();
     polygon.setEditable(true);
     this.setState({selectedPolygon: polygon});
   }
 
   deselectPolygon() {
-    //console.log("Deselect Polygon");
     if(this.state.selectedPolygon) {
       this.state.selectedPolygon.setEditable(false);
       this.setState({selectedPolygon: null});
     }
   }
 
-  polygonDrawingTools(map) {
-    // Keep reference to Overlay so we can call functions inside event listeners on map
-    var overlay = this.state.overlay;
+  deletePolygon(polygon) {
+    polygon.setMap(null);
+  }
 
-    var drawingManager = new google.maps.drawing.DrawingManager({
+  setDrawingTools(map) {
+    // Keep reference to Overlay so we can call functions inside event listeners on map
+    let overlay = this.state.overlay;
+
+    let drawingManager = new google.maps.drawing.DrawingManager({
       drawingMode: google.maps.drawing.OverlayType.POLYGON,
       drawingControl: true,
       drawingControlOptions: {
@@ -53,21 +61,22 @@ export default class Overlay extends Component {
         strokeWeight: 0,
         fillOpacity: 0.45,
         editable: true,
-        draggable: true,
         zIndex: 1
       },
       map: map
     });
+
+    this.setState({drawingManager: drawingManager});
 
     google.maps.event.addListener(drawingManager, 'polygoncomplete', function(polygon) {
       drawingManager.setDrawingMode(null);
 
       google.maps.event.addListener(polygon, "click", function(e) {
         if(e.vertex != null) {
-          var path = polygon.getPaths().getAt(e.path);
+          let path = polygon.getPaths().getAt(e.path);
           path.removeAt(e.vertex);
           if(path.length < 3) {
-            polygon.setMap(null);
+            overlay.deletePolygon(polygon);
           }
         }
         overlay.selectPolygon(polygon);
@@ -80,7 +89,19 @@ export default class Overlay extends Component {
     });
   }
 
+  // handleClick() {
+  //   console.log("CLICK");
+  //   console.log(this);
+  //   this.setState({visibility: false});
+  //   this.setDrawingTools(this.props.map);
+  // }
+
   render() {
     return false;
+    // return (
+    //   <div>
+    //     { this.state.visibility ? <button id="draw-button" onClick={this.handleClick}>DRAW</button> : <div></div> }
+    //   </div>
+    // )
   }
 }
