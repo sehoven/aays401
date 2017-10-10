@@ -62,7 +62,7 @@ export class NavList extends React.Component {
     let map = this.props.index.map;
     this.geocoder.geocode({'placeId': placeid}, function(results, status) {
       if (status !== 'OK') {
-        console.log('Geocoder failed due to: ' + status);
+        Alert.alert('Geocoder failed due to: ' + status);
         return;
       }
       map.setZoom(11);
@@ -70,23 +70,13 @@ export class NavList extends React.Component {
     });
   }
 
-  centerMapByGeocode(center, itemData){
+  neighbourhoodClicked(center, itemData){
     let map = this.props.index.map;
     map.setZoom(14);
     map.setCenter(center);
     let that = this;
-    HTTPService.countPolyResidences(itemData).then(function(array){
-      if (that.markers.length > 0){
-        for (let i = 0; i < that.markers.length; i++){
-          that.markers[i].setMap(null);
-        }
-      }
-      for (let i = 0; i < array.length; i++){
-        that.markers[i] = new google.maps.Marker({
-            position: array[i].center,
-            map: map,
-          });
-      }
+    HTTPService.countPolyResidences(itemData).then(function(json){
+      console.log(json);
     });
     if (this.polygon){
       this.polygon.setMap(null);
@@ -121,7 +111,7 @@ export class NavList extends React.Component {
         {this.props.data.data.map((itemData, i) =>
           <div className="navbar-list-item"
           key={i}
-          onClick={() => { this.centerMapByGeocode(itemData.center, itemData)}}>
+          onClick={() => { this.neighbourhoodClicked(itemData.center, itemData)}}>
             <IconCanvas key={i} item={itemData} />
             <div className="navbar-list-text">{itemData.name}</div>
           </div>

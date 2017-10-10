@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
+const inside = require('point-in-polygon');
 const fs = require('fs');
 
 // Load local neighbourhood data synchronously
@@ -93,17 +94,33 @@ app.post('/addressCount', function(req, res) {
       bot = 999,
       lft = 999,
       rgt = -999;
+
   for (let i = 0; i < req.body.poly.length; i++){
     top = Math.max(req.body.poly[i].lat, top);
     bot = Math.min(req.body.poly[i].lat, bot);
     rgt = Math.max(req.body.poly[i].lng, rgt);
     lft = Math.min(req.body.poly[i].lng, lft);
   }
-  console.log("Filtering latitudes between ", bot, "and", top);
-  resBody = locations.sliceRange(bot, top, "lat");
-  console.log("Filtering longitudes between ", lft, "and", rgt);
-  resBody = resBody.sliceRange(lft, rgt, "lng");
-  console.log("Returning", resBody.length, "addresses");
+  let filtrate = filterBinary(locations, bot, top, "lat")
+    .sort(function(a, b){
+      return a.center.lng - b.center.lng;
+  });
+  filtrate = filterBinary(filtrate, lft, rgt, "lng");
+  let resBody = { "residential": 0,
+                  "commercial": 0,
+                  "industrial": 0,
+                  "urban service": 0,
+                  "other": 0};
+  let polygon = [];
+  for (let i = 0; i < req.body.poly.length; i++){
+    polygon.push([req.body.poly[i].lat, req.body.poly[i].lng]);
+  }
+  for (let i = 0; i < filtrate.length; i++){
+    let point = [filtrate[i].center.lat, filtrate[i].center.lng];
+    if (inside(point, polygon)) {
+      resBody[filtrate[i].type] += 1;
+    }
+  }
   res.writeHead(200, {"Content-Type": "application/json"});
   var json = JSON.stringify(resBody);
   res.end(json);
@@ -111,24 +128,28 @@ app.post('/addressCount', function(req, res) {
 
 app.listen(3000);
 
-Array.prototype.sliceRange = function(min, max, property) {
-    if (min > max) return this.sliceRange(max, min);
-    var l = 0,
-        c = this.length - 1,
-        r = c;
-    while (l < c) {
-        var m = Math.floor(l + (c - l) / 2);
-        if (this[m].center[property] < min)
-            l = m + 1;
-        else
-            c = m;
+function binaryIndexOf(array, searchElement, property) {
+  var minIndex = 0;
+  var maxIndex = array.length - 1;
+  var currentIndex;
+  var currentElement;
+
+  while (minIndex <= maxIndex) {
+    currentIndex = (minIndex + maxIndex) / 2 | 0;
+    currentElement = array[currentIndex].center[property];
+
+    if (currentElement < searchElement) {
+      minIndex = currentIndex + 1;
     }
-    while (c < r) {
-        var m = Math.ceil(c + (r - c) / 2);
-        if (this[m].center[property] > max)
-            r = m - 1;
-        else
-            c = m;
+    else if (currentElement > searchElement) {
+      maxIndex = currentIndex - 1;
     }
-    return this.slice(l, r+1);
+  }
+  return currentIndex;
+}
+
+function filterBinary(arr, min, max, property){
+ let leftIndex = binaryIndexOf(arr, min, property);
+ let rightIndex = binaryIndexOf(arr, max, property) + 1;
+ return arr.slice(leftIndex, rightIndex);
 }

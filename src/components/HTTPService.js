@@ -16,7 +16,6 @@ export function searchLists(term) {
 }
 
 export function countPolyResidences(polyData) {
-  console.log(polyData);
   let body = JSON.stringify({ "poly" : polyData.points,
                               "center" : polyData.center,
                               "radius": polyData.radius});
