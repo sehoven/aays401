@@ -6,27 +6,51 @@ export default class Overlay extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedPolygon: null,
-      overlay: this,
-      visibility: true
+      isDrawing: false
     }
+    this.handleClick = this.handleClick.bind(this);
+    console.log(this.props.toFocus);
+  }
+
+  componentDidMount() {
+    //this.setDrawingTools(this.props.map);
+  }
+
+  handleClick() {
+    console.log("CLICK");
+    console.log(this);
+    this.setState({isDrawing: true});
+    this.props.changeFocus();
+    //document.getElementById("overlay").css({zIndex: 1});
+  }
+
+  render() {
+    let drawButton = <button id="draw-button" onClick={this.handleClick}>DRAW</button>;
+    return (
+      <div>
+        { this.state.isDrawing ? <DrawingTools map={this.props.map} maps={this.props.maps}/> : drawButton }
+      </div>
+    )
+  }
+}
+
+// This component will be used to display the drawing tools and draw a polygon on the map
+export class DrawingTools extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      selectedPolygon: null,
+      drawingTools: this
+    }
+
     this.selectPolygon = this.selectPolygon.bind(this);
     this.deselectPolygon = this.deselectPolygon.bind(this);
     this.deletePolygon = this.deletePolygon.bind(this);
-  //  this.handleClick = this.handleClick.bind(this);
   }
 
   componentDidMount() {
     this.setDrawingTools(this.props.map);
-  }
-
-  renderPolygon(map, coords) {
-    let polygon = new google.maps.Polygon({
-      paths: coords,
-      strokeWeight: 0,
-      fillOpacity: 0.45
-    });
-    polygon.setMap(map);
   }
 
   selectPolygon(polygon) {
@@ -47,8 +71,8 @@ export default class Overlay extends Component {
   }
 
   setDrawingTools(map) {
-    // Keep reference to Overlay so we can call functions inside event listeners on map
-    let overlay = this.state.overlay;
+    // Keep reference to DrawingTools so we can call functions inside event listeners on map
+    let drawingTools = this.state.drawingTools;
 
     let drawingManager = new google.maps.drawing.DrawingManager({
       drawingMode: google.maps.drawing.OverlayType.POLYGON,
@@ -76,32 +100,42 @@ export default class Overlay extends Component {
           let path = polygon.getPaths().getAt(e.path);
           path.removeAt(e.vertex);
           if(path.length < 3) {
-            overlay.deletePolygon(polygon);
+            drawingTools.deletePolygon(polygon);
           }
         }
-        overlay.selectPolygon(polygon);
+        drawingTools.selectPolygon(polygon);
       });
-      overlay.selectPolygon(polygon);
+      drawingTools.selectPolygon(polygon);
     });
 
     google.maps.event.addListener(map, "click", function(e) {
-      overlay.deselectPolygon();
+      drawingTools.deselectPolygon();
     });
   }
 
-  // handleClick() {
-  //   console.log("CLICK");
-  //   console.log(this);
-  //   this.setState({visibility: false});
-  //   this.setDrawingTools(this.props.map);
-  // }
+  render() {
+    return null;
+  }
+}
+
+// This component will be used to render a polygon on the map given an array of points
+export class Polygon extends Component {
+  constructor(props) {
+    super(props);
+
+    this.renderPolygon = this.renderPolygon.bind(this);
+  }
+
+  renderPolygon(map, coords) {
+    let polygon = new google.maps.Polygon({
+      paths: coords,
+      strokeWeight: 0,
+      fillOpacity: 0.45
+    });
+    polygon.setMap(map);
+  }
 
   render() {
-    return false;
-    // return (
-    //   <div>
-    //     { this.state.visibility ? <button id="draw-button" onClick={this.handleClick}>DRAW</button> : <div></div> }
-    //   </div>
-    // )
+    return null;
   }
 }
