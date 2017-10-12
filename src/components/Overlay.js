@@ -6,29 +6,28 @@ export default class Overlay extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isDrawing: false
+      isDrawing: this.props.isDrawing
     }
     this.handleClick = this.handleClick.bind(this);
-    console.log(this.props.toFocus);
-  }
-
-  componentDidMount() {
-    //this.setDrawingTools(this.props.map);
+    this.stopDrawing = this.stopDrawing.bind(this);
   }
 
   handleClick() {
-    console.log("CLICK");
-    console.log(this);
     this.setState({isDrawing: true});
     this.props.changeFocus();
-    //document.getElementById("overlay").css({zIndex: 1});
+    this.props.changeIsDrawing();
+  }
+
+  stopDrawing() {
+    this.drawingTools.removeDrawingTools();
+    this.setState({isDrawing: false});
   }
 
   render() {
     let drawButton = <button id="draw-button" onClick={this.handleClick}>DRAW</button>;
     return (
       <div>
-        { this.state.isDrawing ? <DrawingTools map={this.props.map} maps={this.props.maps}/> : drawButton }
+        { this.state.isDrawing ? <DrawingTools ref={instance => {this.drawingTools = instance;}} map={this.props.map} maps={this.props.maps}/> : drawButton }
       </div>
     )
   }
@@ -41,7 +40,9 @@ export class DrawingTools extends Component {
 
     this.state = {
       selectedPolygon: null,
-      drawingTools: this
+      drawingTools: this,
+      drawingManager: null,
+      polygonListener: null
     }
 
     this.selectPolygon = this.selectPolygon.bind(this);
@@ -70,6 +71,18 @@ export class DrawingTools extends Component {
     polygon.setMap(null);
   }
 
+  removeDrawingTools() {
+    this.deselectPolygon();
+    if(this.state.polygonListener != null) {
+      google.maps.event.removeListener(this.state.polygonListener);
+      this.setState({polygonListener: null});
+    }
+    if(this.state.drawingManager != null) {
+      this.state.drawingManager.setMap(null);
+      this.setState({drawingManager: null});
+    }
+  }
+
   setDrawingTools(map) {
     // Keep reference to DrawingTools so we can call functions inside event listeners on map
     let drawingTools = this.state.drawingTools;
@@ -95,7 +108,7 @@ export class DrawingTools extends Component {
     google.maps.event.addListener(drawingManager, 'polygoncomplete', function(polygon) {
       drawingManager.setDrawingMode(null);
 
-      google.maps.event.addListener(polygon, "click", function(e) {
+      let polygonListener = google.maps.event.addListener(polygon, "click", function(e) {
         if(e.vertex != null) {
           let path = polygon.getPaths().getAt(e.path);
           path.removeAt(e.vertex);
@@ -105,6 +118,8 @@ export class DrawingTools extends Component {
         }
         drawingTools.selectPolygon(polygon);
       });
+      drawingTools.setState({polygonListener: polygonListener});
+
       drawingTools.selectPolygon(polygon);
     });
 

@@ -19,14 +19,25 @@ export default class Map extends Component {
       map: null,
       maps: null,
       isMapFocus: isFocus.FALSE,
-      isOverlayFocus: isFocus.TRUE
+      isOverlayFocus: isFocus.TRUE,
+      isDrawing: false
     }
+
+    this.changeIsDrawing = this.changeIsDrawing.bind(this);
     this.changeFocus = this.changeFocus.bind(this);
   }
 
   onReady(map, maps){
     this.setState({ map: map, maps:maps, mapLoaded: true });
     this.props.setMapRef(map, maps);
+  }
+
+  changeIsDrawing() {
+    if(this.state.isDrawing) {
+      this.setState({isDrawing: false});
+    } else {
+      this.setState({isDrawing: true});
+    }
   }
 
   changeFocus() {
@@ -45,9 +56,12 @@ export default class Map extends Component {
     const overlayStyle = {
       zIndex: this.state.isOverlayFocus
     }
+    let stopDrawButton = <button id="stop-draw-button" onClick={() => {this.overlay.stopDrawing(); this.changeIsDrawing(); this.changeFocus();}}>STOP</button>;
+
     return (
       <div id="map-container">
         <div id="map" style={mapStyle}>
+          { this.state.isDrawing ? stopDrawButton : null }
           <GoogleMap
             bootstrapURLKeys={{key:"AIzaSyB4CMvWi4j-iLXGCKVw_zCIoHrLI18iK4U&libraries=places,drawing"}}
             center={{lat: 53.5444, lng: -113.4909}}
@@ -57,9 +71,11 @@ export default class Map extends Component {
           </GoogleMap>
         </div>
         <div id="overlay" style={overlayStyle}>
-          { this.state.mapLoaded && <Overlay map={this.state.map}
+          { this.state.mapLoaded && <Overlay ref={instance => {this.overlay = instance;}}
+                                             map={this.state.map}
                                              maps={this.state.maps}
-                                             changeFocus={this.changeFocus}/> }
+                                             changeFocus={this.changeFocus}
+                                             changeIsDrawing={this.changeIsDrawing}/> }
         </div>
       </div>
     );
