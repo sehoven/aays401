@@ -27,7 +27,7 @@ export default class Map extends Component {
       <div className="container">
         { this.state.mapLoaded && <Overlay map={this.state.map} maps={this.state.maps}/> }
         <div className="container" id="map-container">
-          <div id="map">
+          <div className="container" id="map">
             <GoogleMap
               bootstrapURLKeys={{key:"AIzaSyB4CMvWi4j-iLXGCKVw_zCIoHrLI18iK4U&libraries=places,drawing"}}
               center={{lat: 53.5444, lng: -113.4909}}
