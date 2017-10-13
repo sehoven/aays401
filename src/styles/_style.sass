@@ -1,5 +1,10 @@
+$uiWidth: 30vw
+$mapControlHeight: 5vh
+$mapControlMargin: 4vh
+$mapControlPadding: 10px
 $navbarPadding: 10px
-$navbarWidth: calc(30vw - (2 * #{$navbarPadding}))
+$navbarWidth: calc(#{$uiWidth} - (2 * #{$navbarPadding}))
+$navMarginTop: calc(#{$mapControlHeight} + (2 * #{$mapControlMargin}))
 $searchboxHeight: 30px
 $searchbarWidth: 0px
 
@@ -9,15 +14,26 @@ h1
 body
   margin: 0
 
-#navpanel
-  width: 30vw
-  height: 90vh
-  margin: 4vh
+.side-panel
   border: 1px gray solid
-  padding: #{$navbarPadding}
   box-shadow: 2px 2px 1px #888888
-  position: absolute
   background-color: white
+
+#navpanel
+  width: #{$uiWidth}
+  height: 90vh
+  margin-left: 4vh
+  margin-top: #{$navMarginTop}
+  padding: #{$navbarPadding}
+  position: absolute
+  z-index: 2
+
+#map-controls
+  width: #{$uiWidth}
+  height: #{$mapControlHeight}
+  margin: 4vh
+  padding: #{$mapControlPadding}
+  position: absolute
   z-index: 2
 
 #search-box
@@ -82,9 +98,11 @@ body
   height: 100vh
   width: 100vw
 
-#map-container
+.container
   height: inherit
   width: inherit
+
+#map-container
   position: relative
   text-align: center
 
@@ -97,20 +115,16 @@ body
   left: 0
 
 #overlay
-  z-index: 1
   display: inline-block
+
+#map
+  z-index: 1
 
 button
   border: 1px solid gray
   border-radius: 2px
   background-color: white
-  margin-top: 1vh
   outline: none
 
 button:hover
   background-color: gray
-
-#stop-draw-button
-  position: absolute
-  z-index: 2
-  margin-left: 5vw

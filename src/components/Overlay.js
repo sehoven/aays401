@@ -8,28 +8,16 @@ export default class Overlay extends Component {
     this.state = {
       isDrawing: this.props.isDrawing
     }
-    this.handleClick = this.handleClick.bind(this);
     this.stopDrawing = this.stopDrawing.bind(this);
   }
 
-  handleClick() {
-    this.setState({isDrawing: true});
-    this.props.changeFocus();
-    this.props.changeIsDrawing();
-  }
-
-  stopDrawing() {
-    this.drawingTools.removeDrawingTools();
+  stopDrawing(drawingTools) {
+    drawingTools.removeDrawingTools();
     this.setState({isDrawing: false});
   }
 
   render() {
-    let drawButton = <button id="draw-button" onClick={this.handleClick}>DRAW</button>;
-    return (
-      <div>
-        { this.state.isDrawing ? <DrawingTools ref={instance => {this.drawingTools = instance;}} map={this.props.map} maps={this.props.maps}/> : drawButton }
-      </div>
-    )
+    return null;
   }
 }
 
@@ -42,7 +30,8 @@ export class DrawingTools extends Component {
       selectedPolygon: null,
       drawingTools: this,
       drawingManager: null,
-      polygonListener: null
+      polygonListener: null,
+      mapListener: null
     }
 
     this.selectPolygon = this.selectPolygon.bind(this);
@@ -81,6 +70,10 @@ export class DrawingTools extends Component {
       this.state.drawingManager.setMap(null);
       this.setState({drawingManager: null});
     }
+    if(this.state.mapListener != null) {
+      google.maps.event.removeListener(this.state.mapListener);
+      this.setState({mapListener: null});
+    }
   }
 
   setDrawingTools(map) {
@@ -91,7 +84,7 @@ export class DrawingTools extends Component {
       drawingMode: google.maps.drawing.OverlayType.POLYGON,
       drawingControl: true,
       drawingControlOptions: {
-        position: google.maps.ControlPosition.TOP_CENTER,
+        position: google.maps.ControlPosition.TOP_RIGHT,
         drawingModes: ["polygon"]
       },
       polygonOptions: {
@@ -123,9 +116,10 @@ export class DrawingTools extends Component {
       drawingTools.selectPolygon(polygon);
     });
 
-    google.maps.event.addListener(map, "click", function(e) {
+    let mapListener = google.maps.event.addListener(map, "click", function(e) {
       drawingTools.deselectPolygon();
     });
+    drawingTools.setState({mapListener: mapListener});
   }
 
   render() {
@@ -134,7 +128,7 @@ export class DrawingTools extends Component {
 }
 
 // This component will be used to render a polygon on the map given an array of points
-export class Polygon extends Component {
+class Polygon extends Component {
   constructor(props) {
     super(props);
 
