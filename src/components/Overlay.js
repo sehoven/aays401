@@ -151,25 +151,3 @@ export class DrawingTools extends Component {
     return null;
   }
 }
-
-// This component will be used to render a polygon on the map given an array of points
-class Polygon extends Component {
-  constructor(props) {
-    super(props);
-
-    this.renderPolygon = this.renderPolygon.bind(this);
-  }
-
-  renderPolygon(map, coords) {
-    let polygon = new google.maps.Polygon({
-      paths: coords,
-      strokeWeight: 0,
-      fillOpacity: 0.45
-    });
-    polygon.setMap(map);
-  }
-
-  render() {
-    return null;
-  }
-}
