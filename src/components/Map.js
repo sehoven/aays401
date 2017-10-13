@@ -4,7 +4,8 @@ import PropTypes from 'prop-types';
 import Overlay, { DrawingTools } from './Overlay';
 
 /*================================
-Receives a pointer to the index.js object in props
+Receives a pointer to setMapRef method in index.js for callback
+to set map references to be used by Map.js and NavPanel.js.
 ================================*/
 export default class Map extends Component {
   constructor(props) {
@@ -35,7 +36,6 @@ export default class Map extends Component {
               yesIWantToUseGoogleMapApiInternals={true}>
             </GoogleMap>
           </div>
-
         </div>
       </div>
     );
