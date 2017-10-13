@@ -45,7 +45,7 @@ export default class NavPanel extends Component {
   }
 
   render() {
-    return <div id="navpanel">
+    return <div id="navpanel" className="side-panel">
         <input type="text" name="searchBar" id="search-box"
           onChange={this.onChange} />
         <NavList
