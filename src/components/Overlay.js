@@ -2,22 +2,47 @@ import React, { Component } from 'react';
 import GoogleMap from 'google-map-react';
 import PropTypes from 'prop-types';
 
+// This component will be used to trigger drawing tools
 export default class Overlay extends Component {
   constructor(props) {
     super(props);
+
     this.state = {
-      isDrawing: this.props.isDrawing
+      isDrawing: false
     }
-    this.stopDrawing = this.stopDrawing.bind(this);
+
+    this.toggleIsDrawing = this.toggleIsDrawing.bind(this);
+    this.drawClick = this.drawClick.bind(this);
+    this.finishClick = this.finishClick.bind(this);
   }
 
-  stopDrawing(drawingTools) {
-    drawingTools.removeDrawingTools();
-    this.setState({isDrawing: false});
+  toggleIsDrawing() {
+    if(this.state.isDrawing) {
+      this.setState({isDrawing: false});
+    } else {
+      this.setState({isDrawing: true});
+    }
+  }
+
+  drawClick() {
+    this.toggleIsDrawing();
+  }
+
+  finishClick() {
+    this.drawingTools.removeDrawingTools();
+    this.toggleIsDrawing();
   }
 
   render() {
-    return null;
+    let finishButton = <button id="stop-draw-button" onClick={this.finishClick}>FINISH</button>;
+    let drawButton = <button id="draw-button" onClick={this.drawClick}>DRAW</button>;
+
+    return (
+      <div id="map-controls" className="side-panel">
+        { this.state.isDrawing ? <DrawingTools ref={instance => {this.drawingTools = instance;}} map={this.props.map} maps={this.props.maps}/> : drawButton }
+        { this.state.isDrawing ? finishButton : null }
+      </div>
+    )
   }
 }
 
