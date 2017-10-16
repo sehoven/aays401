@@ -9,6 +9,12 @@
     "build": "webpack",
     "start": "webpack-dev-server"
   },
+  "jest": {
+    "moduleNameMapper": {
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/fileMock.js",
+      "\\.(css|less|sass)$": "<rootDir>/__mocks__/styleMock.js"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Etiennera/aays401.git"
@@ -43,10 +49,12 @@
     "babel-preset-react": "^6.24.1",
     "css-loader": "^0.28.7",
     "enzyme": "^3.1.0",
+    "enzyme-adapter-react-15": "^1.0.1",
     "extract-text-webpack-plugin": "^3.0.0",
     "html-webpack-plugin": "^2.30.1",
     "jest": "^21.2.1",
     "react-addons-test-utils": "^15.6.2",
+    "react-test-renderer": "^16.0.0",
     "sass-loader": "^6.0.6",
     "style-loader": "^0.18.2",
     "webpack": "^3.6.0",
