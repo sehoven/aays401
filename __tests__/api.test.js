@@ -54,7 +54,10 @@ describe('Search Testing', function() {
 
 
 describe('Polygon Count Testing', function() {
-    //Poly count should return status of 400
+    //Poly count should return status of 400 because
+    //it is missing the variables radius and center
+    //in the api call
+
     it('Poly count should return status of 400',function(done) {
     
 
