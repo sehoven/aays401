@@ -1,7 +1,6 @@
 
 //Dependencies
 const fs = require('fs');
-var expect = require('chai').expect;
 var request = require('request');
 
 describe('Main Page Testing', function() {
@@ -10,7 +9,7 @@ describe('Main Page Testing', function() {
     
         var term = "RUTHERFORD";
         request('http://localhost:8080' , function(error, response, body) {
-            expect(response.statusCode).to.equal(200);
+            expect(response.statusCode).toBe(200);
             done();
         });
     });
@@ -23,7 +22,7 @@ describe('Search Testing', function() {
 
         var term = "RUTHERFORD";
         request(` http://localhost:3000/locations?name=${term}`,function(error,response,body){
-            expect(response.statusCode).to.equal(200);
+            expect(response.statusCode).toBe(200);
             done();
         }); 
     });
@@ -35,7 +34,7 @@ describe('Search Testing', function() {
         var term = "RUTHERFORD";
         request(` http://localhost:3000/locations?name=${term}`,function(error,response,body){
             var obj = JSON.parse(body);
-            expect(obj[0].name).to.equal(term);
+            expect(obj[0].name).toBe(term);
             done();
         });
     });
@@ -47,7 +46,7 @@ describe('Search Testing', function() {
         var term = "lkhfgjkhsafjahsd";
         request(` http://localhost:3000/locations?name=${term}`,function(error,response,body){
             var obj = JSON.parse(body);
-            expect(obj).to.be.empty;
+            expect(obj).toBeNull;
             done();
         });
     });
@@ -74,7 +73,7 @@ describe('Polygon Count Testing', function() {
                 "headers": {  'Content-Type': 'application/json',
                 'Content-Length': new Buffer(body).length }},function(error,response,body){
 
-            expect(response.statusCode).to.equal(400);
+            expect(response.statusCode).toBe(400);
             done();
         });
     });
@@ -97,8 +96,8 @@ describe('Polygon Count Testing', function() {
                 "headers": {  'Content-Type': 'application/json',
                 'Content-Length': new Buffer(body).length }},function(error,response,body){
 
-            expect(response.statusCode).to.equal(200);
-            expect(body).to.not.be.equal({});
+            expect(response.statusCode).toBe(200);
+            expect(body).not.toBe({});
         
             //To print unit counts of neighbourhood
             //console.log("\n");
