@@ -16,7 +16,8 @@ After obtaining a copy of the codebase, initialize npm in the top directory. Run
 
 ## Running the tests
 
-TODO
+run ">npm test" which runs jest
+run ">npm test -- --watch" this will run any tests that have been changed  
 
 ## Deployment
 
