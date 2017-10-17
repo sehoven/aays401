@@ -7,7 +7,6 @@ describe('Main Page Testing', function() {
     //Check status of main page
     it('Main page status is 200', function(done) {
     
-        var term = "RUTHERFORD";
         request('http://localhost:8080' , function(error, response, body) {
             expect(response.statusCode).toBe(200);
             done();
@@ -61,10 +60,7 @@ describe('Polygon Count Testing', function() {
 
         //Variables for testing
         var neighborhoods = fs.readFileSync('./data/neighborhoods.json', 'utf8');
-        neighborhoods = JSON.parse(neighborhoods);
-        neighborhoods = neighborhoods.neighborhoods[0];
-        var center = 53.5727667926;
-        var radius = 1;
+        neighborhoods = JSON.parse(neighborhoods).neighborhoods[0];
 
         let body = JSON.stringify({ "poly" : neighborhoods.points});
         request( ` http://localhost:3000/addressCount` ,
@@ -84,8 +80,7 @@ describe('Polygon Count Testing', function() {
     
         //Variables for testing
         var neighborhoods = fs.readFileSync('./data/neighborhoods.json', 'utf8');
-        neighborhoods = JSON.parse(neighborhoods);
-        neighborhoods = neighborhoods.neighborhoods[5];
+        neighborhoods = JSON.parse(neighborhoods).neighborhoods[5];
         var center = 53.5727667926;
         var radius = 1;
 
