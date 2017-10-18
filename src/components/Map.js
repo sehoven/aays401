@@ -13,7 +13,7 @@ export default class Map extends Component {
     this.state = {
       mapLoaded: false,
       map: null,
-      maps: null,
+      maps: null
     }
   }
 
@@ -25,7 +25,9 @@ export default class Map extends Component {
   render() {
     return (
       <div className="container">
-        { this.state.mapLoaded && <Overlay map={this.state.map} maps={this.state.maps}/> }
+        { this.state.mapLoaded &&
+          <Overlay map={this.state.map}
+                   maps={this.state.maps}/> }
         <div className="container" id="map-container">
           <div className="container" id="map">
             <GoogleMap
