@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
+const inside = require('point-in-polygon');
 const fs = require('fs');
 
 // Load local neighbourhood data synchronously
@@ -9,7 +10,15 @@ var neighborhood_data = require('./data/neighborhoods.json');
 var neighborhoods = fs.readFileSync('./data/neighborhoods.json', 'utf8');
 neighborhoods = JSON.parse(neighborhoods);
 neighborhoods = neighborhoods.neighborhoods;
+
+// Load local neighbourhood data synchronously
+console.log("Loading data into memory...");
+var locations_data = require('./data/locations.json');
+var locations = fs.readFileSync('./data/locations.json', 'utf8');
+locations = JSON.parse(locations);
+locations = locations.addresses;
 console.log("Ready. Listening on port 3000.");
+
 
 app.use(bodyParser.json());
 
@@ -45,7 +54,7 @@ app.get('/nearby', function(req, res) {
   res.writeHead(200, {"Content-Type": "application/json"});
   var json = JSON.stringify(resBody);
   res.end(json);
-})
+});
 
 // Handle requests to "/locations"
 // Returns all known locations that match existing query items
@@ -69,6 +78,78 @@ app.get('/locations', function(req, res) {
   res.writeHead(200, {"Content-Type": "application/json"});
   var json = JSON.stringify(resBody);
   res.end(json);
-})
+});
+
+app.post('/addressCount', function(req, res) {
+  console.log("Count request handler invoked");
+  if (!req.body) return res.sendStatus(400);
+  if (!req.body.poly || !req.body.center || !req.body.radius) {
+    return res.sendStatus(400);
+  }
+  if (req.body.poly.length < 2) {
+    res.sendStatus(400);
+    return;
+  }
+  var top = -999,
+      bot = 999,
+      lft = 999,
+      rgt = -999;
+
+  for (let i = 0; i < req.body.poly.length; i++){
+    top = Math.max(req.body.poly[i].lat, top);
+    bot = Math.min(req.body.poly[i].lat, bot);
+    rgt = Math.max(req.body.poly[i].lng, rgt);
+    lft = Math.min(req.body.poly[i].lng, lft);
+  }
+  let filtrate = filterBinary(locations, bot, top, "lat")
+    .sort(function(a, b){
+      return a.center.lng - b.center.lng;
+  });
+  filtrate = filterBinary(filtrate, lft, rgt, "lng");
+  let resBody = { "residential": 0,
+                  "commercial": 0,
+                  "industrial": 0,
+                  "urban service": 0,
+                  "other": 0};
+  let polygon = [];
+  for (let i = 0; i < req.body.poly.length; i++){
+    polygon.push([req.body.poly[i].lat, req.body.poly[i].lng]);
+  }
+  for (let i = 0; i < filtrate.length; i++){
+    let point = [filtrate[i].center.lat, filtrate[i].center.lng];
+    if (inside(point, polygon)) {
+      resBody[filtrate[i].type] += 1;
+    }
+  }
+  res.writeHead(200, {"Content-Type": "application/json"});
+  var json = JSON.stringify(resBody);
+  res.end(json);
+});
 
 app.listen(3000);
+
+function binaryIndexOf(array, searchElement, property) {
+  var minIndex = 0;
+  var maxIndex = array.length - 1;
+  var currentIndex;
+  var currentElement;
+
+  while (minIndex <= maxIndex) {
+    currentIndex = (minIndex + maxIndex) / 2 | 0;
+    currentElement = array[currentIndex].center[property];
+
+    if (currentElement < searchElement) {
+      minIndex = currentIndex + 1;
+    }
+    else if (currentElement > searchElement) {
+      maxIndex = currentIndex - 1;
+    }
+  }
+  return currentIndex;
+}
+
+function filterBinary(arr, min, max, property){
+ let leftIndex = binaryIndexOf(arr, min, property);
+ let rightIndex = binaryIndexOf(arr, max, property) + 1;
+ return arr.slice(leftIndex, rightIndex);
+}

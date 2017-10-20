@@ -1,5 +1,10 @@
+$uiWidth: 30vw
+$mapControlHeight: 5vh
+$mapControlMargin: 4vh
+$mapControlPadding: 10px
 $navbarPadding: 10px
-$navbarWidth: calc(30vw - (2 * #{$navbarPadding}))
+$navbarWidth: calc(#{$uiWidth} - (2 * #{$navbarPadding}))
+$navMarginTop: calc(#{$mapControlHeight} + (2 * #{$mapControlMargin}))
 $searchboxHeight: 30px
 $searchbarWidth: 0px
 
@@ -9,16 +14,59 @@ h1
 body
   margin: 0
 
-#navpanel
-  width: 30vw
-  height: 90vh
-  margin: 4vh
+.side-panel
   border: 1px gray solid
-  padding: #{$navbarPadding}
   box-shadow: 2px 2px 1px #888888
-  position: absolute
   background-color: white
-  z-index: 1
+#tab-bar
+  width: #{$uiWidth}
+  height: 40px
+  margin-left: 4vh
+  margin-top: 4vh
+  padding: #{$navbarPadding}
+  position: absolute
+  z-index: 2
+
+.tab_title
+	width: #{$uiWidth/2}
+	height: 40px
+	text-align: center
+	line-height: 40px
+	color: #fff
+	background-color: #bdbdbd
+	display: inline-block
+
+.active
+	color: #000
+	background-color: #fff
+
+.tab_item
+	display: none
+.show
+	display: block
+
+.nav-panel
+  width: #{$uiWidth}
+  height: 90vh
+  margin-left: 4vh
+  margin-top: #{$navMarginTop}
+  padding: #{$navbarPadding}
+  position: absolute
+  z-index: 2
+
+.show-number
+  width: #{$uiWidth}
+  text-align: left
+  list-style-type: none
+
+
+#map-controls
+  width: #{$uiWidth}
+  height: #{$mapControlHeight}
+  margin: 4vh
+  padding: #{$mapControlPadding}
+  position: absolute
+  z-index: 2
 
 #search-box
   width: calc(#{$navbarWidth} - #{$searchbarWidth})
@@ -78,10 +126,29 @@ body
 .navbar-list-item:hover
   background-color: rgb(180,180,180)
 
-#app
+.fullScreen
   height: 100vh
   width: 100vw
 
-#map
+.container
   height: inherit
   width: inherit
+
+#map-container
+  position: relative
+  text-align: center
+
+#map
+  position: absolute
+  top: 0
+  left: 0
+  z-index: 1
+
+button
+  border: 1px solid gray
+  border-radius: 2px
+  background-color: white
+  outline: none
+
+button:hover
+  background-color: gray

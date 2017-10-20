@@ -51,6 +51,8 @@ export class NavList extends React.Component {
   constructor(props){
     super(props);
     this.geocoder;
+    this.polygon;
+    this.markers = [];
   }
 
   centerMapOnId(placeid){
@@ -60,7 +62,7 @@ export class NavList extends React.Component {
     let map = this.props.index.map;
     this.geocoder.geocode({'placeId': placeid}, function(results, status) {
       if (status !== 'OK') {
-        console.log('Geocoder failed due to: ' + status);
+        Alert.alert('Geocoder failed due to: ' + status);
         return;
       }
       map.setZoom(11);
@@ -68,10 +70,34 @@ export class NavList extends React.Component {
     });
   }
 
-  centerMapByGeocode(center){
+  neighbourhoodClicked(center, itemData){
     let map = this.props.index.map;
-    map.setZoom(14);
+    let baseZoom = 9;
+    let radiusZoomWeight = 1.1;
+    let polygonZoomVariation = Math.log2(radiusZoomWeight * itemData.radius);
+    let viewportZoomFactor = 1;
+    let zoomFactor = (baseZoom - polygonZoomVariation) * viewportZoomFactor
+    map.setZoom(Math.floor(zoomFactor));
     map.setCenter(center);
+    let that = this;
+    HTTPService.countPolyResidences(itemData).then(function(json){
+      that.props.overlayRef.setState({dataReady: true, data: json});
+    });
+    if (this.polygon){
+      this.polygon.setMap(null);
+    }
+    this.polygon = new google.maps.Polygon({
+          paths: itemData.points,
+          strokeColor: '#FF0000',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#FF0000',
+          fillOpacity: 0.35
+        });
+    this.polygon.setMap(map);
+    let polygonListener = google.maps.event.addListener(this.polygon, "click", function(e) {
+      that.props.tabsRef.swapState(1);
+    });
   }
 
   render() {
@@ -93,7 +119,7 @@ export class NavList extends React.Component {
         {this.props.data.data.map((itemData, i) =>
           <div className="navbar-list-item"
           key={i}
-          onClick={() => { this.centerMapByGeocode(itemData.center)}}>
+          onClick={() => { this.neighbourhoodClicked(itemData.center, itemData)}}>
             <IconCanvas key={i} item={itemData} />
             <div className="navbar-list-text">{itemData.name}</div>
           </div>

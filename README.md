@@ -16,7 +16,8 @@ After obtaining a copy of the codebase, initialize npm in the top directory. Run
 
 ## Running the tests
 
-TODO
+run ">npm test" which runs jest
+run ">npm test -- --watch" this will run any tests that have been changed  
 
 ## Deployment
 
@@ -38,3 +39,4 @@ TODO after consultation
 ## Acknowledgments
 
 * https://gist.github.com/PurpleBooth/109311bb0361f32d87a2
+* https://data.edmonton.ca/City-Administration/Property-Information-Data/dkk9-cj3x
