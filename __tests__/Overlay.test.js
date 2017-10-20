@@ -49,6 +49,7 @@ it("drawing state should have CANCEL button and FINISH button", ()=>{
 });
 
 it("polygon is not added to the polygon list when clicked on CANCEL button", ()=>{
+    const wrapper = shallow(<Overlay/>);
 
 });
 
@@ -62,7 +63,7 @@ it("polygon array is empty when clicked on CLEAR button", ()=>{
     // const polygon1 = jest.fn();
     const wrapper =shallow(<Overlay/>);
     console.log(wrapper.state());
-    console.log(wrapper.state().polygons.polygons.push(p));
+    wrapper.state().polygons.polygons.push(p);
     wrapper.find("#clear-button").simulate("click", {stopPropagation: ()=> undefined});
     console.log(wrapper.state());
     expect(wrapper.state().polygons.polygons.length).toEqual(0);
@@ -103,6 +104,24 @@ it("onClick DRAW button set correct state for drawing", ()=>{
 });
 
 it("onClick FINISH button set drawing state for drawing", ()=>{
+    // var triangle = [{lat: 25.774, lng: -80.190},
+    //      {lat: 18.466, lng: -66.118},
+    //      {lat: 32.321, lng: -64.757}];
+    //
+    // var p = new window.google.maps.Polygon({paths: triangle});
+    // const wrapper = shallow(<Overlay/>);
+    // wrapper.setState({ isDrawing: true });
+    // wrapper.find("#finish-draw-button").simulate("click", {stopPropagation: ()=> undefined})
+    // expect(wrapper.state().isDrawing).toEqual(false);
+    const wrapper = shallow(<Overlay/> );
+    wrapper.setState({ isDrawing: true });
+    wrapper.instance().finishClick = jest.fn();
+    console.log(wrapper.instance().finishClick);
+    console.log(wrapper.instance());
+    //console.log(wrapper.find("#finish-draw-button").simulate("onClick"));
+    wrapper.find("#finish-draw-button").simulate("click");
+    console.log(wrapper.instance().finishClick.mockReturnValue());
+    expect(wrapper.instance().finishClick).toHaveBeenCalled();
 
 });
 
