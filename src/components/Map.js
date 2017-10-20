@@ -24,10 +24,6 @@ export default class Map extends Component {
 
   render() {
     return (
-      <div className="container">
-        { this.state.mapLoaded &&
-          <Overlay map={this.state.map}
-                   maps={this.state.maps}/> }
         <div className="container" id="map-container">
           <div className="container" id="map">
             <GoogleMap
@@ -39,7 +35,6 @@ export default class Map extends Component {
             </GoogleMap>
           </div>
         </div>
-      </div>
     );
   }
 }

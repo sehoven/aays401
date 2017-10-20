@@ -18,8 +18,34 @@ body
   border: 1px gray solid
   box-shadow: 2px 2px 1px #888888
   background-color: white
+#tab-bar
+  width: #{$uiWidth}
+  height: 40px
+  margin-left: 4vh
+  margin-top: 4vh
+  padding: #{$navbarPadding}
+  position: absolute
+  z-index: 2
 
-#navpanel
+.tab_title
+	width: #{$uiWidth/2}
+	height: 40px
+	text-align: center
+	line-height: 40px
+	color: #fff
+	background-color: #bdbdbd
+	display: inline-block
+
+.active
+	color: #000
+	background-color: #fff
+
+.tab_item
+	display: none
+.show
+	display: block
+
+.nav-panel
   width: #{$uiWidth}
   height: 90vh
   margin-left: 4vh
@@ -27,6 +53,12 @@ body
   padding: #{$navbarPadding}
   position: absolute
   z-index: 2
+
+.show-number
+  width: #{$uiWidth}
+  text-align: left
+  list-style-type: none
+
 
 #map-controls
   width: #{$uiWidth}

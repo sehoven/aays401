@@ -45,13 +45,15 @@ export default class NavPanel extends Component {
   }
 
   render() {
-    return <div id="navpanel" className="side-panel">
+    return <div className="side-panel nav-panel">
         <input type="text" name="searchBar" id="search-box"
           onChange={this.onChange} />
         <NavList
           index={this.props.index}
           autocomplete={this.state.autocomplete}
-          data={this.state.list} />
+          data={this.state.list}
+          tabsRef={this.props.tabsRef}
+          overlayRef={this.props.overlayRef} />
     </div>
   }
 }

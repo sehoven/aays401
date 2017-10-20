@@ -1,15 +1,20 @@
 import React, { Component } from 'react';
 import GoogleMap from 'google-map-react';
 import PropTypes from 'prop-types';
+const HTTPService = require('./HTTPService.js');
 
 // This component will be used to trigger drawing tools
 export default class Overlay extends Component {
   constructor(props) {
     super(props);
 
+    // dataReady is true when the unit count data is loaded into overlay.js
+    // data refers to the unit count data
     this.state = {
       isDrawing: false,
-      polygons: new PolygonArray()
+      polygons: new PolygonArray(),
+      dataReady: false,
+      data: null
     }
 
     this.toggleIsDrawing = this.toggleIsDrawing.bind(this);
@@ -37,8 +42,14 @@ export default class Overlay extends Component {
   }
 
   finishClick() {
-    this.state.polygons.add(this.drawingTools.getPolygon());
+    var polygon = this.state.polygons.add(this.drawingTools.getPolygon());
     this.stopDrawing();
+    let that = this;
+    HTTPService.countPolyResidences(
+      { points: polygon, center:  0.1, radius: 0.1 }
+    ).then(function(json){
+      that.setState({dataReady: true, data: json});
+    });
   }
 
   cancelClick() {
@@ -58,7 +69,7 @@ export default class Overlay extends Component {
     let finishButton = <button id="finish-draw-button" onClick={this.finishClick}>FINISH</button>;
 
     return (
-      <div id="map-controls" className="side-panel">
+      <div className="side-panel nav-panel">
         { this.state.isDrawing ?
           <DrawingTools ref={instance => {this.drawingTools = instance;}}
                         map={this.props.map}
@@ -66,6 +77,13 @@ export default class Overlay extends Component {
         { this.state.isDrawing ? null : clearButton }
         { this.state.isDrawing ? cancelButton : null }
         { this.state.isDrawing ? finishButton : null }
+        <ol className="show-number">
+          <li>Residences: {this.state.dataReady? this.state.data["residential"]:"?"}</li>
+          <li>Industrial: {this.state.dataReady? this.state.data["industrial"]:"?"}</li>
+          <li>Commercial: {this.state.dataReady? this.state.data["commercial"]:"?"}</li>
+          <li>Urban: {this.state.dataReady? this.state.data["urban service"]:"?"}</li>
+          <li>Other: {this.state.dataReady? this.state.data["other"]:"?"}</li>
+        </ol>
       </div>
     )
   }
@@ -80,7 +98,9 @@ class PolygonArray {
   add(polygon) {
     if(polygon != null) {
       this.polygons.push(polygon);
+      return this.convertToLatLng(polygon);
     }
+    return null;
   }
 
   remove(polygon) {
@@ -97,20 +117,25 @@ class PolygonArray {
     this.polygons = [];
   }
 
+  convertToLatLng(polygon) {
+    let latLngs = [];
+    let path = polygon.getPath();
+    for(let j = 0; j < path.getLength(); ++j) {
+      let vertex = path.getAt(j);
+      latLngs.push({
+        lat: vertex.lat(),
+        lng: vertex.lng()
+      });
+    }
+
+    return latLngs;
+  }
+
   // Converts the whole array of polygons to objects with the lat/lng pairs for each point
-  convertToLatLng() {
+  convertAllToLatLng() {
     let allPolygons = [];
     for(let i = 0; i < this.polygons.length; ++i) {
-      let polygon = [];
-      let path = this.polygons[i].getPath();
-      for(let j = 0; j < path.getLength(); ++j) {
-        let vertex = path.getAt(j);
-        polygon.push({
-          lat: vertex.lat(),
-          lng: vertex.lng()
-        });
-      }
-      allPolygons.push(polygon);
+      allPolygons.push(convertToLatLng(this.polygons[i]));
     }
 
     return allPolygons;
@@ -238,6 +263,6 @@ export class DrawingTools extends Component {
   }
 
   render() {
-    return null;
+    return null
   }
 }

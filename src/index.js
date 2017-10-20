@@ -2,7 +2,8 @@ import React, {Component} from 'react';
 const ReactDOM = require('react-dom');
 import Map from './components/Map.js';
 import NavPanel from './components/NavPanel.js';
-
+import Tabs from './components/Tabs.js'
+import Overlay, { DrawingTools } from './components/Overlay.js';
 require('./styles/_style.sass');
 
 export class Index extends Component {
@@ -27,8 +28,25 @@ export class Index extends Component {
   render(){
     return (
       <div className="fullScreen">
-        { this.state.mapLoaded && <NavPanel index={this.state} /> }
-        <Map setMapRef={this.setMapRef} />
+        <div className="container">
+          <Tabs ref={instance => {this.tabs = instance}}>
+            <div name="search">
+              <NavPanel
+                index={this.state}
+                overlayRef={this.overlay}
+                tabsRef={this.tabs}
+              />
+            </div>
+            <div name="polygon">
+              <Overlay
+                ref={instance => {this.overlay = instance}}
+                map={this.state.map}
+                maps={this.state.maps}
+              />
+            </div>
+          </Tabs>
+          <Map setMapRef={this.setMapRef} />
+	      </div>
       </div>
     )
   }
