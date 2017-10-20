@@ -72,7 +72,12 @@ export class NavList extends React.Component {
 
   neighbourhoodClicked(center, itemData){
     let map = this.props.index.map;
-    map.setZoom(14);
+    let baseZoom = 9;
+    let radiusZoomWeight = 1.1;
+    let polygonZoomVariation = Math.log2(radiusZoomWeight * itemData.radius);
+    let viewportZoomFactor = 1;
+    let zoomFactor = (baseZoom - polygonZoomVariation) * viewportZoomFactor
+    map.setZoom(Math.floor(zoomFactor));
     map.setCenter(center);
     let that = this;
     HTTPService.countPolyResidences(itemData).then(function(json){
