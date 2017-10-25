@@ -14,7 +14,8 @@ export default class Overlay extends Component {
       isDrawing: false,
       polygons: new PolygonArray(),
       dataReady: false,
-      data: null
+      data: null,
+      url:null
     }
 
     this.toggleIsDrawing = this.toggleIsDrawing.bind(this);
@@ -23,6 +24,7 @@ export default class Overlay extends Component {
     this.finishClick = this.finishClick.bind(this);
     this.cancelClick = this.cancelClick.bind(this);
     this.stopDrawing = this.stopDrawing.bind(this);
+    this.setImgUrl = this.setImgUrl.bind(this);
   }
 
   toggleIsDrawing() {
@@ -44,6 +46,7 @@ export default class Overlay extends Component {
   finishClick() {
     var polygon = this.state.polygons.add(this.drawingTools.getPolygon());
     this.stopDrawing();
+    this.setImgUrl(polygon);
     let that = this;
     HTTPService.countPolyResidences(
       { points: polygon, center:  0.1, radius: 0.1 }
@@ -60,6 +63,17 @@ export default class Overlay extends Component {
   stopDrawing() {
     this.drawingTools.removeDrawingTools();
     this.toggleIsDrawing();
+  }
+  setImgUrl(polygon){
+    let url="https://maps.googleapis.com/maps/api/staticmap?size=300x300&path=color:0x00000000|weight:5|fillcolor:0xBDBDBDBD";
+    polygon.forEach(function(position){
+        url += "|";
+        url += position["lat"];
+        url += ",";
+        url += position["lng"];
+    });
+
+    this.setState({url:url});
   }
 
   render() {
@@ -84,6 +98,9 @@ export default class Overlay extends Component {
           <li>Urban: {this.state.dataReady? this.state.data["urban service"]:"?"}</li>
           <li>Other: {this.state.dataReady? this.state.data["other"]:"?"}</li>
         </ol>
+        {this.state.dataReady ?
+          <img className="image" src= {this.state.url}/>
+          :null}
       </div>
     )
   }

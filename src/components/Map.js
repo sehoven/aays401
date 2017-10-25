@@ -33,6 +33,7 @@ export default class Map extends Component {
               onGoogleApiLoaded={({map, maps}) => this.onReady(map, maps)}
               yesIWantToUseGoogleMapApiInternals={true}>
             </GoogleMap>
+            
           </div>
         </div>
     );
