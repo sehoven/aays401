@@ -41,6 +41,7 @@ export default class Overlay extends Component {
 
   clearClick() {
     this.state.polygons.removeAll();
+    this.setState({dataReady:null, url:null})
   }
 
   finishClick() {
@@ -65,7 +66,7 @@ export default class Overlay extends Component {
     this.toggleIsDrawing();
   }
   setImgUrl(polygon){
-    let url="https://maps.googleapis.com/maps/api/staticmap?size=300x300&path=color:0x00000000|weight:5|fillcolor:0xBDBDBDBD";
+    let url="https://maps.googleapis.com/maps/api/staticmap?size=300x300&path=color:0x00000000|weight:5|fillcolor:0x00BDBDBD";
     polygon.forEach(function(position){
         url += "|";
         url += position["lat"];
