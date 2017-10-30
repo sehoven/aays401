@@ -19,6 +19,14 @@ After obtaining a copy of the codebase, initialize npm in the top directory. Run
 run ">npm test" which runs jest
 run ">npm test -- --watch" this will run any tests that have been changed  
 
+## Creating Documentation Using APIDOCS
+
+* After adding some documentation using APIDOCS format. Your will need to update the /docs/apidocs folder.
+* To do this go into the gulpfile.js file, and edit the paths for the files with documentation
+* Then run gulp apidoc
+* You should see a message like "Finished 'apidoc' after 225 ms".
+* You can use APIDocs for clientside as well
+
 ## Deployment
 
 TODO
