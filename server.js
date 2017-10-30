@@ -17,7 +17,7 @@ var locations_data = require('./data/locations.json');
 var locations = fs.readFileSync('./data/locations.json', 'utf8');
 locations = JSON.parse(locations);
 locations = locations.addresses;
-console.log("Ready. Listening on port 3000.");
+
 
 
 app.use(bodyParser.json());
@@ -32,8 +32,18 @@ app.use(function (req, res, next) {
     next();
 });
 
+
+
+
+
 // Handle requests to "/nearby"
 // Returns all known neighborhoods that are within rad from point (lat, lng)
+/**
+ * @api {get} /nearby Get nearby neighbourhoods
+  * @apiGroup Polygon
+ * @apiErrorExample {json} List error
+ *    HTTP/1.1 500 Internal Server Error
+ */
 app.get('/nearby', function(req, res) {
   console.log("Location request handler invoked");
   //Should add some kind of type validation here.. and everywhere.
@@ -56,8 +66,20 @@ app.get('/nearby', function(req, res) {
   res.end(json);
 });
 
+
+
+
+
 // Handle requests to "/locations"
 // Returns all known locations that match existing query items
+/**
+ * @api {get} /locations List all tasks
+ * @apiGroup Polygon
+ * @apiSuccess {Object[]} resbody
+ * @apiDescription Handle requests to /locations Returns all known locations that match existing query items
+ * @apiErrorExample {json} List error
+ *    HTTP/1.1 500 Internal Server Error
+ */
 app.get('/locations', function(req, res) {
   console.log("Location request handler invoked");
   if (!req.query) return res.sendStatus(400);
@@ -80,6 +102,18 @@ app.get('/locations', function(req, res) {
   res.end(json);
 });
 
+
+
+
+
+/**
+ * @api {post} /addressCount Count addresses in a polygon
+ * @apiGroup Polygon
+ * @apiDescription Receives a array of coordinates and outputs the number of units in the polygon the points create
+ * @apiSuccess {Object[]} resbody
+ * @apiErrorExample {json} List error
+ *    HTTP/1.1 500 Internal Server Error
+ */
 app.post('/addressCount', function(req, res) {
   console.log("Count request handler invoked");
   if (!req.body) return res.sendStatus(400);
@@ -126,8 +160,9 @@ app.post('/addressCount', function(req, res) {
   res.end(json);
 });
 
-app.listen(3000);
-
+app.listen(3000, function() {  
+  console.log('API up and running...');
+});
 function binaryIndexOf(array, searchElement, property) {
   var minIndex = 0;
   var maxIndex = array.length - 1;
