@@ -34,6 +34,7 @@
     "google-map-react": "^0.24.0",
     "immutable": "^3.8.1",
     "jquery": "^3.2.1",
+    "jsonfile": "^4.0.0",
     "node-fetch": "^1.7.3",
     "node-sass": "^4.5.3",
     "point-in-geopolygon": "^1.0.1",

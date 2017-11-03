@@ -79,10 +79,6 @@ export class NavList extends React.Component {
     let zoomFactor = (baseZoom - polygonZoomVariation) * viewportZoomFactor
     map.setZoom(Math.floor(zoomFactor));
     map.setCenter(center);
-    let that = this;
-    HTTPService.countPolyResidences(itemData).then(function(json){
-      that.props.overlayRef.setState({dataReady: true, data: json});
-    });
     if (this.polygon){
       this.polygon.setMap(null);
     }
@@ -95,8 +91,15 @@ export class NavList extends React.Component {
           fillOpacity: 0.35
         });
     this.polygon.setMap(map);
+
+    let that = this;
+    HTTPService.countPolyResidences(itemData).then(function(json){
+      that.props.overlayRef.setState({dataReady: true, data: json});
+      //that.props.overlayRef.setImgUrl(that.polygon);
+    });
     let polygonListener = google.maps.event.addListener(this.polygon, "click", function(e) {
       that.props.tabsRef.swapState(1);
+
     });
   }
 

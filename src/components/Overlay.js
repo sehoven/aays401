@@ -75,6 +75,18 @@ export default class Overlay extends Component {
     });
 
     this.setState({url:url});
+
+    /*
+    var jsonfile = require('jsonfile')
+
+    var file = '/tmp/data.json'
+    var obj = {url:url}
+
+    jsonfile.writeFile(file, obj, function (err) {
+      console.error(err)
+    })
+    */
+
   }
 
   render() {

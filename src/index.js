@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 const ReactDOM = require('react-dom');
 import Map from './components/Map.js';
 import NavPanel from './components/NavPanel.js';
+import HistoryPanel from './components/HistoryPanel.js'
 import Tabs from './components/Tabs.js'
 import Overlay, { DrawingTools } from './components/Overlay.js';
 require('./styles/_style.sass');
@@ -43,6 +44,9 @@ export class Index extends Component {
                 map={this.state.map}
                 maps={this.state.maps}
               />
+            </div>
+            <div name="history">
+              <HistoryPanel />
             </div>
           </Tabs>
           <Map setMapRef={this.setMapRef} />

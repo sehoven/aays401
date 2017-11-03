@@ -16,11 +16,11 @@ export default class Tabs extends Component{
     checkItemIndex( index ){
         return index === this.state.currentIndex ? "tab_item show" : "tab_item"
     }
-
     swapState(index){
       this.setState({ currentIndex : index });
     }
     render(  ){
+        let _this = this
         return(
             <div>
                 { /* Tab title*/ }
