@@ -30,16 +30,27 @@ export default class NavPanel extends Component {
       });
 
       if (!this.AutocompleteService){
-        this.AutocompleteService = new google.maps.places.AutocompleteService();
+        var options = {
+          types : ['geocode'],
+          componentRestrictions:{country: "ca"}
+        }
+        this.AutocompleteService = new google.maps.places.AutocompleteService(null, options);
       }
       this.AutocompleteService.getQueryPredictions(
         { input: event.target.value },
         function(predictions, status) {
+          console.log(predictions)
           let maps = that.props.index.maps;
           if (status != maps.places.PlacesServiceStatus.OK) {
             return;
           }
-          that.state.autocomplete = predictions;
+          let results = predictions.map(
+          function(x){
+            let maxLength = 20;
+            var long = x.terms[0].value + (x.terms.length > 1?(", " + x.terms[1].value):"");
+            return (long.length > maxLength)?(long.slice(0,maxLength)+"…"):long;
+          })
+          that.setState({autocomplete: results});
         });
     }
   }

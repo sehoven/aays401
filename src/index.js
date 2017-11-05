@@ -29,7 +29,7 @@ export class Index extends Component {
     return (
       <div className="fullScreen">
         <div className="container">
-          <Tabs ref={instance => {this.tabs = instance}}>
+          <Tabs className="container" ref = {instance => {this.tabs = instance}}>
             <div name="search">
               <NavPanel
                 index={this.state}
