@@ -1,20 +1,19 @@
-const React = require('react');
-const ReactDOM = require('react-dom');
+import React, {Component} from 'react';
 const HTTPService = require('./HTTPService.js');
 
 /*================================
 Receives a pointer to the index.js object, and two lists:
 autocomplete, data in props
 ================================*/
-class IconCanvas extends React.Component {
+class IconCanvas extends Component {
     componentDidMount() {
-        this.updateCanvas();
+      this.updateCanvas();
     }
 
-    //If looking for performance bottlenecks, look here
+    // If looking for performance bottlenecks, look here
     updateCanvas() {
       let size = 100;
-      const context = this.refs.canvas.getContext('2d');
+      const context = this.refs.canvas.getContext("2d");
       let item = this.props.item;
       let points = item.points;
 
@@ -37,13 +36,13 @@ class IconCanvas extends React.Component {
     }
 
     render() {
-        return (
-            <canvas
-              className="navbar-list-icon"
-              ref="canvas"
-              width="100"
-              height="100" />
-        );
+      return (
+        <canvas
+          className="navbar-list-icon"
+          ref="canvas"
+          width="100"
+          height="100" />
+      );
     }
 }
 
@@ -59,7 +58,7 @@ export class NavList extends React.Component {
     if (!this.geocoder){
        this.geocoder = new google.maps.Geocoder;
     }
-    let map = this.props.index.map;
+    let map = this.props.map;
     this.geocoder.geocode({'placeId': placeid}, function(results, status) {
       if (status !== 'OK') {
         Alert.alert('Geocoder failed due to: ' + status);
@@ -71,7 +70,7 @@ export class NavList extends React.Component {
   }
 
   neighbourhoodClicked(center, itemData){
-    let map = this.props.index.map;
+    let map = this.props.map;
     let baseZoom = 9;
     let radiusZoomWeight = 1.1;
     let polygonZoomVariation = Math.log2(radiusZoomWeight * itemData.radius);
