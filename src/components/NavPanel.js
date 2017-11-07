@@ -18,7 +18,7 @@ export default class NavPanel extends Component {
 
   // Fires when the search bar's text changes, unless it is emptied.
   onChange(event) {
-    if(event.target.value != null && event.target.value != ""){
+    if(event.target != null && event.target.value != ""){
       this.setState({
         list: {ready: false, data: []}
       });
