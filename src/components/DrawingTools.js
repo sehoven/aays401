@@ -222,9 +222,7 @@ export default class DrawingTools extends Component {
             drawingTools.deletePolygon();
           }
         }
-        if(this.state.polygon) {
-          drawingTools.selectPolygon();
-        }
+        drawingTools.selectPolygon();
       });
       drawingTools.setState({polygonListener: polygonListener});
 
