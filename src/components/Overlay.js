@@ -1,10 +1,76 @@
 import React, { Component } from 'react';
-import GoogleMap from 'google-map-react';
-import PropTypes from 'prop-types';
+import DrawingTools, { PolygonTools } from './DrawingTools.js';
 const HTTPService = require('./HTTPService.js');
 
+class Overlay extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      isDrawing: false
+    }
+  }
+
+  toggleIsDrawing(callback) {
+    this.setState({isDrawing: !this.state.isDrawing});
+    if(this.props.toggleDrawingTools) {
+      this.props.toggleDrawingTools(callback);
+    } else if(callback != null) {
+      // also add check to make sure callback is a function?
+      callback();
+    }
+  }
+
+  drawClick() {
+    let callback;
+    if(this.props.finishClickCallback) {
+      callback = () => { this.props.drawClickCallback(); };
+    }
+    this.toggleIsDrawing(callback);
+  }
+
+  clearClick() {
+    if(this.props.clearClickCallback) {
+      this.props.clearClickCallback();
+    }
+  }
+
+  finishClick() {
+    let callback;
+    if(this.props.finishClickCallback) {
+      callback = () => { this.props.finishClickCallback(); };
+    }
+    this.toggleIsDrawing(callback);
+  }
+
+  cancelClick() {
+    let callback;
+    if(this.props.cancelClickCallback) {
+      callback = () => { this.props.cancelClickCallback(); };
+    }
+    this.toggleIsDrawing(callback);
+  }
+
+  render() {
+    let drawButton = <button id="draw-button" onClick={this.drawClick.bind(this)}>DRAW</button>;
+    let clearButton = <button id="clear-button" onClick={this.clearClick.bind(this)}>CLEAR</button>;
+    let cancelButton = <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)}>CANCEL</button>;
+    let finishButton = <button id="finish-draw-button" onClick={this.finishClick.bind(this)}>FINISH</button>;
+
+    return (
+      <div>
+        { this.state.isDrawing ? null : drawButton }
+        { this.state.isDrawing ? null : clearButton }
+        { this.state.isDrawing ? cancelButton : null }
+        { this.state.isDrawing ? finishButton : null }
+      </div>
+    )
+  }
+
+}
+
 // This component will be used to trigger drawing tools
-export default class Overlay extends Component {
+export default class OverlayContainer extends Component {
   constructor(props) {
     super(props);
 
@@ -12,77 +78,88 @@ export default class Overlay extends Component {
     // data refers to the unit count data
     this.state = {
       isDrawing: false,
-      polygons: new PolygonArray(),
+      polygon: null,
       dataReady: false,
       data: null
     }
-
-    this.toggleIsDrawing = this.toggleIsDrawing.bind(this);
-    this.drawClick = this.drawClick.bind(this);
-    this.clearClick = this.clearClick.bind(this);
-    this.finishClick = this.finishClick.bind(this);
-    this.cancelClick = this.cancelClick.bind(this);
-    this.stopDrawing = this.stopDrawing.bind(this);
   }
 
-  toggleIsDrawing() {
-    if(this.state.isDrawing) {
-      this.setState({isDrawing: false});
-    } else {
-      this.setState({isDrawing: true});
+  toggleDrawingTools(callback) {
+    this.setState({isDrawing: !this.state.isDrawing}, callback);
+  }
+
+  drawClickCallback() { }
+
+  clearClickCallback() {
+    if(this.state.polygon) {
+      this.state.polygon.setMap(null);
+    }
+    this.setPolygon(null);
+  }
+
+  convertToLatLng(polygon) {
+    let latLngs;
+    if(polygon != null) {
+      latLngs = [];
+      let path = polygon.getPath();
+      for(let j = 0; j < path.getLength(); ++j) {
+        let vertex = path.getAt(j);
+        latLngs.push({
+          lat: vertex.lat(),
+          lng: vertex.lng()
+        });
+      }
+    }
+    return latLngs;
+  }
+
+  finishClickCallback() {
+    let that = this;
+    let polygon = this.convertToLatLng(this.state.polygon);
+
+    if(polygon) {
+      HTTPService.countPolyResidences(
+        { points: polygon, center:  0.1, radius: 0.1 }
+      ).then(function(json){
+        that.setState({dataReady: true, data: json});
+      });
     }
   }
 
-  drawClick() {
-    this.toggleIsDrawing();
-  }
+  cancelClickCallback() { }
 
-  clearClick() {
-    this.state.polygons.removeAll();
-  }
+  setPolygon(polygon) {
+    this.setState({polygon: polygon});
 
-  finishClick() {
-    var polygon = this.state.polygons.add(this.drawingTools.getPolygon());
-    this.stopDrawing();
-    let that = this;
-    HTTPService.countPolyResidences(
-      { points: polygon, center:  0.1, radius: 0.1 }
-    ).then(function(json){
-      that.setState({dataReady: true, data: json});
-    });
-  }
-
-  cancelClick() {
-    this.drawingTools.deletePolygon(this.drawingTools.getPolygon());
-    this.stopDrawing();
-  }
-
-  stopDrawing() {
-    this.drawingTools.removeDrawingTools();
-    this.toggleIsDrawing();
+    // If there is no longer a polygon, clear the unit count data
+    if(polygon == null) {
+      this.setState({dataReady: false, data: null});
+    }
   }
 
   render() {
-    let drawButton = <button id="draw-button" onClick={this.drawClick}>DRAW</button>;
-    let clearButton = <button id="clear-button" onClick={this.clearClick}>CLEAR</button>;
-    let cancelButton = <button id="cancel-draw-button" onClick={this.cancelClick}>CANCEL</button>;
-    let finishButton = <button id="finish-draw-button" onClick={this.finishClick}>FINISH</button>;
-
     return (
       <div className="side-panel nav-panel">
-        { this.state.isDrawing ?
-          <DrawingTools ref={instance => {this.drawingTools = instance;}}
-                        map={this.props.map}
-                        maps={this.props.maps}/> : drawButton }
-        { this.state.isDrawing ? null : clearButton }
-        { this.state.isDrawing ? cancelButton : null }
-        { this.state.isDrawing ? finishButton : null }
+        <Overlay toggleDrawingTools={this.toggleDrawingTools.bind(this)}
+                 drawClickCallback={this.drawClickCallback.bind(this)}
+                 clearClickCallback={this.clearClickCallback.bind(this)}
+                 finishClickCallback={this.finishClickCallback.bind(this)}
+                 cancelClickCallback={this.cancelClickCallback.bind(this)} />
+        { this.state.isDrawing && this.state.polygon != null ?
+          <PolygonTools map={this.props.map}
+                        maps={this.props.maps}
+                        polygon={this.state.polygon}
+                        setPolygon={(polygon) => this.setPolygon(polygon)} /> : null }
+        { this.state.isDrawing && this.state.polygon == null ?
+          <DrawingTools map={this.props.map}
+                        maps={this.props.maps}
+                        setPolygon={(polygon) => this.setPolygon(polygon)} /> : null }
         <ol className="show-number">
-          <li>Residences: {this.state.dataReady? this.state.data["residential"]:"?"}</li>
-          <li>Industrial: {this.state.dataReady? this.state.data["industrial"]:"?"}</li>
-          <li>Commercial: {this.state.dataReady? this.state.data["commercial"]:"?"}</li>
-          <li>Urban: {this.state.dataReady? this.state.data["urban service"]:"?"}</li>
-          <li>Other: {this.state.dataReady? this.state.data["other"]:"?"}</li>
+          <li>Residences: {this.state.dataReady ? this.state.data["residential"]:"?"}</li>
+          <li>Industrial: {this.state.dataReady ? this.state.data["industrial"]:"?"}</li>
+          <li>Commercial: {this.state.dataReady ? this.state.data["commercial"]:"?"}</li>
+          <li>Urban: {this.state.dataReady ? this.state.data["urban service"]:"?"}</li>
+          <li>Other: {this.state.dataReady ? this.state.data["other"]:"?"}</li>
         </ol>
       </div>
     )
@@ -139,130 +216,5 @@ class PolygonArray {
     }
 
     return allPolygons;
-  }
-}
-
-// This component will be used to display the drawing tools and draw a polygon on the map
-export class DrawingTools extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      polygon: null,
-      isSelected: false,
-      drawingTools: this,
-      drawingManager: null,
-      polygonListener: null,
-      mapListener: null
-    }
-
-    this.getPolygon = this.getPolygon.bind(this);
-    this.selectPolygon = this.selectPolygon.bind(this);
-    this.deselectPolygon = this.deselectPolygon.bind(this);
-    this.deletePolygon = this.deletePolygon.bind(this);
-    this.removeDrawingTools = this.removeDrawingTools.bind(this);
-    this.setDrawingTools = this.setDrawingTools.bind(this);
-  }
-
-  componentDidMount() {
-    this.setDrawingTools(this.props.map);
-  }
-
-  getPolygon() {
-    return this.state.polygon;
-  }
-
-  selectPolygon(polygon) {
-    this.deselectPolygon();
-    polygon.setEditable(true);
-    this.setState({isSelected: true});
-  }
-
-  deselectPolygon() {
-    if(this.state.isSelected) {
-      this.state.polygon.setEditable(false);
-      this.setState({isSelected: false});
-    }
-  }
-
-  deletePolygon(polygon) {
-    // When the polygon is deleted, the user can draw a polygon again (limit to one)
-    this.state.drawingManager.setDrawingMode(google.maps.drawing.OverlayType.POLYGON);
-    this.state.drawingManager.setOptions({
-      drawingControl: true
-    });
-    polygon.setMap(null);
-  }
-
-  removeDrawingTools() {
-    this.deselectPolygon();
-    if(this.state.polygonListener != null) {
-      google.maps.event.removeListener(this.state.polygonListener);
-      this.setState({polygonListener: null});
-    }
-    if(this.state.drawingManager != null) {
-      this.state.drawingManager.setMap(null);
-      this.setState({drawingManager: null});
-    }
-    if(this.state.mapListener != null) {
-      google.maps.event.removeListener(this.state.mapListener);
-      this.setState({mapListener: null});
-    }
-  }
-
-  setDrawingTools(map) {
-    // Keep reference to DrawingTools so we can call functions inside event listeners on map
-    let drawingTools = this.state.drawingTools;
-
-    let drawingManager = new google.maps.drawing.DrawingManager({
-      drawingMode: google.maps.drawing.OverlayType.POLYGON,
-      drawingControl: true,
-      drawingControlOptions: {
-        position: google.maps.ControlPosition.TOP_RIGHT,
-        drawingModes: ["polygon"]
-      },
-      polygonOptions: {
-        strokeWeight: 0,
-        fillOpacity: 0.45,
-        editable: true,
-        zIndex: 1
-      },
-      map: map
-    });
-
-    this.setState({drawingManager: drawingManager});
-
-    google.maps.event.addListener(drawingManager, 'polygoncomplete', function(polygon) {
-      // After drawing, switch to non-drawing mode and remove drawing controls to limit to one polygon.
-      drawingManager.setDrawingMode(null);
-      drawingManager.setOptions({
-        drawingControl: false
-      });
-      drawingTools.setState({polygon: polygon, isSelected: true});
-
-      let polygonListener = google.maps.event.addListener(polygon, "click", function(e) {
-        // When the user clicks on a node, that node will be deleted from the polygon.
-        if(e.vertex != null) {
-          let path = polygon.getPaths().getAt(e.path);
-          path.removeAt(e.vertex);
-          if(path.length < 3) {
-            drawingTools.deletePolygon(polygon);
-          }
-        }
-        drawingTools.selectPolygon(polygon);
-      });
-      drawingTools.setState({polygonListener: polygonListener});
-
-      drawingTools.selectPolygon(polygon);
-    });
-
-    let mapListener = google.maps.event.addListener(map, "click", function(e) {
-      drawingTools.deselectPolygon();
-    });
-    drawingTools.setState({mapListener: mapListener});
-  }
-
-  render() {
-    return null
   }
 }

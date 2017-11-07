@@ -3,7 +3,7 @@ import { NavList } from './NavList.js';
 const HTTPService = require('./HTTPService.js');
 
 /*================================
-Receives a pointer to the index.js object in props
+Receives a pointer to map object in props
 ================================*/
 export default class NavPanel extends Component {
   constructor(props){
@@ -16,12 +16,13 @@ export default class NavPanel extends Component {
     this.AutocompleteService;
   }
 
-  //Fires when the search bar's text changes, unless it is emptied.
-  onChange(event){
-    if (event.target.value != ''){
+  // Fires when the search bar's text changes, unless it is emptied.
+  onChange(event) {
+    if(event.target != null && event.target.value != ""){
       this.setState({
         list: {ready: false, data: []}
       });
+
       let that = this;
       HTTPService.searchLists(event.target.value).then(function(array){
         that.setState({
@@ -29,31 +30,34 @@ export default class NavPanel extends Component {
         });
       });
 
-      if (!this.AutocompleteService){
+      if(!this.AutocompleteService){
         this.AutocompleteService = new google.maps.places.AutocompleteService();
       }
       this.AutocompleteService.getQueryPredictions(
         { input: event.target.value },
         function(predictions, status) {
-          let maps = that.props.index.maps;
-          if (status != maps.places.PlacesServiceStatus.OK) {
+          if(status != that.props.maps.places.PlacesServiceStatus.OK) {
             return;
           }
-          that.state.autocomplete = predictions;
-        });
+          that.setState({ autocomplete: predictions});
+        }
+      );
     }
   }
 
   render() {
-    return <div className="side-panel nav-panel">
+    return (
+      <div className="side-panel nav-panel">
         <input type="text" name="searchBar" id="search-box"
           onChange={this.onChange} />
         <NavList
-          index={this.props.index}
+          map={this.props.map}
+          maps={this.props.maps}
           autocomplete={this.state.autocomplete}
           data={this.state.list}
           tabsRef={this.props.tabsRef}
           overlayRef={this.props.overlayRef} />
-    </div>
+      </div>
+    )
   }
 }
