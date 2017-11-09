@@ -4,7 +4,14 @@ $mapControlHeight: 5vh
 $mapControlMargin: 4vh
 $mapControlPadding: 10px
 $navbarPadding: 10px
+<<<<<<< HEAD
 $navMarginTop: calc(#{$mapControlHeight} + (2 * #{$mapControlMargin}))
+=======
+$tabBarHeight: 40px
+$tabBarMargin: 4vh
+$navbarWidth: calc(#{$uiWidth} - (2 * #{$navbarPadding}))
+$navMarginTop: calc(#{$tabBarHeight} + (2 * #{$tabBarMargin}))
+>>>>>>> 7f8cd87725362b6acb407d8564ce0416086e2e3a
 $searchboxHeight: 30px
 
 h1
@@ -14,9 +21,23 @@ body
   margin: 0
   font-family: 'Roboto', sans-serif
 
+<<<<<<< HEAD
 #leftContainer
   margin: 5vh
   width: 550px
+=======
+.side-panel
+  border: 1px gray solid
+  box-shadow: 2px 2px 1px #888888
+  background-color: white
+
+#tab-bar
+  width: #{$uiWidth}
+  height: #{$tabBarHeight}
+  margin-left: 4vh
+  margin-top: #{$tabBarMargin}
+  padding: #{$navbarPadding}
+>>>>>>> 7f8cd87725362b6acb407d8564ce0416086e2e3a
   position: absolute
   height: 90vh
 
