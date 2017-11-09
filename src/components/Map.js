@@ -1,12 +1,6 @@
 import React, { Component } from 'react';
 import GoogleMap from 'google-map-react';
-import PropTypes from 'prop-types';
-import Overlay, { DrawingTools } from './Overlay';
 
-/*================================
-Receives a pointer to setMapRef method in index.js for callback
-to set map references to be used by Map.js and NavPanel.js.
-================================*/
 export default class Map extends Component {
   constructor(props) {
     super(props);
@@ -17,22 +11,20 @@ export default class Map extends Component {
     }
   }
 
-  onReady(map, maps){
+  onMapReady(map, maps){
     this.setState({ map: map, maps:maps, mapLoaded: true });
     this.props.setMapRef(map, maps);
   }
 
   render() {
     return (
-        <div id="map">
-          <GoogleMap
-            bootstrapURLKeys={{key:"AIzaSyB4CMvWi4j-iLXGCKVw_zCIoHrLI18iK4U&libraries=places,drawing"}}
-            center={{lat: 53.5444, lng: -113.4909}}
-            zoom={10}
-            onGoogleApiLoaded={({map, maps}) => this.onReady(map, maps)}
-            yesIWantToUseGoogleMapApiInternals={true}>
-          </GoogleMap>
-        </div>
-    );
+      <GoogleMap
+        bootstrapURLKeys={{key:"AIzaSyB4CMvWi4j-iLXGCKVw_zCIoHrLI18iK4U&libraries=places,drawing"}}
+        center={{lat: 53.5444, lng: -113.4909}}
+        zoom={10}
+        onGoogleApiLoaded={({map, maps}) => this.onMapReady(map, maps)}
+        yesIWantToUseGoogleMapApiInternals={true}>
+      </GoogleMap>
+    )
   }
 }

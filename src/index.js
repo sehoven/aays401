@@ -1,28 +1,12 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
+import MapContainer from './components/MapContainer.js';
 const ReactDOM = require('react-dom');
-import Map from './components/Map.js';
-import NavPanel from './components/NavPanel.js'
-import Overlay, { DrawingTools } from './components/Overlay.js';
+
 require('./styles/_style.sass');
 
 export class Index extends Component {
   constructor(props){
     super(props);
-    this.state = {
-      mapLoaded: false,
-      map: null,
-      maps: null,
-      currentPanel: "search"
-    }
-    this.setMapRef = this.setMapRef.bind(this);
-  }
-
-  setMapRef(map, maps) {
-    this.setState({
-      mapLoaded: true,
-      map: map,
-      maps: maps
-    });
   }
 
   swapState(toggle){
@@ -58,45 +42,12 @@ export class Index extends Component {
 
     return (
       <div className="fullScreen">
-        <div id="leftContainer">
-          { (this.state.currentPanel == "search") &&
-            <NavPanel
-              index={this.state}
-              overlayRef={this.overlay}
-              tabsRef={this.tabs}
-            />
-          }
-          { (this.state.currentPanel == "draw") &&
-            <Overlay
-              ref={instance => {this.overlay = instance}}
-              map={this.state.map}
-              maps={this.state.maps}
-            />
-          }
-          <div id="tabButtons">
-            <div
-              className="tabButton"
-              id="topTabButton"
-              onClick={() => { this.swapState("search") }}
-              style={ topButtonStyle }
-            >
-              <div className="buttonText">Search</div>
-            </div>
-            <div
-              className="tabButton"
-              id="bottomTabButton"
-              onClick={() => { this.swapState("draw") }}
-              style={ bottomButtonStyle }
-            >
-              <div className="buttonText">Draw</div>
-            </div>
-	        </div>
-        </div>
-        <Map setMapRef={this.setMapRef} />
+        <MapContainer />
       </div>
     )
   }
 }
+
 ReactDOM.render(
   <Index />,
   document.getElementById('app')
