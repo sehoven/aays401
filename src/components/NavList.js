@@ -54,12 +54,18 @@ export class NavList extends React.Component {
     this.markers = [];
   }
 
-  centerMapOnId(placeid){
+  componentWillUnmount(){
+    if (this.polygon){
+      this.polygon.setMap(null);
+    }
+  }
+
+  centerMapOnId(placeId){
     if (!this.geocoder){
        this.geocoder = new google.maps.Geocoder();
     }
     let map = this.props.map;
-    this.geocoder.geocode({'placeId': placeid}, function(results, status) {
+    this.geocoder.geocode({'placeId': placeId}, function(results, status) {
       if (status !== 'OK') {
         console.log('Geocoder failed due to: ' + status);
         return;

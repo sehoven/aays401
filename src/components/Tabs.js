@@ -20,18 +20,19 @@ export default class Tabs extends Component {
 
   render() {
     const { currentPanel } = this.state;
+    
     return (
       <div id="leftContainer">
         <NavPanel
           map={this.props.map}
           maps={this.props.maps}
-          active = { currentPanel == PanelType.SEARCH }
+          active={ currentPanel == PanelType.SEARCH }
           overlayRef={this.overlay}
           tabsRef={this.tabs}
         />
         <OverlayContainer
           ref={instance => {this.overlay = instance}}
-          active = { currentPanel == PanelType.DRAW }
+          active={ currentPanel == PanelType.DRAW }
           map={this.props.map}
           maps={this.props.maps}
         />
