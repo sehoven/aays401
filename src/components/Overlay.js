@@ -10,9 +10,9 @@ class Overlay extends Component {
 
     this.state = {
       isDrawing: false,
-      notification:null
+      notification:null,
+      banner:null
     }
-
   }
 
   toggleIsDrawing(callback) {
@@ -31,14 +31,16 @@ class Overlay extends Component {
       callback = () => { this.props.drawClickCallback(); };
     }
     this.toggleIsDrawing(callback);
-    this.notification = 'draw';
+    this.state.notification = 'draw';
+    this.createNotification(this.state.notification);
   }
 
   clearClick() {
     if(this.props.clearClickCallback) {
       this.props.clearClickCallback();
     }
-    this.notification = 'clear';
+    this.state.notification = 'clear';
+    this.createNotification(this.state.notification);
   }
 
   finishClick() {
@@ -47,7 +49,8 @@ class Overlay extends Component {
       callback = () => { this.props.finishClickCallback(); };
     }
     this.toggleIsDrawing(callback);
-    this.notification = 'finish';
+    this.state.notification = 'finish';
+    this.createNotification(this.state.notification);
   }
 
   cancelClick() {
@@ -56,42 +59,34 @@ class Overlay extends Component {
       callback = () => { this.props.cancelClickCallback(); };
     }
     this.toggleIsDrawing(callback);
-    this.notification = 'cancel';
-    
-    
+    this.state.notification = 'cancel';
+    this.createNotification(this.state.notification);
   }
 
   createNotification (type){
-      switch (type) {
+
+    switch (type) {
         case 'draw':
-          NotificationManager.info('Draw Outer Delivery Zone','',notificationTimer);
-          this.notification = null;
+          this.state.banner = NotificationManager.info('Draw Outer Delivery Zone','',notificationTimer);
           break;
         case 'inner':
-          NotificationManager.info('Draw Individual Zones Routes','',notificationTimer);
-          this.notification = null;
+          this.state.banner = NotificationManager.info('Draw Individual Zones Routes','',notificationTimer);
           break;
         case 'finish':
-          NotificationManager.success('Delivery Route Map Generated','',notificationTimer);
-          this.notification = null;
+          this.state.banner = NotificationManager.success('Delivery Route Map Generated','',notificationTimer);
           break;
         case 'cancel':
-          NotificationManager.warning('Removed Last Drawn Polygon','' ,notificationTimer);
-          this.notification = null;
+          this.state.banner = NotificationManager.warning('Removed Last Drawn Polygon','' ,notificationTimer);
           break;
         case 'clear':
-          NotificationManager.warning('Cleared Polygon','', notificationTimer);
-          this.notification = null;
+          this.state.banner = NotificationManager.warning('Cleared Polygon','', notificationTimer);
           break;
         case 'error':
-          NotificationManager.error('Error message', 'Click me!', 2000, () => {
+          this.state.banner = NotificationManager.error('Error message', 'Click me!', 2000, () => {
             alert('callback');
-          });
-          this.notification = null;
+          })
           break;
-      }
-
-    
+      };
   };
 
   render() {
@@ -106,7 +101,7 @@ class Overlay extends Component {
     return (
 
       <div>
-        {this.createNotification(this.notification)}
+        {this.state.banner}
         <NotificationContainer/>
         { this.state.isDrawing ? null : drawButton }
         { this.state.isDrawing ? null : clearButton }
@@ -114,7 +109,7 @@ class Overlay extends Component {
         { this.state.isDrawing ? finishButton : null }
       </div>
     )
-    this.notification=null;
+    
   }
 
 }
