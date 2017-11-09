@@ -10,6 +10,7 @@ export default class NavPanel extends Component {
     super(props);
     this.state = {
       autocomplete: [],
+      placeIds: [],
       list: {ready: true, data:[]}
     };
     this.onChange = this.onChange.bind(this);
@@ -41,11 +42,14 @@ export default class NavPanel extends Component {
           }
           let results = predictions.map(
           function(x){
-            let maxLength = 28;
+            let maxLength = 22;
             var long = x.terms[0].value + (x.terms.length > 1?(", " + x.terms[1].value):"");
             return (long.length > maxLength)?(long.slice(0,maxLength)+"…"):long;
-          })
-          that.setState({autocomplete: results});
+          });
+          that.setState({
+            autocomplete: results,
+            placeIds: predictions
+          });
         });
     }
   }
@@ -59,6 +63,7 @@ export default class NavPanel extends Component {
           map={this.props.map}
           maps={this.props.maps}
           autocomplete={this.state.autocomplete}
+          placeIds={this.state.placeIds}
           data={this.state.list}
           tabsRef={this.props.tabsRef}
           overlayRef={this.props.overlayRef} />

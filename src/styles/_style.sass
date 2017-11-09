@@ -28,15 +28,24 @@ body
   z-index: 6
 
 .tabButton
+  position: relative
   border-top-right-radius: 8px
   border-bottom-right-radius: 8px
   height: 50%
 
 .buttonText
+  font-size: 25px
+  font-weight: bold
+  color: rgb(50,50,50)
   margin: auto
-  -ms-transform: rotate(90deg)
-  -webkit-transform: rotate(90deg)
-  transform: rotate(90deg)
+  p
+    position: absolute
+    top: 50%
+    left: 50%
+    -ms-transform: translateX(-50%) translateY(-50%) rotate(90deg)
+    -webkit-transform: translateX(-50%) translateY(-50%) rotate(90deg)
+    transform: translateX(-50%) translateY(-50%) rotate(90deg)
+
 
 .nav-panel
   width: #{$uiWidth}
@@ -80,16 +89,15 @@ body
 
 .navbar-list-autocomplete-item
   height: 60px
-  border-top: 1px solid gray
+  margin: 10px
+  -webkit-box-shadow: 2px 2px 3px 0px rgba(0,0,0,0.75)
+  -moz-box-shadow: 2px 2px 3px 0px rgba(0,0,0,0.75)
+  box-shadow: 2px 2px 3px 0px rgba(0,0,0,0.75)
+  border: 1px solid rgb(117,117,117)
   background-color: white
   transition: background-color 0.1s
   &:hover
     background-color: rgb(180,180,180)
-
-.navbar-list-autocomplete-icon
-  display: inline-block
-  width: 100px
-  height: 50px
 
 .navbar-list-autocomplete-text
   display: inline-block
@@ -102,26 +110,37 @@ body
   vertical-align: bottom
 
 .navbar-list-item
+  padding-left: 5px
   height: 110px
-  border-top: 1px solid gray
+  margin: 10px
+  -webkit-box-shadow: 2px 2px 3px 0px rgba(0,0,0,0.75)
+  -moz-box-shadow: 2px 2px 3px 0px rgba(0,0,0,0.75)
+  box-shadow: 2px 2px 3px 0px rgba(0,0,0,0.75)
+  border: 1px solid rgb(117,117,117)
   background-color: white
   transition: background-color 0.1s
   &:hover
     background-color: rgb(180,180,180)
 
 .navbar-list-icon
+  margin: 5px
   display: inline-block
   width: 100px
   height: 100px
 
 .navbar-list-text
   display: inline-block
-  vertical-align: top
   width: 300px
   height: 100px
   margin-left: 10px
-  padding-top: 30px
   font-size: 25px
+  position: relative
+  p
+    position: absolute
+    top: 20px
+    -ms-transform: translate(0, -50%)
+    -webkit-transform: translate(0, -50%)
+    transform: translate(0, -50%)
 
 .fullScreen
   height: 100vh

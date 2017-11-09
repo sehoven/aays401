@@ -65,7 +65,7 @@ swapState(toggle){
             onClick={() => {this.swapState("search") }}
             style={ topButtonStyle }
           >
-            <div className="buttonText">search</div>
+            <div className="buttonText"><p>Search</p></div>
           </div>
           <div
             className="tabButton"
@@ -73,7 +73,7 @@ swapState(toggle){
             onClick={() => { this.swapState("draw") }}
             style={ bottomButtonStyle }
           >
-            <div className="buttonText">Draw</div>
+            <div className="buttonText"><p>Draw</p></div>
           </div>
         </div>
       </div>
