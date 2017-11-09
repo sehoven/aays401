@@ -100,7 +100,6 @@ export class NavList extends React.Component {
   }
 
   render() {
-    console.log(this.props);
     if (!this.props.data.ready){
       return <div id="navbar-list">Loading...</div>
     } else {
@@ -115,7 +114,7 @@ export class NavList extends React.Component {
             <div className="navbar-list-autocomplete-text">
               {itemData}
             </div>
-          </div>
+        </div>
         )}
         {this.props.data.data.map((itemData, i) =>
           <div className="navbar-list-item"
