@@ -65,7 +65,7 @@ export default class Tabs extends Component {
             onClick={() => { this.swapState("search") }}
             style={ topButtonStyle }
           >
-            <div className="buttonText">Search</div>
+            <div className="buttonText"><p>Search</p></div>
           </div>
           <div
             className="tabButton"
@@ -73,7 +73,7 @@ export default class Tabs extends Component {
             onClick={() => { this.swapState("draw") }}
             style={ bottomButtonStyle }
           >
-            <div className="buttonText">Draw</div>
+            <div className="buttonText"><p>Draw</p></div>
           </div>
         </div>
       </div>
