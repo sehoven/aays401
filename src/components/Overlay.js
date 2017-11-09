@@ -90,12 +90,12 @@ class Overlay extends Component {
   };
 
   render() {
-    
+
     let drawButton = <button id="draw-button" onClick={this.drawClick.bind(this)}>DRAW</button>;
     let clearButton = <button id="clear-button" onClick={this.clearClick.bind(this)}>CLEAR</button>;
     let cancelButton = <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)}>CANCEL</button>;
     let finishButton = <button id="finish-draw-button" onClick={this.finishClick.bind(this)}>FINISH</button>;
-    
+
 
 
     return (
@@ -109,7 +109,6 @@ class Overlay extends Component {
         { this.state.isDrawing ? finishButton : null }
       </div>
     )
-    
   }
 
 }
@@ -123,10 +122,11 @@ export default class OverlayContainer extends Component {
     // data refers to the unit count data
     this.state = {
       isDrawing: false,
-      polygon: null,
+      //polygon: null,
+      polygon: new PolygonArray(),
       dataReady: false,
       data: null
-      
+
     }
   }
 
@@ -137,12 +137,11 @@ export default class OverlayContainer extends Component {
   drawClickCallback() { }
 
   clearClickCallback() {
-    if(this.state.polygon) {
-      this.state.polygon.setMap(null);
+    if(this.state.polygon.polygons.length>0) {
+        let i = this.state.polygon.polygons.length-1;
+        this.state.polygon.polygons[i].setMap(null);
+        this.state.polygon.polygons.pop();
     }
-    this.setPolygon(null);
-    
-    
   }
 
   convertToLatLng(polygon) {
@@ -162,51 +161,58 @@ export default class OverlayContainer extends Component {
   }
 
   finishClickCallback() {
-    let that = this;
-    let polygon = this.convertToLatLng(this.state.polygon);
-
-    if(polygon) {
-      HTTPService.countPolyResidences(
-        { points: polygon, center:  0.1, radius: 0.1 }
-      ).then(function(json){
-        that.setState({dataReady: true, data: json});
-      });
-    }
+      //this is part of outputing data
+    //let that = this;
+    // let polygon = this.convertToLatLng(this.state.polygon);
+    //
+    // if(polygon) {
+    //   HTTPService.countPolyResidences(
+    //     { points: polygon, center:  0.1, radius: 0.1 }
+    //   ).then(function(json){
+    //     that.setState({dataReady: true, data: json});
+    //   });
+    // }
   }
 
   cancelClickCallback() { }
 
   setPolygon(polygon) {
-    this.setState({polygon: polygon});
-
-    // If there is no longer a polygon, clear the unit count data
     if(polygon == null) {
       this.setState({dataReady: false, data: null});
-    }
+  }else{
+      this.state.polygon.add(polygon);
+  }
+  //this is part of outputing data
+    // If there is no longer a polygon, clear the unit count data
+    // if(polygon == null) {
+    //   this.setState({dataReady: false, data: null});
+    // }
   }
 
-  
+
 
   render() {
     return (
-      
-      
+
+
       <div className="side-panel nav-panel">
-        
+
         <Overlay toggleDrawingTools={this.toggleDrawingTools.bind(this)}
                  drawClickCallback={this.drawClickCallback.bind(this)}
                  clearClickCallback={this.clearClickCallback.bind(this)}
                  finishClickCallback={this.finishClickCallback.bind(this)}
                  cancelClickCallback={this.cancelClickCallback.bind(this)} />
-        { this.state.isDrawing && this.state.polygon != null ?
-          <PolygonTools map={this.props.map}
-                        maps={this.props.maps}
-                        polygon={this.state.polygon}
-                        setPolygon={(polygon) => this.setPolygon(polygon)} /> : null }
-        { this.state.isDrawing && this.state.polygon == null ?
+
+        { this.state.isDrawing ?
           <DrawingTools map={this.props.map}
                         maps={this.props.maps}
                         setPolygon={(polygon) => this.setPolygon(polygon)} /> : null }
+        { this.state.isDrawing && this.state.polygon.polygons.length >0 ?
+        <PolygonTools map={this.props.map}
+                        maps={this.props.maps}
+                        polygon={this.state.polygon}
+                        setPolygon={(polygon) => this.setPolygon(polygon)} /> : null }
+
         <ol className="show-number">
           <li>Residences: {this.state.dataReady ? this.state.data["residential"]:"?"}</li>
           <li>Industrial: {this.state.dataReady ? this.state.data["industrial"]:"?"}</li>
@@ -271,4 +277,3 @@ class PolygonArray {
     return allPolygons;
   }
 }
-

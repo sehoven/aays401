@@ -12,58 +12,73 @@ export class PolygonTools extends Component {
     super(props);
     this.state = {
       polygon: this.props.polygon,
-      polygonListener: null,
-      mapListener: null,
-      isSelected: false
+      polygonListener: [],
+      mapListener: [],
+      isSelected: []
     }
   }
 
   // Before the component mounts, set the polygon and add the listeners
   componentWillMount() {
+      for(var i=0;i<this.state.polygon.polygons.length;++i){
+          this.state.polygonListener.push(null);
+          this.state.mapListener.push(null);
+          this.state.isSelected.push(false);
+      }
     this.selectPolygon();
     let that = this;
-    if(this.state.polygonListener == null) {
-      let polygonListener = google.maps.event.addListener(this.state.polygon, "click", function(e) {
-        // When the user clicks on a node, that node will be deleted from the polygon.
-        if(e.vertex != null) {
-          let path = that.state.polygon.getPaths().getAt(e.path);
-          path.removeAt(e.vertex);
-          if(path.length < 3) {
-            that.deletePolygon();
-          }
+    for(var i=0;i<this.state.polygon.polygons.length;++i){
+        if(this.state.polygonListener[i] == null) {
+          let polygonListener = google.maps.event.addListener(this.state.polygon.polygons[i], "click", function(e) {
+            // When the user clicks on a node, that node will be deleted from the polygon.
+            if(e.vertex != null) {
+              let path = that.state.polygon.polygons[i].getPaths().getAt(e.path);
+              path.removeAt(e.vertex);
+              if(path.length < 3) {
+                that.deletePolygon();
+              }
+            }
+            if(that.state.polygon.polygons[i]) {
+              that.selectPolygon();
+            }
+          });
+          that.state.polygonListener[i]=polygonListener;
         }
-        if(that.state.polygon) {
-          that.selectPolygon();
+
+        if(this.state.mapListener[i] == null) {
+          let mapListener = google.maps.event.addListener(this.props.map, "click", function(e) {
+            that.deselectPolygon();
+          });
+          that.state.mapListener[i]=mapListener;
         }
-      });
-      that.setState({polygonListener: polygonListener});
     }
 
-    if(this.state.mapListener == null) {
-      let mapListener = google.maps.event.addListener(this.props.map, "click", function(e) {
-        that.deselectPolygon();
-      });
-      that.setState({mapListener: mapListener});
-    }
+
+
   }
 
   componentWillUnmount() {
     // Before the component unmounts, "deselect" the polygon by making in uneditable
-    if(this.state.polygon != null) {
-      this.state.polygon.setEditable(false);
+
+    for(var i=0;i<this.state.polygon.polygons.length;++i){
+        if(this.state.polygon.polygons[i]!=null) {
+            this.state.polygon.polygons[i].setEditable(false);
+        }
     }
     this.removeListeners();
-    // Set the polygon in the callback function
-    this.props.setPolygon(this.state.polygon);
+    //not sure if this is needed.
+    //this.props.setPolygon(this.state.polygon);
   }
 
   removeListeners() {
     // Remove listeners
-    if(this.state.polygonListener != null) {
-      google.maps.event.removeListener(this.state.polygonListener);
-    }
-    if(this.state.mapListener != null) {
-      google.maps.event.removeListener(this.state.mapListener);
+    for(var i=0;i<this.state.polygon.polygons.length;++i){
+        if(this.state.polygonListener[i] != null) {
+          google.maps.event.removeListener(this.state.polygonListener[i]);
+        }
+        if(this.state.mapListener[i] != null) {
+          google.maps.event.removeListener(this.state.mapListener[i]);
+        }
     }
   }
 
@@ -78,19 +93,21 @@ export class PolygonTools extends Component {
 
   selectPolygon() {
     this.deselectPolygon();
-    if(this.state.polygon != null) {
-      this.state.polygon.setEditable(true);
-      this.setState({isSelected: true});
+    for(var i=0;i<this.state.polygon.polygons.length;++i){
+        if(this.state.polygon.polygons[i]!=null){
+            this.state.polygon.polygons[i].setEditable(true);
+            this.state.isSelected[i]=true;
+        }
     }
   }
 
   deselectPolygon() {
-    if(this.state.isSelected) {
-      if(this.state.polygon != null) {
-        this.state.polygon.setEditable(false);
+      for(var i=0;i<this.state.polygon.polygons.length;++i){
+          if(this.state.isSelected[i]!=null){
+              this.state.polygon.polygons[i].setEditable(false);
+          }
+          this.state.isSelected[i]=false;
       }
-      this.setState({isSelected: false});
-    }
   }
 
   deletePolygon() {
