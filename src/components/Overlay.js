@@ -1,14 +1,18 @@
 import React, { Component } from 'react';
+import {NotificationContainer, NotificationManager} from 'react-notifications';
 import DrawingTools, { PolygonTools } from './DrawingTools.js';
 const HTTPService = require('./HTTPService.js');
+const notificationTimer = 2000;
 
 class Overlay extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      isDrawing: false
+      isDrawing: false,
+      notification:null
     }
+
   }
 
   toggleIsDrawing(callback) {
@@ -27,12 +31,14 @@ class Overlay extends Component {
       callback = () => { this.props.drawClickCallback(); };
     }
     this.toggleIsDrawing(callback);
+    this.notification = 'draw';
   }
 
   clearClick() {
     if(this.props.clearClickCallback) {
       this.props.clearClickCallback();
     }
+    this.notification = 'clear';
   }
 
   finishClick() {
@@ -41,6 +47,7 @@ class Overlay extends Component {
       callback = () => { this.props.finishClickCallback(); };
     }
     this.toggleIsDrawing(callback);
+    this.notification = 'finish';
   }
 
   cancelClick() {
@@ -49,22 +56,65 @@ class Overlay extends Component {
       callback = () => { this.props.cancelClickCallback(); };
     }
     this.toggleIsDrawing(callback);
+    this.notification = 'cancel';
+    
+    
   }
 
+  createNotification (type){
+      switch (type) {
+        case 'draw':
+          NotificationManager.info('Draw Outer Delivery Zone','',notificationTimer);
+          this.notification = null;
+          break;
+        case 'inner':
+          NotificationManager.info('Draw Individual Zones Routes','',notificationTimer);
+          this.notification = null;
+          break;
+        case 'finish':
+          NotificationManager.success('Delivery Route Map Generated','',notificationTimer);
+          this.notification = null;
+          break;
+        case 'cancel':
+          NotificationManager.warning('Removed Last Drawn Polygon','' ,notificationTimer);
+          this.notification = null;
+          break;
+        case 'clear':
+          NotificationManager.warning('Cleared Polygon','', notificationTimer);
+          this.notification = null;
+          break;
+        case 'error':
+          NotificationManager.error('Error message', 'Click me!', 2000, () => {
+            alert('callback');
+          });
+          this.notification = null;
+          break;
+      }
+
+    
+  };
+
   render() {
+    
     let drawButton = <button id="draw-button" onClick={this.drawClick.bind(this)}>DRAW</button>;
     let clearButton = <button id="clear-button" onClick={this.clearClick.bind(this)}>CLEAR</button>;
     let cancelButton = <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)}>CANCEL</button>;
     let finishButton = <button id="finish-draw-button" onClick={this.finishClick.bind(this)}>FINISH</button>;
+    
+
 
     return (
+
       <div>
+        {this.createNotification(this.notification)}
+        <NotificationContainer/>
         { this.state.isDrawing ? null : drawButton }
         { this.state.isDrawing ? null : clearButton }
         { this.state.isDrawing ? cancelButton : null }
         { this.state.isDrawing ? finishButton : null }
       </div>
     )
+    this.notification=null;
   }
 
 }
@@ -81,6 +131,7 @@ export default class OverlayContainer extends Component {
       polygon: null,
       dataReady: false,
       data: null
+      
     }
   }
 
@@ -95,6 +146,8 @@ export default class OverlayContainer extends Component {
       this.state.polygon.setMap(null);
     }
     this.setPolygon(null);
+    
+    
   }
 
   convertToLatLng(polygon) {
@@ -137,9 +190,14 @@ export default class OverlayContainer extends Component {
     }
   }
 
+  
+
   render() {
     return (
+      
+      
       <div className="side-panel nav-panel">
+        
         <Overlay toggleDrawingTools={this.toggleDrawingTools.bind(this)}
                  drawClickCallback={this.drawClickCallback.bind(this)}
                  clearClickCallback={this.clearClickCallback.bind(this)}
@@ -218,3 +276,4 @@ class PolygonArray {
     return allPolygons;
   }
 }
+
