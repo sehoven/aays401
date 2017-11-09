@@ -56,7 +56,7 @@ export class NavList extends React.Component {
 
   centerMapOnId(placeid){
     if (!this.geocoder){
-       this.geocoder = new google.maps.Geocoder;
+       this.geocoder = new google.maps.Geocoder();
     }
     let map = this.props.map;
     this.geocoder.geocode({'placeId': placeid}, function(results, status) {
@@ -105,21 +105,25 @@ export class NavList extends React.Component {
     } else {
       return (
         <div id="navbar-list">
-        {this.props.autocomplete.map((itemData, i) =>
-          <div className="navbar-list-autocomplete-item"
+          {this.props.autocomplete.map((itemData, i) =>
+            <div className="navbar-list-autocomplete-item"
               key={i}
-              onClick={() => { this.centerMapOnId(itemData.place_id)}}>
-              <div className="navbar-list-autocomplete-text">
+              onClick={
+                () => { this.centerMapOnId(this.props.placeIds[i].place_id)}
+            }>
+            <div className="navbar-list-autocomplete-text">
               {itemData}
             </div>
-          </div>
+        </div>
         )}
         {this.props.data.data.map((itemData, i) =>
           <div className="navbar-list-item"
-          key={i}
-          onClick={() => { this.neighbourhoodClicked(itemData.center, itemData)}}>
+            key={i}
+            onClick={
+              () => { this.neighbourhoodClicked(itemData.center, itemData) }
+          }>
             <IconCanvas key={i} item={itemData} />
-            <div className="navbar-list-text">{itemData.name}</div>
+            <div className="navbar-list-text"><p>{itemData.name}</p></div>
           </div>
         )}
         </div>
