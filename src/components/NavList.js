@@ -109,7 +109,6 @@ export class NavList extends React.Component {
           <div className="navbar-list-autocomplete-item"
               key={i}
               onClick={() => { this.centerMapOnId(itemData.place_id)}}>
-            <div className="navbar-list-autocomplete-icon"></div>
             <div className="navbar-list-autocomplete-text">
               {itemData}
             </div>

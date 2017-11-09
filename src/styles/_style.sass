@@ -5,7 +5,6 @@ $mapControlHeight: 5vh
 $mapControlMargin: 4vh
 $mapControlPadding: 10px
 $navMarginTop: calc(#{$mapControlHeight} + (2 * #{$mapControlMargin}))
-$searchboxHeight: 30px
 
 h1
   color: blue
@@ -33,6 +32,7 @@ body
   height: 50%
 
 .buttonText
+  margin: auto
   -ms-transform: rotate(90deg)
   -webkit-transform: rotate(90deg)
   transform: rotate(90deg)
@@ -62,7 +62,12 @@ body
 
 #search-box
   width: 460px
-  height: #{$searchboxHeight}
+  height: 40px
+  padding-left: 8px
+  border-style: solid
+  border-width: 1px
+  border-radius: 5px
+  border-color: rgb(117, 117, 117)
   margin-right: 0px
   font-size: 25px
   vertical-align: bottom
@@ -77,6 +82,8 @@ body
   border-top: 1px solid gray
   background-color: white
   transition: background-color 0.1s
+  &:hover
+    background-color: rgb(180,180,180)
 
 .navbar-list-autocomplete-icon
   display: inline-block
@@ -88,18 +95,18 @@ body
   vertical-align: top
   width: 360px
   height: 50px
-  margin-left: 10px
-  padding-top: 20px
-  font-size: 15px
-
-.navbar-list-autocomplete-item:hover
-  background-color: rgb(180,180,180)
+  padding-top: 15px
+  padding-left: 30px
+  font-size: 25px
+  vertical-align: bottom
 
 .navbar-list-item
   height: 110px
   border-top: 1px solid gray
   background-color: white
   transition: background-color 0.1s
+  &:hover
+    background-color: rgb(180,180,180)
 
 .navbar-list-icon
   display: inline-block
@@ -108,15 +115,12 @@ body
 
 .navbar-list-text
   display: inline-block
-  vertical-align: top
-  width: 360px
+  vertical-align: center
+  width: 300px
   height: 100px
   margin-left: 10px
-  padding-top: 10px
-  font-size: 20px
-
-.navbar-list-item:hover
-  background-color: rgb(180,180,180)
+  padding-top: 50px
+  font-size: 25px
 
 .fullScreen
   height: 100vh
@@ -136,6 +140,5 @@ button
   border-radius: 2px
   background-color: white
   outline: none
-
-button:hover
+  &:hover
   background-color: gray
