@@ -80,8 +80,10 @@ export default class OverlayContainer extends Component {
       isDrawing: false,
       polygon: null,
       dataReady: false,
-      data: null
+      data: null,
+      url:null
     }
+    this.setImgUrl = this.setImgUrl.bind(this);
   }
 
   toggleDrawingTools(callback) {
@@ -95,6 +97,7 @@ export default class OverlayContainer extends Component {
       this.state.polygon.setMap(null);
     }
     this.setPolygon(null);
+    this.setState({dataReady:null, url:null});
   }
 
   convertToLatLng(polygon) {
@@ -123,6 +126,7 @@ export default class OverlayContainer extends Component {
       ).then(function(json){
         that.setState({dataReady: true, data: json});
       });
+       this.setImgUrl(polygon);
     }
   }
 
@@ -137,7 +141,18 @@ export default class OverlayContainer extends Component {
     }
   }
 
+  setImgUrl(polygon){
+      let url="https://maps.googleapis.com/maps/api/staticmap?&size=1000x1000&path=color:0x00000000|weight:5|fillcolor:0x00BDBDBD";
+      polygon.forEach(function(position){
+          url += "|";
+          url += position["lat"];
+          url += ",";
+          url += position["lng"];
+      });
+      this.setState({url:url});
+    }
   render() {
+    let image = <img className="image" src= {this.state.url}/>
     return (
       <div className="side-panel nav-panel">
         <Overlay toggleDrawingTools={this.toggleDrawingTools.bind(this)}
@@ -154,6 +169,7 @@ export default class OverlayContainer extends Component {
           <DrawingTools map={this.props.map}
                         maps={this.props.maps}
                         setPolygon={(polygon) => this.setPolygon(polygon)} /> : null }
+
         <ol className="show-number">
           <li>Residences: {this.state.dataReady ? this.state.data["residential"]:"?"}</li>
           <li>Industrial: {this.state.dataReady ? this.state.data["industrial"]:"?"}</li>
@@ -161,6 +177,14 @@ export default class OverlayContainer extends Component {
           <li>Urban: {this.state.dataReady ? this.state.data["urban service"]:"?"}</li>
           <li>Other: {this.state.dataReady ? this.state.data["other"]:"?"}</li>
         </ol>
+
+        {this.state.url !=null ?
+          <div>
+            <a href={this.state.url} download="map">{image}</a>
+            <div>Click the map to download!</div>
+          </div>
+          :null}
+
       </div>
     )
   }
