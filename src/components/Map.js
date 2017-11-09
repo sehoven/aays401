@@ -24,16 +24,14 @@ export default class Map extends Component {
 
   render() {
     return (
-        <div className="container" id="map-container">
-          <div className="container" id="map">
-            <GoogleMap
-              bootstrapURLKeys={{key:"AIzaSyB4CMvWi4j-iLXGCKVw_zCIoHrLI18iK4U&libraries=places,drawing"}}
-              center={{lat: 53.5444, lng: -113.4909}}
-              zoom={10}
-              onGoogleApiLoaded={({map, maps}) => this.onReady(map, maps)}
-              yesIWantToUseGoogleMapApiInternals={true}>
-            </GoogleMap>
-          </div>
+        <div id="map">
+          <GoogleMap
+            bootstrapURLKeys={{key:"AIzaSyB4CMvWi4j-iLXGCKVw_zCIoHrLI18iK4U&libraries=places,drawing"}}
+            center={{lat: 53.5444, lng: -113.4909}}
+            zoom={10}
+            onGoogleApiLoaded={({map, maps}) => this.onReady(map, maps)}
+            yesIWantToUseGoogleMapApiInternals={true}>
+          </GoogleMap>
         </div>
     );
   }

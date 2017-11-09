@@ -69,7 +69,7 @@ export default class Overlay extends Component {
     let finishButton = <button id="finish-draw-button" onClick={this.finishClick}>FINISH</button>;
 
     return (
-      <div className="side-panel nav-panel">
+      <div className="nav-panel">
         { this.state.isDrawing ?
           <DrawingTools ref={instance => {this.drawingTools = instance;}}
                         map={this.props.map}

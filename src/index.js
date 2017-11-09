@@ -1,8 +1,7 @@
 import React, {Component} from 'react';
 const ReactDOM = require('react-dom');
 import Map from './components/Map.js';
-import NavPanel from './components/NavPanel.js';
-import Tabs from './components/Tabs.js'
+import NavPanel from './components/NavPanel.js'
 import Overlay, { DrawingTools } from './components/Overlay.js';
 require('./styles/_style.sass');
 
@@ -12,7 +11,8 @@ export class Index extends Component {
     this.state = {
       mapLoaded: false,
       map: null,
-      maps: null
+      maps: null,
+      currentPanel: "search"
     }
     this.setMapRef = this.setMapRef.bind(this);
   }
@@ -25,28 +25,74 @@ export class Index extends Component {
     });
   }
 
+  swapState(toggle){
+    this.setState({ currentPanel : toggle });
+  }
+
   render(){
+    var topButtonStyle = {};
+    var bottomButtonStyle = {};
+    if (this.state.currentPanel =="search") {
+      topButtonStyle = {
+        borderTop: "1px black solid",
+        borderRight: "1px black solid",
+        borderBottom: "1px black solid",
+        backgroundColor: "white"
+      }
+      bottomButtonStyle = {
+        borderLeft: "1px black solid",
+        backgroundColor: "gray"
+      }
+    } else {
+      topButtonStyle = {
+        borderLeft: "1px black solid",
+        backgroundColor: "gray"
+      }
+      bottomButtonStyle = {
+        borderTop: "1px black solid",
+        borderRight: "1px black solid",
+        borderBottom: "1px black solid",
+        backgroundColor: "white"
+      }
+    }
+
     return (
       <div className="fullScreen">
-        <div className="container">
-          <Tabs className="container" ref = {instance => {this.tabs = instance}}>
-            <div name="search">
-              <NavPanel
-                index={this.state}
-                overlayRef={this.overlay}
-                tabsRef={this.tabs}
-              />
+        <div id="leftContainer">
+          { (this.state.currentPanel == "search") &&
+            <NavPanel
+              index={this.state}
+              overlayRef={this.overlay}
+              tabsRef={this.tabs}
+            />
+          }
+          { (this.state.currentPanel == "draw") &&
+            <Overlay
+              ref={instance => {this.overlay = instance}}
+              map={this.state.map}
+              maps={this.state.maps}
+            />
+          }
+          <div id="tabButtons">
+            <div
+              className="tabButton"
+              id="topTabButton"
+              onClick={() => { this.swapState("search") }}
+              style={ topButtonStyle }
+            >
+              <div className="buttonText">Search</div>
             </div>
-            <div name="polygon">
-              <Overlay
-                ref={instance => {this.overlay = instance}}
-                map={this.state.map}
-                maps={this.state.maps}
-              />
+            <div
+              className="tabButton"
+              id="bottomTabButton"
+              onClick={() => { this.swapState("draw") }}
+              style={ bottomButtonStyle }
+            >
+              <div className="buttonText">Draw</div>
             </div>
-          </Tabs>
-          <Map setMapRef={this.setMapRef} />
-	      </div>
+	        </div>
+        </div>
+        <Map setMapRef={this.setMapRef} />
       </div>
     )
   }
