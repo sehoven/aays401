@@ -36,13 +36,12 @@ export default class NavPanel extends Component {
       this.AutocompleteService.getQueryPredictions(
         { input: event.target.value },
         function(predictions, status) {
-          let maps = that.props.index.maps;
-          if (status != maps.places.PlacesServiceStatus.OK) {
+          if (status != that.props.maps.places.PlacesServiceStatus.OK) {
             return;
           }
           let results = predictions.map(
           function(x){
-            let maxLength = 20;
+            let maxLength = 28;
             var long = x.terms[0].value + (x.terms.length > 1?(", " + x.terms[1].value):"");
             return (long.length > maxLength)?(long.slice(0,maxLength)+"…"):long;
           })
@@ -54,7 +53,7 @@ export default class NavPanel extends Component {
   render() {
     return (
       <div className="nav-panel">
-        <input type="text" name="searchBar" id="search-box"
+        <input type="text" id="search-box"
           onChange={this.onChange} />
         <NavList
           map={this.props.map}

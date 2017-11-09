@@ -1,50 +1,80 @@
 import React, { Component } from 'react';
 import NavPanel from './NavPanel.js';
+import OverlayContainer from './Overlay';
 
-export default class Tabs extends Component{
-  constructor() {
-    super()
+export default class Tabs extends Component {
+  constructor(props) {
+    super(props);
     this.state = {
-      currentIndex : 0
+      currentPanel: "search"
     }
   }
 
-  checkTitleIndex(index) {
-    return index === this.state.currentIndex ? "tab_title active" : "tab_title"
-  }
-
-  checkItemIndex(index) {
-    return index === this.state.currentIndex ? "tab_item show" : "tab_item"
-  }
-
-  swapState(index) {
-    this.setState({ currentIndex : index });
+  swapState(toggle){
+    this.setState({ currentPanel : toggle });
   }
 
   render() {
-    return(
-      <div>
-        { /* Tab title*/ }
-        <div id="tab-bar" className="side-panel">
-          {
-            React.Children.map(this.props.children , (element,index) => {
-              return(
-                <div onClick={ () => { this.swapState(index) } } className={ this.checkTitleIndex(index) }>
-                  { element.props.name }
-                </div>
-              )
-            })
-          }
-        </div>
-        {/*Tab content*/}
-        <div>
-          {
-            React.Children.map(this.props.children, (element,index) => {
-              return(
-                <div className={ this.checkItemIndex(index) }>{ element }</div>
-              )
-            })
-          }
+    var topButtonStyle = {};
+    var bottomButtonStyle = {};
+    if (this.state.currentPanel == "search") {
+      topButtonStyle = {
+        borderTop: "1px black solid",
+        borderRight: "1px black solid",
+        borderBottom: "1px black solid",
+        backgroundColor: "white"
+      }
+      bottomButtonStyle = {
+        borderLeft: "1px black solid",
+        backgroundColor: "gray"
+      }
+    } else {
+      topButtonStyle = {
+        borderLeft: "1px black solid",
+        backgroundColor: "gray"
+      }
+      bottomButtonStyle = {
+        borderTop: "1px black solid",
+        borderRight: "1px black solid",
+        borderBottom: "1px black solid",
+        backgroundColor: "white"
+      }
+    }
+    return (
+      <div id="leftContainer">
+        { (this.state.currentPanel == "search") &&
+          <NavPanel
+            map={this.props.map}
+            maps={this.props.maps}
+            index={this.state}
+            overlayRef={this.overlay}
+            tabsRef={this.tabs}
+          />
+        }
+        { (this.state.currentPanel == "draw") &&
+          <OverlayContainer
+            ref={instance => {this.overlay = instance}}
+            map={this.props.map}
+            maps={this.props.maps}
+          />
+        }
+        <div id="tabButtons">
+          <div
+            className="tabButton"
+            id="topTabButton"
+            onClick={() => { this.swapState("search") }}
+            style={ topButtonStyle }
+          >
+            <div className="buttonText">Search</div>
+          </div>
+          <div
+            className="tabButton"
+            id="bottomTabButton"
+            onClick={() => { this.swapState("draw") }}
+            style={ bottomButtonStyle }
+          >
+            <div className="buttonText">Draw</div>
+          </div>
         </div>
       </div>
     )
