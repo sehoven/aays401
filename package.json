@@ -36,6 +36,7 @@
   "homepage": "https://github.com/Etiennera/aays401#readme",
   "dependencies": {
     "body-parser": "^1.18.2",
+    "enumify": "^1.0.4",
     "express": "^4.15.4",
     "google-map-react": "^0.24.0",
     "immutable": "^3.8.1",

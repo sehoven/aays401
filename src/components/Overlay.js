@@ -138,8 +138,9 @@ export default class OverlayContainer extends Component {
   }
 
   render() {
+    if (!this.props.active) return null;
     return (
-      <div className="side-panel nav-panel">
+      <div className="nav-panel">
         <Overlay toggleDrawingTools={this.toggleDrawingTools.bind(this)}
                  drawClickCallback={this.drawClickCallback.bind(this)}
                  clearClickCallback={this.clearClickCallback.bind(this)}

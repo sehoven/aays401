@@ -55,6 +55,7 @@ export default class NavPanel extends Component {
   }
 
   render() {
+    if (!this.props.active) return null;
     return (
       <div className="nav-panel">
         <input type="text" id="search-box"
