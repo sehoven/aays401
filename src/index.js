@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import MapContainer from './components/MapContainer.js';
+import Tabs from './components/Tabs';
 const ReactDOM = require('react-dom');
 
 require('./styles/_style.sass');
@@ -7,42 +8,29 @@ require('./styles/_style.sass');
 export class Index extends Component {
   constructor(props){
     super(props);
+    this.state = {
+      mapLoaded: false,
+      map: null,
+      maps: null
+    }
   }
 
-  swapState(toggle){
-    this.setState({ currentPanel : toggle })  ;
+  setMapRef(map, maps) {
+    this.setState({
+      mapLoaded: true,
+      map: map,
+      maps: maps
+    });
   }
 
   render(){
-    var topButtonStyle = {};
-    var bottomButtonStyle = {};
-    if (this.state.currentPanel == "search"){
-      topButtonStyle = {
-        borderTop: "1px black solid",
-        borderRight: "1px black solid",
-        borderBottom: "1px black solid",
-        backgroundColor: "white"
-      }
-      bottomButtonStyle = {
-        borderLeft: "1px black solid",
-        backgroundColor: "gray"
-      }
-    } else {
-      topButtonStyle = {
-        borderLeft: "1px black solid",
-        backgroundColor: "gray"
-      }
-        bottomButtonStyle = {
-        borderTop: "1px black solid",
-        borderRight: "1px black solid",
-        borderBottom: "1px black solid",
-        backgroundColor: "white"
-      }
-    }
-    
     return (
       <div className="fullScreen">
-        <MapContainer />
+        <Tabs
+          map={this.state.map}
+          maps={this.state.maps}
+        />
+        <MapContainer setMapRef={this.setMapRef.bind(this)}/>
       </div>
     )
   }
