@@ -1,64 +1,52 @@
-$uiWidth: 30vw
+@import url('https://fonts.googleapis.com/css?family=Roboto')
+$uiWidth: 480px
 $mapControlHeight: 5vh
 $mapControlMargin: 4vh
 $mapControlPadding: 10px
 $navbarPadding: 10px
-$navbarWidth: calc(#{$uiWidth} - (2 * #{$navbarPadding}))
 $navMarginTop: calc(#{$mapControlHeight} + (2 * #{$mapControlMargin}))
 $searchboxHeight: 30px
-$searchbarWidth: 0px
 
 h1
   color: blue
 
 body
   margin: 0
+  font-family: 'Roboto', sans-serif
 
-.side-panel
-  border: 1px gray solid
-  box-shadow: 2px 2px 1px #888888
-  background-color: white
-
-.side
-
-#tab-bar
-  width: #{$uiWidth}
-  height: 40px
-  margin-left: 4vh
-  margin-top: 4vh
-  padding: #{$navbarPadding}
+#leftContainer
+  margin: 5vh
+  width: 550px
   position: absolute
-  z-index: 2
+  height: 90vh
 
-.tab_title
-	width: 50px
-	height: 90px
-	text-align: center
-	line-height: 40px
-	color: #fff
-	background-color: #bdbdbd
-	display: inline-block
+#tabButtons
+  position: absolute
+  left: 500px
+  height: inherit
+  width: 50px
+  z-index: 6
 
-.active
-	color: #000
-	background-color: #fff
+.tabButton
+  border-top-right-radius: 8px
+  border-bottom-right-radius: 8px
+  height: 50%
 
-.tab_item
-	display: none
-.show
-	display: block
+.buttonText
+  
 
 .nav-panel
   width: #{$uiWidth}
-  height: 90vh
-  margin-left: 4vh
-  margin-top: #{$navMarginTop}
-  padding: #{$navbarPadding}
+  height: calc(100% - 20px)
+  padding: 10px
   position: absolute
   z-index: 2
+  border-top: 1px black solid
+  border-left: 1px black solid
+  border-bottom: 1px black solid
+  background-color: white
 
 .show-number
-  width: #{$uiWidth}
   text-align: left
   list-style-type: none
 
@@ -72,7 +60,7 @@ body
   z-index: 2
 
 #search-box
-  width: calc(#{$navbarWidth} - #{$searchbarWidth})
+  width: 460
   height: #{$searchboxHeight}
   margin-right: 0px
   font-size: 25px
@@ -80,7 +68,7 @@ body
 
 #navbar-list
   margin-top: 10px
-  height: calc(90vh - #{$searchboxHeight} - 16px - calc(#{$navbarPadding} * 2))
+  height: calc(90vh - 66px)
   overflow-y: auto
 
 .navbar-list-autocomplete-item
@@ -97,7 +85,7 @@ body
 .navbar-list-autocomplete-text
   display: inline-block
   vertical-align: top
-  width: calc(#{$navbarWidth} - 120px)
+  width: 360px
   height: 50px
   margin-left: 10px
   padding-top: 20px
@@ -120,7 +108,7 @@ body
 .navbar-list-text
   display: inline-block
   vertical-align: top
-  width: calc(#{$navbarWidth} - 120px)
+  width: 360px
   height: 100px
   margin-left: 10px
   padding-top: 10px
@@ -133,16 +121,14 @@ body
   height: 100vh
   width: 100vw
 
-.container
-  height: inherit
-  width: inherit
-
 #map-container
   position: relative
-  text-align: center
 
 #map
   position: absolute
+  text-align: center
+  width: inherit
+  height: inherit
   top: 0
   left: 0
   z-index: 1
