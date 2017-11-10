@@ -192,6 +192,7 @@ export default class OverlayContainer extends Component {
               }
           }
           if(that.state.polygon.polygons.length==0){
+              this.state.polyNum=0;
               that.setState({dataReady: false});
               that.state.data=[];
           }
