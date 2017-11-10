@@ -217,16 +217,17 @@ export default class OverlayContainer extends Component {
 
   addClickCallback() {
     this.setState({isDrawing:true});
+    return this.state.polygons.polygons.length!=this.state.polyNum;
     //this.updatePolygonData();
   }
 
   updatePolygonData() {
       let that = this;
-      this.state.url=[];
-      that.state.url=[];
-      this.state.data=[];
-      that.state.data=[];
       if(that.state.polygons.polygons.length!=this.state.polyNum){
+          this.state.url=[];
+          that.state.url=[];
+          this.state.data=[];
+          that.state.data=[];
           that.state.polyNum=that.state.polygons.polygons.length;
           for(var i = 0;i<that.state.polygons.polygons.length;++i){
               let polygon = that.convertToLatLng(this.state.polygons.polygons[i]);
@@ -254,6 +255,10 @@ export default class OverlayContainer extends Component {
                              data: []});
           }
       }
+  }
+
+  resetPolygon() {
+    this.setState({polygon: new PolygonArray()});
   }
 
   setPolygon(polygon) {
