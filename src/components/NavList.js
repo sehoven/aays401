@@ -105,6 +105,9 @@ export class NavList extends React.Component {
     this.polygon.setMap(map);
     that.willInject = true;
     that.props.tabsRef.injectNeighborhood(this.polygon);
+    let polygonListener = google.maps.event.addListener(this.polygon, "click", function(e) {
+        
+    });
   }
 
   render() {

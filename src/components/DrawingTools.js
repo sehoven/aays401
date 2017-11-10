@@ -68,10 +68,10 @@ export class PolygonTools extends Component {
         // }
     }
     if(this.state.mapListener == null) {
-      let mapListener = google.maps.event.addListener(this.props.map, "click", function(e) {
-        that.deselectPolygon();
-      });
-      that.state.mapListener=mapListener;
+      //let mapListener = google.maps.event.addListener(this.props.map, "click", function(e) {
+      //  that.deselectPolygon();
+      //});
+      //that.state.mapListener=mapListener;
     }
   }
 
@@ -269,10 +269,10 @@ export default class DrawingTools extends Component {
     });
 
     if(this.state.mapListener == null) {
-      let mapListener = google.maps.event.addListener(map, "click", function(e) {
-        drawingTools.deselectPolygon();
-      });
-      drawingTools.setState({mapListener: mapListener});
+     // let mapListener = google.maps.event.addListener(map, "click", function(e) {
+     //   drawingTools.deselectPolygon();
+     // });
+      //drawingTools.setState({mapListener: mapListener});
     }
 
   }
