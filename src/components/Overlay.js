@@ -98,7 +98,6 @@ export default class OverlayContainer extends Component {
       this.state.polygon.setMap(null);
     }
     this.setPolygon(null);
-    this.setState({dataReady:null, url:null});
   }
 
   convertToLatLng(polygon) {
@@ -139,16 +138,14 @@ export default class OverlayContainer extends Component {
     // If there is no longer a polygon, clear the unit count data
     if(polygon == null) {
       this.setState({dataReady: false, data: null});
+      this.setState({dataReady:null, url:null});
     }
   }
 
   setImgUrl(polygon){
       let url="https://maps.googleapis.com/maps/api/staticmap?&size=1000x1000&path=color:0x00000000|weight:5|fillcolor:0x00BDBDBD";
       polygon.forEach(function(position){
-          url += "|";
-          url += position["lat"];
-          url += ",";
-          url += position["lng"];
+          url += "|"+position["lat"]+ ","+ position["lng"];
       });
       this.setState({url:url});
     }
