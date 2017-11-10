@@ -137,8 +137,8 @@ export default class OverlayContainer extends Component {
 
     // If there is no longer a polygon, clear the unit count data
     if(polygon == null) {
-      this.setState({dataReady: false, data: null});
-      this.setState({dataReady:null, url:null});
+      this.setState({dataReady: false, data: null, url:null});
+      
     }
   }
 
