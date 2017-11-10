@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-var randomColor = require('randomcolor'); 
+var randomColor = require('randomcolor');
 
 var polygonOptions = {
   strokeWeight: 0.2,
@@ -16,14 +16,11 @@ export class PolygonTools extends Component {
     this.state = {
       polygon: this.props.polygon,
       polygonListener: [],
-      mapListener: [],
-      isSelected: [],
-      polyNum:this.props.polyNum
+      mapListener: null,
+      isSelected: []
     }
-    
 
-    console.log(this.state.polyNum);
-    if(this.state.polyNum==0){
+    if(this.props.polyNum==0){
       polygonOptions.fillColor = '#000000';
       polygonOptions.fillOpacity = 0.20;
     }
@@ -32,17 +29,18 @@ export class PolygonTools extends Component {
       polygonOptions.fillOpacity = 0.45;
 
     }
-    
+
   }
 
   // Before the component mounts, set the polygon and add the listeners
   componentWillMount() {
-      for(var i=0;i<this.state.polygon.polygons.length;++i){
-          this.state.polygonListener.push(null);
-          this.state.mapListener.push(null);
-          this.state.isSelected.push(false);
-      }
+    for(var i=0;i<this.state.polygon.polygons.length;++i){
+        this.state.polygonListener.push(null);
+        this.state.isSelected.push(false);
+    }
+    this.setState({mapListener:null});
     this.selectPolygon();
+
     let that = this;
     for(var i=0;i<this.state.polygon.polygons.length;++i){
         if(this.state.polygonListener[i] == null) {
@@ -62,16 +60,19 @@ export class PolygonTools extends Component {
           that.state.polygonListener[i]=polygonListener;
         }
 
-        if(this.state.mapListener[i] == null) {
-          let mapListener = google.maps.event.addListener(this.props.map, "click", function(e) {
-            that.deselectPolygon();
-          });
-          that.state.mapListener[i]=mapListener;
-        }
+        // if(this.state.mapListener[i] == null) {
+        //   let mapListener = google.maps.event.addListener(this.props.map, "click", function(e) {
+        //     that.deselectPolygon();
+        //   });
+        //   that.state.mapListener[i]=mapListener;
+        // }
     }
-
-
-
+    if(this.state.mapListener == null) {
+      let mapListener = google.maps.event.addListener(this.props.map, "click", function(e) {
+        that.deselectPolygon();
+      });
+      that.state.mapListener=mapListener;
+    }
   }
 
   componentWillUnmount() {
@@ -93,9 +94,9 @@ export class PolygonTools extends Component {
         if(this.state.polygonListener[i] != null) {
           google.maps.event.removeListener(this.state.polygonListener[i]);
         }
-        if(this.state.mapListener[i] != null) {
-          google.maps.event.removeListener(this.state.mapListener[i]);
-        }
+    }
+    if(this.state.mapListener != null) {
+      google.maps.event.removeListener(this.state.mapListener);
     }
   }
 
@@ -155,8 +156,7 @@ export default class DrawingTools extends Component {
       drawingTools: this,
       drawingManager: null,
       polygonListener: null,
-      mapListener: null,
-      polyNum: this.props.polyNum
+      mapListener: null
     }
 
   }
@@ -226,8 +226,8 @@ export default class DrawingTools extends Component {
   }
 
   setDrawingTools(map) {
-    
-    
+
+
     const drawingToolsOptions = {
       drawingMode: google.maps.drawing.OverlayType.POLYGON,
       drawingControl: true,
@@ -267,16 +267,16 @@ export default class DrawingTools extends Component {
 
       drawingTools.selectPolygon();
     });
-    
+
     if(this.state.mapListener == null) {
       let mapListener = google.maps.event.addListener(map, "click", function(e) {
         drawingTools.deselectPolygon();
       });
       drawingTools.setState({mapListener: mapListener});
     }
-    
+
   }
-  
+
 
   render() {
     return null

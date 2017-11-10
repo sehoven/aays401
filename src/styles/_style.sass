@@ -162,7 +162,7 @@ body
 .navbar-count-poly-title
   display: inline-block
   vertical-align: bottom
-  width: calc(#{$navbarWidth} - 120px)
+  width: calc(#{$uiWidth} - 40px)
   //height: 100px
   margin-left: 10px
   font-size: 20px
@@ -170,7 +170,7 @@ body
 .navbar-count-poly-text
   display: inline-block
   vertical-align: bottom
-  width: calc(#{$navbarWidth} - 120px)
+  width: calc(#{$uiWidth} - 40px)
   //height: 100px
   margin-top: 5px
   margin-left: 10px
@@ -190,7 +190,6 @@ body
   z-index: 1
 
 button
-
   border-radius: 4px
   background-color: #5B84A2
   border: none
@@ -227,7 +226,6 @@ buttonLarge:hover
 @font-face
   font-weight: normal
   font-style: normal
-
 
 .notification-container
   box-sizing: border-box
@@ -311,3 +309,12 @@ buttonLarge:hover
   &:before
     content: ""
 
+img
+  height: 250px
+  width: 250px
+img:hover
+  -webkit-transform: scale(1.1)
+  -moz-transform: scale(1.1)
+  -o-transform: scale(1.1)
+  -ms-transform: scale(1.1)
+  transform: scale(1.1)
