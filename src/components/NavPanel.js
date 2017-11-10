@@ -10,6 +10,7 @@ export default class NavPanel extends Component {
     super(props);
     this.state = {
       autocomplete: [],
+      placeIds: [],
       list: {ready: true, data:[]}
     };
     this.onChange = this.onChange.bind(this);
@@ -36,24 +37,33 @@ export default class NavPanel extends Component {
       this.AutocompleteService.getQueryPredictions(
         { input: event.target.value },
         function(predictions, status) {
-          if(status != that.props.maps.places.PlacesServiceStatus.OK) {
+          if (status != that.props.maps.places.PlacesServiceStatus.OK) {
             return;
           }
-          that.setState({ autocomplete: predictions});
-        }
-      );
+          let results = predictions.map(
+          function(x){
+            return x.terms[0].value
+                    + (x.terms.length>1?(", " + x.terms[1].value):"");
+          });
+          that.setState({
+            autocomplete: results,
+            placeIds: predictions
+          });
+        });
     }
   }
 
   render() {
+    if (!this.props.active) return null;
     return (
-      <div className="side-panel nav-panel">
-        <input type="text" name="searchBar" id="search-box"
+      <div className="nav-panel">
+        <input type="text" id="search-box"
           onChange={this.onChange} />
         <NavList
           map={this.props.map}
           maps={this.props.maps}
           autocomplete={this.state.autocomplete}
+          placeIds={this.state.placeIds}
           data={this.state.list}
           tabsRef={this.props.tabsRef}
           overlayRef={this.props.overlayRef} />
