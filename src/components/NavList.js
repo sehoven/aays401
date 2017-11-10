@@ -52,16 +52,25 @@ export class NavList extends React.Component {
     this.geocoder;
     this.polygon;
     this.markers = [];
+    this.willInject = false;
   }
 
-  centerMapOnId(placeid){
+  componentWillUnmount(){
+    if (this.willInject){
+      this.polygon = null;
+    } else {
+      if (this.polygon) this.polygon.setMap(null);
+    }
+  }
+
+  centerMapOnId(placeId){
     if (!this.geocoder){
-       this.geocoder = new google.maps.Geocoder;
+       this.geocoder = new google.maps.Geocoder();
     }
     let map = this.props.map;
-    this.geocoder.geocode({'placeId': placeid}, function(results, status) {
+    this.geocoder.geocode({'placeId': placeId}, function(results, status) {
       if (status !== 'OK') {
-        Alert.alert('Geocoder failed due to: ' + status);
+        console.log('Geocoder failed due to: ' + status);
         return;
       }
       map.setZoom(11);
@@ -87,15 +96,14 @@ export class NavList extends React.Component {
     }
     this.polygon = new google.maps.Polygon({
           paths: itemData.points,
-          strokeColor: '#FF0000',
-          strokeOpacity: 0.8,
-          strokeWeight: 2,
-          fillColor: '#FF0000',
-          fillOpacity: 0.35
-        });
+          strokeWeight: 0,
+          fillOpacity: 0.45,
+          zIndex: 1
+    });
     this.polygon.setMap(map);
     let polygonListener = google.maps.event.addListener(this.polygon, "click", function(e) {
-      that.props.tabsRef.swapState(1);
+      that.willInject = true;
+      that.props.tabsRef.injectNeighborhood(this);
     });
   }
 
@@ -105,22 +113,25 @@ export class NavList extends React.Component {
     } else {
       return (
         <div id="navbar-list">
-        {this.props.autocomplete.map((itemData, i) =>
-          <div className="navbar-list-autocomplete-item"
+          {this.props.autocomplete.map((itemData, i) =>
+            <div className="navbar-list-autocomplete-item"
               key={i}
-              onClick={() => { this.centerMapOnId(itemData.place_id)}}>
-            <div className="navbar-list-autocomplete-icon"></div>
+              onClick={
+                () => { this.centerMapOnId(this.props.placeIds[i].place_id)}
+            }>
             <div className="navbar-list-autocomplete-text">
-              {itemData.description}
+              {itemData}
             </div>
-          </div>
+        </div>
         )}
         {this.props.data.data.map((itemData, i) =>
           <div className="navbar-list-item"
-          key={i}
-          onClick={() => { this.neighbourhoodClicked(itemData.center, itemData)}}>
+            key={i}
+            onClick={
+              () => { this.neighbourhoodClicked(itemData.center, itemData) }
+          }>
             <IconCanvas key={i} item={itemData} />
-            <div className="navbar-list-text">{itemData.name}</div>
+            <div className="navbar-list-text"><p>{itemData.name}</p></div>
           </div>
         )}
         </div>
