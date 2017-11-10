@@ -152,6 +152,30 @@ body
     -webkit-transform: translate(0, -50%)
     transform: translate(0, -50%)
 
+.navbar-count-poly-box
+  //height: 110px
+  padding-top: 10px
+  padding-bottom: 10px
+  border-top: 1px solid gray
+  //transition: background-color 0.1s
+
+.navbar-count-poly-title
+  display: inline-block
+  vertical-align: bottom
+  width: calc(#{$uiWidth} - 40px)
+  //height: 100px
+  margin-left: 10px
+  font-size: 20px
+
+.navbar-count-poly-text
+  display: inline-block
+  vertical-align: bottom
+  width: calc(#{$uiWidth} - 40px)
+  //height: 100px
+  margin-top: 5px
+  margin-left: 10px
+  font-size: 20px
+
 .fullScreen
   height: 100vh
   width: 100vw
@@ -166,42 +190,128 @@ body
   z-index: 1
 
 button
-  border: 1px solid rgb(117,117,117)
-  width: calc(50% - 10px)
-  margin: 0 5px
-  height: 40px
-  border-radius: 5px
-  -webkit-box-shadow: 1px 1px 3px 0px rgba(0,0,0,0.75)
-  -moz-box-shadow: 1px 1px 3px 0px rgba(0,0,0,0.75)
-  box-shadow: 1px 1px 3px 0px rgba(0,0,0,0.75)
-  font-size: 25px
-  font-weight: bold
-  outline: none
-  &:hover
-    box-shadow: inset 1px 1px 3px 0px rgba(0, 0, 0, 0.75)
+  border-radius: 4px
+  background-color: #5B84A2
+  border: none
+  color: #FFFFFF
+  text-align: center
+  font-size: 14px
+  padding: 20px
+  width: 120px
+  transition: all 0.2s
+  cursor: pointer
+  margin: 5px
 
-#draw-button
-  background-color: rgb(0, 200, 83)
-  &:hover
-    background-color: rgba(0, 200, 83, 0.75)
+button:hover
+  background-color: #5D5D5D
 
-#finish-draw-button
-  background-color: rgb(0, 200, 83)
-  &:hover
-    background-color: rgba(0, 200, 83, 0.75)
+buttonLarge
+  border-radius: 4px
+  background-color: #5B84A2
+  border: none
+  color: #FFFFFF
+  text-align: center
+  font-size: 14px
+  padding: 20px
+  width: 360px
+  transition: all 0.2s
+  cursor: pointer
+  margin: 5px
 
-#cancel-button
-  background-color: rgb(213, 0, 0)
-  &:hover
-    background-color: rgba(213, 0, 0, 0.75)
+buttonLarge:hover
+  background-color: #5D5D5D
 
-#clear-button
-  background-color: rgb(213, 0, 0)
-  &:hover
-    background-color: rgba(213, 0, 0, 0.75)
+@charset "UTF-8"
+
+@font-face
+  font-weight: normal
+  font-style: normal
+
+.notification-container
+  box-sizing: border-box
+  position: fixed
+  top: 0
+  right: 0
+  z-index: 999999
+  width: 420px
+  padding: 0px 15px
+  max-height: calc(100% - 30px)
+  overflow-x: hidden
+  overflow-y: auto
+
+.notification
+  box-sizing: border-box
+  padding: 15px 15px 15px 58px
+  border-radius: 2px
+  color: #fff
+  background-color: #ccc
+  box-shadow: 0 0 12px #999
+  cursor: pointer
+  font-size: 1.5em
+  line-height: 1.2em
+  position: relative
+  opacity: 0.9
+  margin-top: 15px
+  .title
+    font-size: 1em
+    line-height: 1.2em
+    font-weight: bold
+    margin: 0 0 5px 0
+  &:hover, &:focus
+    opacity: 1
+
+.notification-enter
+  visibility: hidden
+  transform: translate3d(100%, 0, 0)
+  &.notification-enter-active
+    visibility: visible
+    transform: translate3d(0, 0, 0)
+    transition: all 0.4s
+
+.notification-leave
+  visibility: visible
+  transform: translate3d(0, 0, 0)
+  &.notification-leave-active
+    visibility: hidden
+    transform: translate3d(100%, 0, 0)
+    transition: all 0.4s
+
+.notification:before
+  position: absolute
+  top: 50%
+  left: 15px
+  margin-top: -14px
+  display: block
+  font-family: 'Notification'
+  width: 28px
+  height: 28px
+  font-size: 28px
+  text-align: center
+  line-height: 28px
+
+.notification-info
+  background-color: #2f96b4
+  &:before
+    content: ""
+
+.notification-success
+  background-color: #51a351
+  &:before
+    content: ""
+
+.notification-warning
+  background-color: #f89406
+  &:before
+    content: ""
+
+.notification-error
+  background-color: #bd362f
+  &:before
+    content: ""
 
 img
   height: 250px
+  border-radius: 2px
   width: 250px
 img:hover
   -webkit-transform: scale(1.1)
