@@ -89,7 +89,9 @@ export class NavList extends React.Component {
     map.setCenter(center);
     let that = this;
     HTTPService.countPolyResidences(itemData).then(function(json){
-      that.props.overlayRef.setState({dataReady: true, data: json});
+      let dataList = this.props.overlayRef.state.data == null ? this.props.overlayRef.state.data : [];
+      dataList.push(json);
+      that.props.overlayRef.setState({dataReady: true, data: dataList});
     });
     if (this.polygon){
       this.polygon.setMap(null);
@@ -101,9 +103,10 @@ export class NavList extends React.Component {
           zIndex: 1
     });
     this.polygon.setMap(map);
+    that.willInject = true;
+    that.props.tabsRef.injectNeighborhood(this.polygon);
     let polygonListener = google.maps.event.addListener(this.polygon, "click", function(e) {
-      that.willInject = true;
-      that.props.tabsRef.injectNeighborhood(this);
+        
     });
   }
 

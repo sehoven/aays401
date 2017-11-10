@@ -1,13 +1,17 @@
 import React, { Component } from 'react';
+import {NotificationContainer, NotificationManager} from 'react-notifications';
 import DrawingTools, { PolygonTools } from './DrawingTools.js';
 const HTTPService = require('./HTTPService.js');
+const notificationTimer = 2000;
 
 class Overlay extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      isDrawing: false
+      isDrawing: false,
+      notification:null,
+      banner:null
     }
   }
 
@@ -21,18 +25,45 @@ class Overlay extends Component {
     }
   }
 
+  toggleDrawing(callback){
+    this.setState({isDrawing: true});
+    if(this.props.toggleDrawingTools) {
+      this.props.toggleDrawingTools(callback);
+    } else if(callback != null) {
+      // also add check to make sure callback is a function?
+      callback();
+    }
+      // also add check to make sure callback is a function?
+
+
+  }
+
   drawClick() {
     let callback;
-    if(this.props.finishClickCallback) {
+
+    if(this.props.drawClickCallback) {
       callback = () => { this.props.drawClickCallback(); };
     }
     this.toggleIsDrawing(callback);
+    if(this.state.notification==null){
+      this.state.notification = 'draw';
+    }
+
+    this.createNotification(this.state.notification);
+    this.state.notification = 'nothing';
   }
 
   clearClick() {
+    let polycount = 0;
+
     if(this.props.clearClickCallback) {
-      this.props.clearClickCallback();
+      polycount = this.props.clearClickCallback();
     }
+    if(polycount>0){
+      this.state.notification = 'clear';
+    }
+    this.createNotification(this.state.notification);
+    this.state.notification = 'nothing';
   }
 
   finishClick() {
@@ -41,6 +72,10 @@ class Overlay extends Component {
       callback = () => { this.props.finishClickCallback(); };
     }
     this.toggleIsDrawing(callback);
+
+    this.state.notification = 'finish';
+    this.createNotification(this.state.notification);
+    this.state.notification = 'nothing';
   }
 
   cancelClick() {
@@ -49,22 +84,70 @@ class Overlay extends Component {
       callback = () => { this.props.cancelClickCallback(); };
     }
     this.toggleIsDrawing(callback);
+
+    this.state.notification = 'cancel';
+    this.createNotification(this.state.notification);
+    this.state.notification = 'nothing';
   }
 
+  addClick(){
+    let callback;
+    if(this.props.addClickCallback) {
+      callback = () => { this.props.addClickCallback();};
+    }
+    this.toggleDrawing(callback);
+
+    this.state.notification = 'inner';
+    this.createNotification(this.state.notification);
+    this.state.notification = 'nothing';
+  }
+
+  createNotification (type){
+
+    switch (type) {
+        case 'draw':
+          this.state.banner = NotificationManager.info('Draw Outer Delivery Zone','',notificationTimer);
+          break;
+        case 'inner':
+          this.state.banner = NotificationManager.info('Draw Individual Zones Routes','',notificationTimer);
+          break;
+        case 'finish':
+          this.state.banner = NotificationManager.success('Delivery Route Map Generated','',notificationTimer);
+          break;
+        //case 'cancel':
+        // this.state.banner = NotificationManager.warning('Removed Last Drawn Polygon','' ,notificationTimer);
+        //  break;
+        case 'clear':
+          this.state.banner = NotificationManager.warning('Cleared Polygon','', notificationTimer);
+          break;
+        case 'error':
+          this.state.banner = NotificationManager.error('Error message', 'Click me!', notificationTimer, () => {
+            alert('callback');
+          })
+          break;
+      };
+  };
+
   render() {
+
     if (!this.props.active) return null;
 
     let drawButton = <button id="draw-button" onClick={this.drawClick.bind(this)}>DRAW</button>;
     let clearButton = <button id="clear-button" onClick={this.clearClick.bind(this)}>CLEAR</button>;
-    let cancelButton = <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)}>CANCEL</button>;
+    let cancelButton = <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)}>RETURN</button>;
     let finishButton = <button id="finish-draw-button" onClick={this.finishClick.bind(this)}>FINISH</button>;
+    let addButton = <button id="add-draw-button" onClick={this.addClick.bind(this)}>ADD</button>;
 
     return (
+
       <div>
+        {this.state.banner}
+        <NotificationContainer/>
         { this.state.isDrawing ? null : drawButton }
         { this.state.isDrawing || !this.props.canClear ? null : clearButton }
         { this.state.isDrawing ? cancelButton : null }
         { this.state.isDrawing ? finishButton : null }
+        { this.state.isDrawing ? addButton : null }
       </div>
     )
   }
@@ -79,25 +162,33 @@ export default class OverlayContainer extends Component {
     // data refers to the unit count data
     this.state = {
       isDrawing: false,
-      polygon: null,
+      polygons: new PolygonArray(),
+      polyNum: 0,
       dataReady: false,
-      data: null,
-      url:null
+      data:[],
+      url:[]
     }
-    this.setImgUrl = this.setImgUrl.bind(this);
+
+
   }
 
   toggleDrawingTools(callback) {
     this.setState({isDrawing: !this.state.isDrawing}, callback);
   }
 
-  drawClickCallback() { }
+  drawClickCallback() {
+      this.updatePolygonData();
+  }
 
   clearClickCallback() {
-    if(this.state.polygon) {
-      this.state.polygon.setMap(null);
+    let polycount = this.state.polygons.polygons.length;
+    this.state.polygons.removeLast();
+    if(this.state.polygons.polygons.length>0) {
+        this.state.url.pop();
     }
-    this.setPolygon(null);
+
+    this.updatePolygonData();
+    return polycount;
   }
 
   convertToLatLng(polygon) {
@@ -117,29 +208,62 @@ export default class OverlayContainer extends Component {
   }
 
   finishClickCallback() {
-    let that = this;
-    let polygon = this.convertToLatLng(this.state.polygon);
-
-    if(polygon) {
-      HTTPService.countPolyResidences(
-        { points: polygon, center:  0.1, radius: 0.1 }
-      ).then(function(json){
-        that.setState({dataReady: true, data: json});
-      });
-       this.setImgUrl(polygon);
-    }
+    //this.updatePolygonData();
   }
 
-  cancelClickCallback() { }
+  cancelClickCallback() {
+    //this.updatePolygonData();
+  }
+
+  addClickCallback() {
+    this.setState({isDrawing:true});
+    return this.state.polygons.polygons.length!=this.state.polyNum;
+    //this.updatePolygonData();
+  }
+
+  updatePolygonData() {
+      let that = this;
+      if(that.state.polygons.polygons.length!=this.state.polyNum){
+          this.state.url=[];
+          that.state.url=[];
+          this.state.data=[];
+          that.state.data=[];
+          that.state.polyNum=that.state.polygons.polygons.length;
+          for(var i = 0;i<that.state.polygons.polygons.length;++i){
+              let polygon = that.convertToLatLng(this.state.polygons.polygons[i]);
+              if(polygon){
+                  HTTPService.countPolyResidences(
+                    { points: polygon, center:  0.1, radius: 0.1 }
+                  ).then(function(json){
+                      that.state.data.push(json);
+                      if(that.state.data.length>0){
+                          that.setState({dataReady: true});
+                      }else {
+                          that.setState({dataReady: false});
+                      }
+                  });
+                  that.setImgUrl(polygon);
+
+
+              }
+          }
+
+          if(that.state.polygons.polygons.length==0){
+              that.setState({polyNum: 0,
+                             dataReady: false,
+
+                             data: []});
+          }
+      }
+  }
+
+  resetPolygon() {
+    this.setState({polygon: new PolygonArray()});
+  }
 
   setPolygon(polygon) {
-    this.setState({polygon: polygon});
-
-    // If there is no longer a polygon, clear the unit count data
-    if(polygon == null) {
-      this.setState({dataReady: false, data: null, url:null});
-      
-    }
+    this.state.polygons.add(polygon);
+    this.updatePolygonData();
   }
 
   setImgUrl(polygon){
@@ -147,10 +271,11 @@ export default class OverlayContainer extends Component {
       polygon.forEach(function(position){
           url += "|"+position["lat"]+ ","+ position["lng"];
       });
-      this.setState({url:url});
+      this.state.url.push(url);
     }
+
   render() {
-    let image = <img className="image" src= {this.state.url}/>
+
     return (
       <div className={ this.props.active && "nav-panel"}>
         <Overlay
@@ -158,33 +283,37 @@ export default class OverlayContainer extends Component {
           toggleDrawingTools={this.toggleDrawingTools.bind(this)}
           drawClickCallback={this.drawClickCallback.bind(this)}
           clearClickCallback={this.clearClickCallback.bind(this)}
-          canClear={ (this.state.polygon != null) }
+          canClear={ (this.state.polygons != null) }
           finishClickCallback={this.finishClickCallback.bind(this)}
+          addClickCallback = {this.addClickCallback.bind(this)}
           cancelClickCallback={this.cancelClickCallback.bind(this)} />
-        { this.state.isDrawing && this.state.polygon != null ?
+        { this.state.isDrawing && this.state.polygons.polygons.length >0 ?
           <PolygonTools map={this.props.map}
                         maps={this.props.maps}
-                        polygon={this.state.polygon}
-                        setPolygon={(polygon) => this.setPolygon(polygon)} /> : null
+                        polygons={this.state.polygons}
+                        polyNum = {this.state.polyNum} /> : null
         }
-        { this.state.isDrawing && this.state.polygon == null ?
+        { this.state.isDrawing ?
           <DrawingTools map={this.props.map}
                         maps={this.props.maps}
                         setPolygon={(polygon) => this.setPolygon(polygon)} /> : null
         }
         { this.props.active &&
-          <div>
-            <ol className="show-number">
-              <li>Residences: {this.state.dataReady ? this.state.data["residential"]:"?"}</li>
-              <li>Industrial: {this.state.dataReady ? this.state.data["industrial"]:"?"}</li>
-              <li>Commercial: {this.state.dataReady ? this.state.data["commercial"]:"?"}</li>
-              <li>Urban: {this.state.dataReady ? this.state.data["urban service"]:"?"}</li>
-              <li>Other: {this.state.dataReady ? this.state.data["other"]:"?"}</li>
-            </ol>
+          <div id="navbar-list">
+            {this.state.dataReady ? this.state.data.map((itemData, i)=>
+              <div className="navbar-count-poly-box" key={i}>
+                <div className="navbar-count-poly-title">Polygon {i}</div>
+                <ul className="navbar-count-poly-text">
+                    <li >Residences: {this.state.dataReady ? itemData["residential"]:"?"}</li>
+                    <li >Industrial: {this.state.dataReady ? itemData["industrial"]:"?"}</li>
+                    <li >Commercial: {this.state.dataReady ? itemData["commercial"]:"?"}</li>
+                    <li >Urban: {this.state.dataReady ? itemData["urban service"]:"?"}</li>
+                    <li >Other: {this.state.dataReady ? itemData["other"]:"?"}</li>
+                </ul>
+                <a href={this.state.url[i]} download="map">{<img className="image" src= {this.state.url[i]}/>}</a>
 
-            { this.state.url !=null ?
-              <a href={this.state.url} download="map">{image}</a> : null
-            }
+              </div>
+            ): null}
           </div>
         }
       </div>
@@ -213,6 +342,13 @@ class PolygonArray {
     }
   }
 
+  removeLast() {
+      if(this.polygons.length>0) {
+          let i = this.polygons.length-1;
+          this.polygons[i].setMap(null);
+          this.polygons.pop();
+      }
+  }
   removeAll() {
     for(let i = 0; i < this.polygons.length; ++i) {
       this.polygons[i].setMap(null);
