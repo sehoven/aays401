@@ -16,7 +16,6 @@ export default class NavPanel extends Component {
     this.onChange = this.onChange.bind(this);
     this.AutocompleteService;
   }
-
   // Fires when the search bar's text changes, unless it is emptied.
   onChange(event) {
     if(event.target != null && event.target.value != ""){
@@ -34,8 +33,11 @@ export default class NavPanel extends Component {
       if(!this.AutocompleteService){
         this.AutocompleteService = new google.maps.places.AutocompleteService();
       }
+      let searchtext = event.target.value + "Edmonton Canada";
+
+      //console.log(event.target.value);
       this.AutocompleteService.getQueryPredictions(
-        { input: event.target.value },
+        {input:searchtext},
         function(predictions, status) {
           if (status != that.props.maps.places.PlacesServiceStatus.OK) {
             return;
