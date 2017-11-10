@@ -3,6 +3,12 @@
   "version": "1.0.0",
   "description": "CMPUT401 AaYS project",
   "main": "index.js",
+  "apidoc": {
+    "title": "AAYS",
+    "url": "https://github.com/Etiennera/aays401",
+    "name": "Anthony at Your Service (AAYS)",
+    "description": "This system will provide a graphical interface to facilitate division of geographical areas within the city given a total delivery zone that can be further partitioned into individual flyer routes. It will also provide additional functionality to analyze zone properties such as estimated total number of units and estimated numbers of buildings of a particular type."
+  },
   "scripts": {
     "test": "jest",
     "deploy": "npm run build && npm run git-commit && npm run git-push",
@@ -30,6 +36,7 @@
   "homepage": "https://github.com/Etiennera/aays401#readme",
   "dependencies": {
     "body-parser": "^1.18.2",
+    "enumify": "^1.0.4",
     "express": "^4.15.4",
     "google-map-react": "^0.24.0",
     "immutable": "^3.8.1",
@@ -56,6 +63,8 @@
     "enzyme": "^3.1.0",
     "enzyme-adapter-react-15": "^1.0.1",
     "extract-text-webpack-plugin": "^3.0.0",
+    "gulp": "^3.9.1",
+    "gulp-apidoc": "^0.2.6",
     "html-webpack-plugin": "^2.30.1",
     "jest": "^21.2.1",
     "react-addons-test-utils": "^15.6.2",

@@ -1,0 +1,10 @@
+{
+    "title": "AaYS",
+    "url" : "https://github.com/Etiennera/aays401",
+    "name":"Anthony at Your Service (AaYS) API Documentation",
+    "version": "1.0.0",
+    "description": "This system will provide a graphical interface to facilitate division of geographical areas within the city given a total delivery zone that can be further partitioned into individual flyer routes. It will also provide additional functionality to analyze zone properties such as estimated total number of units and estimated numbers of buildings of a particular type.",
+    "template": {
+        "forceLanguage": "en"
+    }
+}

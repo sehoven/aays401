@@ -17,7 +17,7 @@ var locations_data = require('./data/locations.json');
 var locations = fs.readFileSync('./data/locations.json', 'utf8');
 locations = JSON.parse(locations);
 locations = locations.addresses;
-console.log("Ready. Listening on port 3000.");
+
 
 
 app.use(bodyParser.json());
@@ -32,8 +32,34 @@ app.use(function (req, res, next) {
     next();
 });
 
+
+
+
+
 // Handle requests to "/nearby"
 // Returns all known neighborhoods that are within rad from point (lat, lng)
+/**
+ * @api {get} /nearby/{Object[]} Get nearby neighbourhoods
+ * @apiGroup Polygon
+ * 
+ * @apiSuccessExample Success-Response:
+ *    HTTP/1.1 200 OK
+ *    {
+ *      "neighborhoods"[{
+ *          "name":"NiceAvenue",
+ *          "points":[{"lat":-113,"lng":53},{"lat":-113,"lng":53}],
+ *          "center":{"lat":-113,"lng":53},
+ *          "radius":0.111
+ *          "width":0.111
+ *          "height":0.111
+ *      }
+ *    }
+ * @apiErrorExample Error-Response:
+ *    HTTP/1.1 400 Null parameters
+ *    {
+ *      "error":"Null parameters"
+ *    }
+ */
 app.get('/nearby', function(req, res) {
   console.log("Location request handler invoked");
   //Should add some kind of type validation here.. and everywhere.
@@ -56,8 +82,40 @@ app.get('/nearby', function(req, res) {
   res.end(json);
 });
 
+
+
+
+
 // Handle requests to "/locations"
 // Returns all known locations that match existing query items
+/**
+ * @api {get} /locations/{text} List all neighbourhoods in Edmonton that match search string
+ * @apiName locations
+ * @apiGroup Polygon
+ * @apiDescription Handle requests to /locations Returns all known locations that match existing query items
+ * @apiParam {String} Any text that is reterived from search bar in the frontend
+ * @apiError (Polygon) {get} NullParameters The parameters required are null
+ * @apiParamExample {String} SearchString:
+ *                        "Rutherford"
+ * @apiSuccessExample Success-Response:
+ *    HTTP/1.1 200 OK
+ *    {
+ *      "neighborhoods"[{
+ *          "name":"NiceAvenue",
+ *          "points":[{"lat":-113,"lng":53},{"lat":-113,"lng":53}],
+ *          "center":{"lat":-113,"lng":53},
+ *          "radius":0.111
+ *          "width":0.111
+ *          "height":0.111
+ *      }
+ *    }
+ * @apiError (Polygon) {get} NullParameters The parameters required are null
+ * @apiErrorExample Error-Response:
+ *    HTTP/1.1 400 Null parameters
+ *    {
+ *      "error":"Null parameters"
+ *    }
+ */
 app.get('/locations', function(req, res) {
   console.log("Location request handler invoked");
   if (!req.query) return res.sendStatus(400);
@@ -80,6 +138,34 @@ app.get('/locations', function(req, res) {
   res.end(json);
 });
 
+
+
+
+
+/**
+ * @api {post} /addressCount/{Object[]} Count addresses in a polygon
+ * @apiGroup Polygon
+ * @apiDescription Receives a array of coordinates and outputs the number of units in the polygon the points create
+ * @apiParam {Object[]} An array of latitude, and longitude points.
+ * @apiParamExample {Object[]} PolygonArray:
+ *                        [{"lat":-113.11,"lng":56.232},{"lat":-113.11,"lng":56.232}]
+ * @apiSuccessExample Success-Response:
+ *    HTTP/1.1 200 OK
+ *    {
+ *      "residential": 112,
+        "commercial": 4,
+        "industrial": 2,
+        "urban service": 1,
+        "other": 6;
+ *    }
+ * @apiError (Polygon) {get} NullParameters The parameters required are null
+ * @apiError (Polygon) {get} InvalidParameters The parameters required do not create a shape with area.
+ * @apiErrorExample Error-Response:
+ *    HTTP/1.1 400 Polygon is not a polygon
+ *    {
+ *      "error":"Polygon points dont exist or have less that two points (Not a shape)."
+ *    }
+ */
 app.post('/addressCount', function(req, res) {
   console.log("Count request handler invoked");
   if (!req.body) return res.sendStatus(400);
@@ -126,8 +212,9 @@ app.post('/addressCount', function(req, res) {
   res.end(json);
 });
 
-app.listen(3000);
-
+app.listen(3000, function() {  
+  console.log('API up and running...');
+});
 function binaryIndexOf(array, searchElement, property) {
   var minIndex = 0;
   var maxIndex = array.length - 1;
