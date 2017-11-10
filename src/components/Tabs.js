@@ -10,28 +10,37 @@ export default class Tabs extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentPanel: PanelType.SEARCH
+      currentPanel: PanelType.SEARCH,
+      overlay: null
     }
+  }
+
+  componentDidMount(){
+    this.setState({ overlay: this.overlay })
   }
 
   swapState(toggle){
     this.setState({ currentPanel : toggle });
   }
 
+  injectNeighborhood(polygon){
+    this.setState({ currentPanel : PanelType.DRAW });
+    this.overlay.setState({ polygon: polygon, isSelected: true });
+  }
+
   render() {
     const { currentPanel } = this.state;
-    
     return (
       <div id="leftContainer">
         <NavPanel
           map={this.props.map}
           maps={this.props.maps}
           active={ currentPanel == PanelType.SEARCH }
-          overlayRef={this.overlay}
-          tabsRef={this.tabs}
+          overlayRef={this.state.overlay}
+          tabsRef={this}
         />
         <OverlayContainer
-          ref={instance => {this.overlay = instance}}
+          ref={(instance) => {this.overlay = instance}}
           active={ currentPanel == PanelType.DRAW }
           map={this.props.map}
           maps={this.props.maps}

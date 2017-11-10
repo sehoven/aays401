@@ -52,10 +52,13 @@ export class NavList extends React.Component {
     this.geocoder;
     this.polygon;
     this.markers = [];
+    this.willInject = false;
   }
 
   componentWillUnmount(){
-    if (this.polygon){
+    if (this.willInject){
+      this.polygon = null;
+    } else {
       this.polygon.setMap(null);
     }
   }
@@ -93,15 +96,14 @@ export class NavList extends React.Component {
     }
     this.polygon = new google.maps.Polygon({
           paths: itemData.points,
-          strokeColor: '#FF0000',
-          strokeOpacity: 0.8,
-          strokeWeight: 2,
-          fillColor: '#FF0000',
-          fillOpacity: 0.35
-        });
+          strokeWeight: 0,
+          fillOpacity: 0.45,
+          zIndex: 1
+    });
     this.polygon.setMap(map);
     let polygonListener = google.maps.event.addListener(this.polygon, "click", function(e) {
-      that.props.tabsRef.swapState(1);
+      that.willInject = true;
+      that.props.tabsRef.injectNeighborhood(this);
     });
   }
 

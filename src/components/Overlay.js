@@ -68,7 +68,6 @@ class Overlay extends Component {
       </div>
     )
   }
-
 }
 
 // This component will be used to trigger drawing tools
