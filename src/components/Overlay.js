@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import DrawingTools, { PolygonTools } from './DrawingTools.js';
+import Modal from 'react-modal';
 const HTTPService = require('./HTTPService.js');
 
 class Overlay extends Component {
@@ -82,9 +83,22 @@ export default class OverlayContainer extends Component {
       polygon: null,
       dataReady: false,
       data: null,
-      url:null
+      url:null,
+      showModal: false
     }
     this.setImgUrl = this.setImgUrl.bind(this);
+    this.handleOpenModal = this.handleOpenModal.bind(this);
+    this.handleCloseModal = this.handleCloseModal.bind(this);
+    this.previous = this.previous.bind(this);
+    this.next = this.next.bind(this);
+  }
+
+  handleOpenModal () {
+    this.setState({ showModal: true });
+  }
+
+  handleCloseModal () {
+    this.setState({ showModal: false });
   }
 
   toggleDrawingTools(callback) {
@@ -138,8 +152,14 @@ export default class OverlayContainer extends Component {
     // If there is no longer a polygon, clear the unit count data
     if(polygon == null) {
       this.setState({dataReady: false, data: null, url:null});
-      
+
     }
+  }
+  previous(){
+
+  }
+  next(){
+
   }
 
   setImgUrl(polygon){
@@ -150,7 +170,6 @@ export default class OverlayContainer extends Component {
       this.setState({url:url});
     }
   render() {
-    let image = <img className="image" src= {this.state.url}/>
     return (
       <div className={ this.props.active && "nav-panel"}>
         <Overlay
@@ -182,8 +201,22 @@ export default class OverlayContainer extends Component {
               <li>Other: {this.state.dataReady ? this.state.data["other"]:"?"}</li>
             </ol>
 
-            { this.state.url !=null ?
-              <a href={this.state.url} download="map">{image}</a> : null
+            { this.state.url !=null &&
+              <div>
+                <button onClick={this.handleOpenModal}>Output Map</button>
+                <Modal
+                  isOpen={this.state.showModal}
+                  contentLabel="Output Map"
+                  onRequestClose={this.handleCloseModal}
+                  className="Modal"
+                  overlayClassName="ModalOverlay"
+                >
+                  <a href="#" className="previous" onClick={this.previous}>&laquo; Previous</a>
+                  <a href={this.state.url} download="map" className="outputImg">{<img className="image" src= {this.state.url}/>}</a>
+                  <a href="#" className="next" onClick={this.next}>Next &raquo;</a>
+                  <button className="CancelButton"onClick={this.handleCloseModal}>Cancel</button>
+                </Modal>
+              </div>
             }
           </div>
         }
