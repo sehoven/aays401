@@ -227,18 +227,21 @@ export default class OverlayContainer extends Component {
                         maps={this.props.maps}
                         polygon={this.state.polygon}
                         /> : null }
-        {this.state.dataReady ? this.state.data.map((itemData, i)=>
-        <div className="navbar-count-poly-box" key={i}>
-        <div className="navbar-count-poly-title">Polygon {i}</div>
-        <ul className="navbar-count-poly-text">
-            <li >Residences: {this.state.dataReady ? itemData["residential"]:"?"}</li>
-            <li >Industrial: {this.state.dataReady ? itemData["industrial"]:"?"}</li>
-            <li >Commercial: {this.state.dataReady ? itemData["commercial"]:"?"}</li>
-            <li >Urban: {this.state.dataReady ? itemData["urban service"]:"?"}</li>
-            <li >Other: {this.state.dataReady ? itemData["other"]:"?"}</li>
-            </ul>
+        <div id="navbar-list">
+            {this.state.dataReady ? this.state.data.map((itemData, i)=>
+                <div className="navbar-count-poly-box" key={i}>
+                <div className="navbar-count-poly-title">Polygon {i}</div>
+                <ul className="navbar-count-poly-text">
+                    <li >Residences: {this.state.dataReady ? itemData["residential"]:"?"}</li>
+                    <li >Industrial: {this.state.dataReady ? itemData["industrial"]:"?"}</li>
+                    <li >Commercial: {this.state.dataReady ? itemData["commercial"]:"?"}</li>
+                    <li >Urban: {this.state.dataReady ? itemData["urban service"]:"?"}</li>
+                    <li >Other: {this.state.dataReady ? itemData["other"]:"?"}</li>
+                </ul>
         </div>
+
         ): null}
+        </div>
       </div>
     )
   }
