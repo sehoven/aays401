@@ -182,7 +182,6 @@ export default class OverlayContainer extends Component {
 
   clearClickCallback() {
     let polycount = this.state.polygons.polygons.length;
-    console.log("fdsfds "+ this.state.polygons);
     this.state.polygons.removeLast();
     if(this.state.polygons.polygons.length>0) {
         this.state.url.pop();
@@ -339,7 +338,6 @@ class PolygonArray {
   }
 
   removeLast() {
-      console.log("999999999");
       if(this.polygons.length>0) {
           let i = this.polygons.length-1;
           this.polygons[i].setMap(null);
