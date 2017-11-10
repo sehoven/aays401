@@ -1,67 +1,73 @@
-$uiWidth: 30vw
+@import url('https://fonts.googleapis.com/css?family=Roboto')
+
+$uiWidth: 400px
 $mapControlHeight: 5vh
 $mapControlMargin: 4vh
 $mapControlPadding: 10px
-$navbarPadding: 10px
-$tabBarHeight: 40px
-$tabBarMargin: 4vh
-$navbarWidth: calc(#{$uiWidth} - (2 * #{$navbarPadding}))
-$navMarginTop: calc(#{$tabBarHeight} + (2 * #{$tabBarMargin}))
-$searchboxHeight: 30px
-$searchbarWidth: 0px
+$navMarginTop: calc(#{$mapControlHeight} + (2 * #{$mapControlMargin}))
 
 h1
   color: blue
 
 body
   margin: 0
+  font-family: 'Roboto', sans-serif
 
-.side-panel
-  border: 1px gray solid
-  box-shadow: 2px 2px 1px #888888
+#leftContainer
+  margin: 5vh
+  width: calc(#{$uiWidth} + 70px)
+  position: absolute
+  height: 90vh
+
+#tabButtons
+  position: absolute
+  left: calc(#{$uiWidth} + 20px)
+  width: 50px
+  height: inherit
+  z-index: 6
+
+.tabButton
+  position: relative
+  border-top-right-radius: 8px
+  border-bottom-right-radius: 8px
+  height: 50%
+  border-left: 1px black solid
+  background-color: rgb(117,117,117)
+
+.activeTabButton
+  border-top: 1px black solid
+  border-right: 1px black solid
+  border-bottom: 1px black solid
+  border-left: none
   background-color: white
 
-#tab-bar
-  width: #{$uiWidth}
-  height: #{$tabBarHeight}
-  margin-left: 4vh
-  margin-top: #{$tabBarMargin}
-  padding: #{$navbarPadding}
-  position: absolute
-  z-index: 2
-
-.tab_title
-	width: #{$uiWidth/2}
-	height: 40px
-	text-align: center
-	line-height: 40px
-	color: #fff
-	background-color: #bdbdbd
-	display: inline-block
-
-.active
-	color: #000
-	background-color: #fff
-
-.tab_item
-	display: none
-.show
-	display: block
+.buttonText
+  font-size: 25px
+  font-weight: bold
+  color: rgb(50, 50, 50)
+  margin: auto
+  p
+    position: absolute
+    top: 50%
+    left: 50%
+    -ms-transform: translateX(-50%) translateY(-50%) rotate(90deg)
+    -webkit-transform: translateX(-50%) translateY(-50%) rotate(90deg)
+    transform: translateX(-50%) translateY(-50%) rotate(90deg)
 
 .nav-panel
   width: #{$uiWidth}
-  height: 90vh
-  margin-left: 4vh
-  margin-top: #{$navMarginTop}
-  padding: #{$navbarPadding}
+  height: calc(100% - 20px)
+  padding: 10px
   position: absolute
   z-index: 2
+  border-top: 1px black solid
+  border-left: 1px black solid
+  border-bottom: 1px black solid
+  background-color: white
 
 .show-number
-  width: #{$uiWidth}
   text-align: left
   list-style-type: none
-
 
 #map-controls
   width: #{$uiWidth}
@@ -72,62 +78,79 @@ body
   z-index: 2
 
 #search-box
-  width: calc(#{$navbarWidth} - #{$searchbarWidth})
-  height: #{$searchboxHeight}
+  width: calc(#{$uiWidth} - 20px)
+  height: 40px
+  padding-left: 8px
+  border-width: 1px
+  border-radius: 5px
+  border-color: rgb(117, 117, 117)
   margin-right: 0px
+  border-radius: 5px
   font-size: 25px
   vertical-align: bottom
 
 #navbar-list
   margin-top: 10px
-  height: calc(90vh - #{$searchboxHeight} - 16px - calc(#{$navbarPadding} * 2))
+  height: calc(90vh - 66px)
   overflow-y: auto
 
 .navbar-list-autocomplete-item
   height: 60px
-  border-top: 1px solid gray
+  margin: 10px
+  -webkit-box-shadow: 2px 2px 3px 0px rgba(0,0,0,0.75)
+  -moz-box-shadow: 2px 2px 3px 0px rgba(0,0,0,0.75)
+  box-shadow: 2px 2px 3px 0px rgba(0,0,0,0.75)
+  border: 1px solid rgb(117, 117, 117)
   background-color: white
   transition: background-color 0.1s
-
-.navbar-list-autocomplete-icon
-  display: inline-block
-  width: 100px
-  height: 50px
+  &:hover
+    background-color: rgb(180,180,180)
 
 .navbar-list-autocomplete-text
   display: inline-block
   vertical-align: top
-  width: calc(#{$navbarWidth} - 120px)
+  width: calc(#{$uiWidth} - 70px)
   height: 50px
-  margin-left: 10px
-  padding-top: 20px
-  font-size: 15px
-
-.navbar-list-autocomplete-item:hover
-  background-color: rgb(180,180,180)
+  padding-top: 15px
+  padding-left: 30px
+  font-size: 25px
+  vertical-align: bottom
+  text-overflow: ellipsis
+  overflow: hidden
+  white-space: nowrap
 
 .navbar-list-item
+  padding-left: 5px
   height: 110px
-  border-top: 1px solid gray
+  margin: 10px
+  -webkit-box-shadow: 2px 2px 3px 0px rgba(0,0,0,0.75)
+  -moz-box-shadow: 2px 2px 3px 0px rgba(0,0,0,0.75)
+  box-shadow: 2px 2px 3px 0px rgba(0,0,0,0.75)
+  border: 1px solid rgb(117, 117, 117)
   background-color: white
   transition: background-color 0.1s
+  &:hover
+    background-color: rgb(180,180,180)
 
 .navbar-list-icon
+  margin: 5px
   display: inline-block
   width: 100px
   height: 100px
 
 .navbar-list-text
   display: inline-block
-  vertical-align: top
-  width: calc(#{$navbarWidth} - 120px)
+  width: calc(#{$uiWidth} - 180px)
   height: 100px
   margin-left: 10px
-  padding-top: 10px
-  font-size: 20px
-
-.navbar-list-item:hover
-  background-color: rgb(180,180,180)
+  font-size: 25px
+  position: relative
+  p
+    position: absolute
+    top: 20px
+    -ms-transform: translate(0, -50%)
+    -webkit-transform: translate(0, -50%)
+    transform: translate(0, -50%)
 
 .navbar-count-poly-box
   //height: 110px
@@ -157,21 +180,17 @@ body
   height: 100vh
   width: 100vw
 
-.container
-  height: inherit
-  width: inherit
-
-#map-container
-  position: relative
-  text-align: center
-
 #map
+  text-align: center
   position: absolute
+  width: inherit
+  height: inherit
   top: 0
   left: 0
   z-index: 1
 
 button
+
   border-radius: 4px
   background-color: #5B84A2
   border: none
@@ -291,3 +310,4 @@ buttonLarge:hover
   background-color: #bd362f
   &:before
     content: ""
+
