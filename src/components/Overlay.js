@@ -131,14 +131,12 @@ class Overlay extends Component {
   render() {
 
 
-
     
     let drawButton = <button id="draw-button" onClick={this.drawClick.bind(this)}><span>DRAW</span></button>;
     let clearButton = <button id="clear-button" onClick={this.clearClick.bind(this)}><span>CLEAR</span></button>;
     let cancelButton = <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)}><span>VIEW</span></button>;
     let finishButton = <button id="finish-draw-button" onClick={this.finishClick.bind(this)}><span>FINISH</span></button>;
     let addButton = <button id="add-draw-button" onClick={this.addClick.bind(this)}><span>ADD</span></button>;
-
 
 
     return (
@@ -154,7 +152,6 @@ class Overlay extends Component {
       </div>
     )
   }
-
 }
 
 // This component will be used to trigger drawing tools
@@ -169,9 +166,11 @@ export default class OverlayContainer extends Component {
       polygon: new PolygonArray(),
       polyNum: 0,
       dataReady: false,
+
       data:[]
 
     }
+    this.setImgUrl = this.setImgUrl.bind(this);
   }
 
   toggleDrawingTools(callback) {
@@ -218,6 +217,7 @@ export default class OverlayContainer extends Component {
   cancelClickCallback() {
   }
 
+
   addClickCallback() { 
     this.setState({isDrawing:true});
     this.updatePolygonData();
@@ -260,11 +260,9 @@ export default class OverlayContainer extends Component {
   this.updatePolygonData();
   }
 
-
-
   render() {
+    let image = <img className="image" src= {this.state.url}/>
     return (
-
 
       <div className="side-panel nav-panel">
 
@@ -304,6 +302,7 @@ export default class OverlayContainer extends Component {
 
         ): null}
         </div>
+
       </div>
     )
   }
