@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
+var randomColor = require('randomcolor'); 
 
-const polygonOptions = {
-  strokeWeight: 0,
-  fillOpacity: 0.45,
+var polygonOptions = {
+  strokeWeight: 0.2,
+  strokeColor: '#000000',
+  fillOpacity: 0.20,
+  fillColor: '#000000',
   editable: true,
   zIndex: 1
 }
@@ -14,8 +17,22 @@ export class PolygonTools extends Component {
       polygon: this.props.polygon,
       polygonListener: [],
       mapListener: [],
-      isSelected: []
+      isSelected: [],
+      polyNum:this.props.polyNum
     }
+    
+
+    console.log(this.state.polyNum);
+    if(this.state.polyNum==0){
+      polygonOptions.fillColor = '#000000';
+      polygonOptions.fillOpacity = 0.20;
+    }
+    else{
+      polygonOptions.fillColor = randomColor();
+      polygonOptions.fillOpacity = 0.45;
+
+    }
+    
   }
 
   // Before the component mounts, set the polygon and add the listeners
@@ -138,8 +155,10 @@ export default class DrawingTools extends Component {
       drawingTools: this,
       drawingManager: null,
       polygonListener: null,
-      mapListener: null
+      mapListener: null,
+      polyNum: this.props.polyNum
     }
+
   }
 
   componentDidMount() {
@@ -207,6 +226,8 @@ export default class DrawingTools extends Component {
   }
 
   setDrawingTools(map) {
+    
+    
     const drawingToolsOptions = {
       drawingMode: google.maps.drawing.OverlayType.POLYGON,
       drawingControl: true,
@@ -223,6 +244,7 @@ export default class DrawingTools extends Component {
     this.setState({drawingManager: drawingManager});
 
     google.maps.event.addListener(drawingManager, "polygoncomplete", function(polygon) {
+      //console.log(polygon);
       // After drawing, switch to non-drawing mode and remove drawing controls to limit to one polygon.
       drawingManager.setDrawingMode(null);
       drawingManager.setOptions({
@@ -245,14 +267,16 @@ export default class DrawingTools extends Component {
 
       drawingTools.selectPolygon();
     });
-
+    
     if(this.state.mapListener == null) {
       let mapListener = google.maps.event.addListener(map, "click", function(e) {
         drawingTools.deselectPolygon();
       });
       drawingTools.setState({mapListener: mapListener});
     }
+    
   }
+  
 
   render() {
     return null

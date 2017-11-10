@@ -10,7 +10,7 @@
     "start": "webpack-dev-server"
   },
   "jest": {
-    "globals":{
+    "globals": {
       "google": {}
     },
     "moduleNameMapper": {
@@ -39,6 +39,7 @@
     "point-in-geopolygon": "^1.0.1",
     "point-in-polygon": "^1.0.1",
     "prop-types": "^15.6.0",
+    "randomcolor": "^0.5.3",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "react-google-maps": "^8.3.0",
