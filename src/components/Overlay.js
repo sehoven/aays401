@@ -130,16 +130,13 @@ class Overlay extends Component {
 
   render() {
 
+    if (!this.props.active) return null;
 
-
-    
-    let drawButton = <button id="draw-button" onClick={this.drawClick.bind(this)}><span>DRAW</span></button>;
-    let clearButton = <button id="clear-button" onClick={this.clearClick.bind(this)}><span>CLEAR</span></button>;
-    let cancelButton = <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)}><span>VIEW</span></button>;
-    let finishButton = <button id="finish-draw-button" onClick={this.finishClick.bind(this)}><span>FINISH</span></button>;
-    let addButton = <button id="add-draw-button" onClick={this.addClick.bind(this)}><span>ADD</span></button>;
-
-
+    let drawButton = <button id="draw-button" onClick={this.drawClick.bind(this)}>DRAW</button>;
+    let clearButton = <button id="clear-button" onClick={this.clearClick.bind(this)}>CLEAR</button>;
+    let cancelButton = <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)}>CANCEL</button>;
+    let finishButton = <button id="finish-draw-button" onClick={this.finishClick.bind(this)}>FINISH</button>;
+    let addButton = <button id="add-draw-button" onClick={this.addClick.bind(this)}>ADD</button>;
 
     return (
 
@@ -147,14 +144,13 @@ class Overlay extends Component {
         {this.state.banner}
         <NotificationContainer/>
         { this.state.isDrawing ? null : drawButton }
-        { this.state.isDrawing ? null : clearButton }
-        { this.state.isDrawing ? addButton : null }
+        { this.state.isDrawing || !this.props.canClear ? null : clearButton }
         { this.state.isDrawing ? cancelButton : null }
         { this.state.isDrawing ? finishButton : null }
+        { this.state.isDrawing ? addButton : null }
       </div>
     )
   }
-
 }
 
 // This component will be used to trigger drawing tools
@@ -169,9 +165,11 @@ export default class OverlayContainer extends Component {
       polygon: new PolygonArray(),
       polyNum: 0,
       dataReady: false,
-      data:[]
-
+      data:[],
+      url:null
     }
+
+    this.setImgUrl = this.setImgUrl.bind(this);
   }
 
   toggleDrawingTools(callback) {
@@ -214,7 +212,6 @@ export default class OverlayContainer extends Component {
     this.updatePolygonData();
   }
 
-
   cancelClickCallback() {
   }
 
@@ -222,9 +219,6 @@ export default class OverlayContainer extends Component {
     this.setState({isDrawing:true});
     this.updatePolygonData();
   }
-
-
-
 
   updatePolygonData() {
       let that = this;
@@ -245,53 +239,59 @@ export default class OverlayContainer extends Component {
                           that.setState({dataReady: false});
                       }
                   });
+                  this.setImgUrl(polygon);
+                  
               }
           }
           if(that.state.polygon.polygons.length==0){
-              this.state.polyNum=0;
-              that.setState({dataReady: false});
-              that.state.data=[];
+              that.setState({polyNum: 0,
+                             dataReady: false,
+                             data: []});
           }
       }
   }
 
   setPolygon(polygon) {
-  this.state.polygon.add(polygon);
-  this.updatePolygonData();
+    this.state.polygon.add(polygon);
+    this.updatePolygonData();
   }
-
-
+  
+  setImgUrl(polygon){
+      let url="https://maps.googleapis.com/maps/api/staticmap?&size=1000x1000&path=color:0x00000000|weight:5|fillcolor:0x00BDBDBD";
+      polygon.forEach(function(position){
+          url += "|"+position["lat"]+ ","+ position["lng"];
+      });
+      this.setState({url:url});
+    }
 
   render() {
+    let image = <img className="image" src= {this.state.url}/>
     return (
-
-
-      <div className="side-panel nav-panel">
-
-        <Overlay toggleDrawingTools={this.toggleDrawingTools.bind(this)}
-                 drawClickCallback={this.drawClickCallback.bind(this)}
-                 clearClickCallback={this.clearClickCallback.bind(this)}
-                 finishClickCallback={this.finishClickCallback.bind(this)}
-                 addClickCallback = {this.addClickCallback.bind(this)}
-                 cancelClickCallback={this.cancelClickCallback.bind(this)} />
-
+      <div className={ this.props.active && "nav-panel"}>
+        <Overlay
+          active={this.props.active}
+          toggleDrawingTools={this.toggleDrawingTools.bind(this)}
+          drawClickCallback={this.drawClickCallback.bind(this)}
+          clearClickCallback={this.clearClickCallback.bind(this)}
+          canClear={ (this.state.polygon != null) }
+          finishClickCallback={this.finishClickCallback.bind(this)}
+          addClickCallback = {this.addClickCallback.bind(this)}
+          cancelClickCallback={this.cancelClickCallback.bind(this)} />
+        { this.state.isDrawing && this.state.polygon.polygons.length >0 ?
+          <PolygonTools map={this.props.map}
+                        maps={this.props.maps}
+                        polygon={this.state.polygon}
+                        polyNum = {this.state.polyNum} /> : null
+        }
         { this.state.isDrawing ?
           <DrawingTools map={this.props.map}
                         maps={this.props.maps}
-                        
-                        setPolygon={(polygon) => this.setPolygon(polygon)} /> : null }
-                        
-        { this.state.isDrawing && this.state.polygon.polygons.length >0 ?
-        <PolygonTools map={this.props.map}
-                        maps={this.props.maps}
-                        polygon={this.state.polygon}
-                        polyNum = {this.state.polyNum}
-                    
-                        /> : null }
-
-        <div id="navbar-list">
+                        setPolygon={(polygon) => this.setPolygon(polygon)} /> : null
+        }
+        { this.props.active &&
+          <div id="navbar-list">
             {this.state.dataReady ? this.state.data.map((itemData, i)=>
-                <div className="navbar-count-poly-box" key={i}>
+              <div className="navbar-count-poly-box" key={i}>
                 <div className="navbar-count-poly-title">Polygon {i}</div>
                 <ul className="navbar-count-poly-text">
                     <li >Residences: {this.state.dataReady ? itemData["residential"]:"?"}</li>
@@ -300,10 +300,13 @@ export default class OverlayContainer extends Component {
                     <li >Urban: {this.state.dataReady ? itemData["urban service"]:"?"}</li>
                     <li >Other: {this.state.dataReady ? itemData["other"]:"?"}</li>
                 </ul>
-        </div>
-
-        ): null}
-        </div>
+                { this.state.url != null ?
+                  <a href={this.state.url} download="map">{image}</a> : null
+                }
+              </div>
+            ): null}
+          </div>
+        }
       </div>
     )
   }

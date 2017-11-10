@@ -11,9 +11,7 @@ export class Index extends Component {
 
   render(){
     return (
-      <div className="fullScreen">
-        <MapContainer />
-      </div>
+      <MapContainer />
     )
   }
 }

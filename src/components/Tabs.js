@@ -1,50 +1,71 @@
 import React, { Component } from 'react';
 import NavPanel from './NavPanel.js';
+import OverlayContainer from './Overlay';
+import {Enum} from 'enumify';
 
-export default class Tabs extends Component{
-  constructor() {
-    super()
+class PanelType extends Enum {}
+PanelType.initEnum(['SEARCH', 'DRAW']);
+
+export default class Tabs extends Component {
+  constructor(props) {
+    super(props);
     this.state = {
-      currentIndex : 0
+      currentPanel: PanelType.SEARCH,
+      overlay: null
     }
   }
 
-  checkTitleIndex(index) {
-    return index === this.state.currentIndex ? "tab_title active" : "tab_title"
+  componentDidMount(){
+    this.setState({ overlay: this.overlay })
   }
 
-  checkItemIndex(index) {
-    return index === this.state.currentIndex ? "tab_item show" : "tab_item"
+  swapState(toggle){
+    this.setState({ currentPanel : toggle });
   }
 
-  swapState(index) {
-    this.setState({ currentIndex : index });
+  injectNeighborhood(polygon){
+    this.setState({ currentPanel : PanelType.DRAW });
+    this.overlay.setState({ polygon: polygon, isSelected: true });
   }
 
   render() {
-    return(
-      <div>
-        { /* Tab title*/ }
-        <div id="tab-bar" className="side-panel">
-          {
-            React.Children.map(this.props.children , (element,index) => {
-              return(
-                <div onClick={ () => { this.swapState(index) } } className={ this.checkTitleIndex(index) }>
-                  { element.props.name }
-                </div>
-              )
-            })
-          }
-        </div>
-        {/*Tab content*/}
-        <div>
-          {
-            React.Children.map(this.props.children, (element,index) => {
-              return(
-                <div className={ this.checkItemIndex(index) }>{ element }</div>
-              )
-            })
-          }
+    const { currentPanel } = this.state;
+    return (
+      <div id="leftContainer">
+        <NavPanel
+          map={this.props.map}
+          maps={this.props.maps}
+          active={ currentPanel == PanelType.SEARCH }
+          overlayRef={this.state.overlay}
+          tabsRef={this}
+        />
+        <OverlayContainer
+          ref={(instance) => {this.overlay = instance}}
+          active={ currentPanel == PanelType.DRAW }
+          map={this.props.map}
+          maps={this.props.maps}
+        />
+        <div id="tabButtons">
+          <div
+            className= {
+              "tabButton " +
+              ((currentPanel == PanelType.SEARCH)?"activeTabButton":"")
+            }
+            id="topTabButton"
+            onClick={() => { this.swapState(PanelType.SEARCH) }}
+          >
+            <div className="buttonText"><p>Search</p></div>
+          </div>
+          <div
+            className={
+              "tabButton " +
+              ((currentPanel == PanelType.DRAW)? "activeTabButton":"")
+            }
+            id="bottomTabButton"
+            onClick={() => { this.swapState(PanelType.DRAW) }}
+          >
+            <div className="buttonText"><p>Draw</p></div>
+          </div>
         </div>
       </div>
     )
