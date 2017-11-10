@@ -162,7 +162,7 @@ export default class OverlayContainer extends Component {
     // data refers to the unit count data
     this.state = {
       isDrawing: false,
-      polygon: new PolygonArray(),
+      polygons: new PolygonArray(),
       polyNum: 0,
       dataReady: false,
       data:[],
@@ -181,11 +181,10 @@ export default class OverlayContainer extends Component {
   }
 
   clearClickCallback() {
-    let polycount = this.state.polygon.polygons.length;
-    if(this.state.polygon.polygons.length>0) {
-        let i = this.state.polygon.polygons.length-1;
-        this.state.polygon.polygons[i].setMap(null);
-        this.state.polygon.polygons.pop();
+    let polycount = this.state.polygons.polygons.length;
+    console.log("fdsfds "+ this.state.polygons);
+    this.state.polygons.removeLast();
+    if(this.state.polygons.polygons.length>0) {
         this.state.url.pop();
     }
 
@@ -228,10 +227,10 @@ export default class OverlayContainer extends Component {
       that.state.url=[];
       this.state.data=[];
       that.state.data=[];
-      if(that.state.polygon.polygons.length!=this.state.polyNum){
-          that.state.polyNum=that.state.polygon.polygons.length;
-          for(var i = 0;i<that.state.polygon.polygons.length;++i){
-              let polygon = that.convertToLatLng(this.state.polygon.polygons[i]);
+      if(that.state.polygons.polygons.length!=this.state.polyNum){
+          that.state.polyNum=that.state.polygons.polygons.length;
+          for(var i = 0;i<that.state.polygons.polygons.length;++i){
+              let polygon = that.convertToLatLng(this.state.polygons.polygons[i]);
               if(polygon){
                   HTTPService.countPolyResidences(
                     { points: polygon, center:  0.1, radius: 0.1 }
@@ -249,7 +248,7 @@ export default class OverlayContainer extends Component {
               }
           }
 
-          if(that.state.polygon.polygons.length==0){
+          if(that.state.polygons.polygons.length==0){
               that.setState({polyNum: 0,
                              dataReady: false,
 
@@ -259,7 +258,7 @@ export default class OverlayContainer extends Component {
   }
 
   setPolygon(polygon) {
-    this.state.polygon.add(polygon);
+    this.state.polygons.add(polygon);
     this.updatePolygonData();
   }
 
@@ -280,14 +279,14 @@ export default class OverlayContainer extends Component {
           toggleDrawingTools={this.toggleDrawingTools.bind(this)}
           drawClickCallback={this.drawClickCallback.bind(this)}
           clearClickCallback={this.clearClickCallback.bind(this)}
-          canClear={ (this.state.polygon != null) }
+          canClear={ (this.state.polygons != null) }
           finishClickCallback={this.finishClickCallback.bind(this)}
           addClickCallback = {this.addClickCallback.bind(this)}
           cancelClickCallback={this.cancelClickCallback.bind(this)} />
-        { this.state.isDrawing && this.state.polygon.polygons.length >0 ?
+        { this.state.isDrawing && this.state.polygons.polygons.length >0 ?
           <PolygonTools map={this.props.map}
                         maps={this.props.maps}
-                        polygon={this.state.polygon}
+                        polygons={this.state.polygons}
                         polyNum = {this.state.polyNum} /> : null
         }
         { this.state.isDrawing ?
@@ -339,6 +338,14 @@ class PolygonArray {
     }
   }
 
+  removeLast() {
+      console.log("999999999");
+      if(this.polygons.length>0) {
+          let i = this.polygons.length-1;
+          this.polygons[i].setMap(null);
+          this.polygons.pop();
+      }
+  }
   removeAll() {
     for(let i = 0; i < this.polygons.length; ++i) {
       this.polygons[i].setMap(null);
