@@ -122,10 +122,10 @@ export default class OverlayContainer extends Component {
     // data refers to the unit count data
     this.state = {
       isDrawing: false,
-      //polygon: null,
       polygon: new PolygonArray(),
+      polyNum: 0,
       dataReady: false,
-      data: null
+      data:[]
 
     }
   }
@@ -134,7 +134,9 @@ export default class OverlayContainer extends Component {
     this.setState({isDrawing: !this.state.isDrawing}, callback);
   }
 
-  drawClickCallback() { }
+  drawClickCallback() {
+      this.updatePolygonData();
+  }
 
   clearClickCallback() {
     if(this.state.polygon.polygons.length>0) {
@@ -142,6 +144,7 @@ export default class OverlayContainer extends Component {
         this.state.polygon.polygons[i].setMap(null);
         this.state.polygon.polygons.pop();
     }
+    this.updatePolygonData();
   }
 
   convertToLatLng(polygon) {
@@ -161,32 +164,43 @@ export default class OverlayContainer extends Component {
   }
 
   finishClickCallback() {
-      //this is part of outputing data
-    //let that = this;
-    // let polygon = this.convertToLatLng(this.state.polygon);
-    //
-    // if(polygon) {
-    //   HTTPService.countPolyResidences(
-    //     { points: polygon, center:  0.1, radius: 0.1 }
-    //   ).then(function(json){
-    //     that.setState({dataReady: true, data: json});
-    //   });
-    // }
+    this.updatePolygonData();
   }
 
-  cancelClickCallback() { }
+  cancelClickCallback() {
+  }
+
+  updatePolygonData() {
+      let that = this;
+      this.state.data=[];
+      that.state.data=[];
+      if(that.state.polygon.polygons.length!=this.state.polyNum){
+          that.state.polyNum=that.state.polygon.polygons.length;
+          for(var i = 0;i<that.state.polygon.polygons.length;++i){
+              let polygon = that.convertToLatLng(this.state.polygon.polygons[i]);
+              if(polygon){
+                  HTTPService.countPolyResidences(
+                    { points: polygon, center:  0.1, radius: 0.1 }
+                  ).then(function(json){
+                      that.state.data.push(json);
+                      if(that.state.data.length>0){
+                          that.setState({dataReady: true});
+                      }else {
+                          that.setState({dataReady: false});
+                      }
+                  });
+              }
+          }
+          if(that.state.polygon.polygons.length==0){
+              that.setState({dataReady: false});
+              that.state.data=[];
+          }
+      }
+  }
 
   setPolygon(polygon) {
-    if(polygon == null) {
-      this.setState({dataReady: false, data: null});
-  }else{
-      this.state.polygon.add(polygon);
-  }
-  //this is part of outputing data
-    // If there is no longer a polygon, clear the unit count data
-    // if(polygon == null) {
-    //   this.setState({dataReady: false, data: null});
-    // }
+  this.state.polygon.add(polygon);
+  this.updatePolygonData();
   }
 
 
@@ -211,15 +225,19 @@ export default class OverlayContainer extends Component {
         <PolygonTools map={this.props.map}
                         maps={this.props.maps}
                         polygon={this.state.polygon}
-                        setPolygon={(polygon) => this.setPolygon(polygon)} /> : null }
-
-        <ol className="show-number">
-          <li>Residences: {this.state.dataReady ? this.state.data["residential"]:"?"}</li>
-          <li>Industrial: {this.state.dataReady ? this.state.data["industrial"]:"?"}</li>
-          <li>Commercial: {this.state.dataReady ? this.state.data["commercial"]:"?"}</li>
-          <li>Urban: {this.state.dataReady ? this.state.data["urban service"]:"?"}</li>
-          <li>Other: {this.state.dataReady ? this.state.data["other"]:"?"}</li>
-        </ol>
+                        /> : null }
+        {this.state.dataReady ? this.state.data.map((itemData, i)=>
+        <div className="navbar-count-poly-box" key={i}>
+        <div className="navbar-count-poly-title">Polygon {i}</div>
+        <ul className="navbar-count-poly-text">
+            <li >Residences: {this.state.dataReady ? itemData["residential"]:"?"}</li>
+            <li >Industrial: {this.state.dataReady ? itemData["industrial"]:"?"}</li>
+            <li >Commercial: {this.state.dataReady ? itemData["commercial"]:"?"}</li>
+            <li >Urban: {this.state.dataReady ? itemData["urban service"]:"?"}</li>
+            <li >Other: {this.state.dataReady ? itemData["other"]:"?"}</li>
+            </ul>
+        </div>
+        ): null}
       </div>
     )
   }
