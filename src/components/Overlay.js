@@ -41,7 +41,7 @@ class Overlay extends Component {
   drawClick() {
     let callback;
 
-    if(this.props.finishClickCallback) {
+    if(this.props.drawClickCallback) {
       callback = () => { this.props.drawClickCallback(); };
     }
     this.toggleIsDrawing(callback);
@@ -134,7 +134,7 @@ class Overlay extends Component {
 
     let drawButton = <button id="draw-button" onClick={this.drawClick.bind(this)}>DRAW</button>;
     let clearButton = <button id="clear-button" onClick={this.clearClick.bind(this)}>CLEAR</button>;
-    let cancelButton = <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)}>CANCEL</button>;
+    let cancelButton = <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)}>RETURN</button>;
     let finishButton = <button id="finish-draw-button" onClick={this.finishClick.bind(this)}>FINISH</button>;
     let addButton = <button id="add-draw-button" onClick={this.addClick.bind(this)}>ADD</button>;
 
@@ -166,10 +166,10 @@ export default class OverlayContainer extends Component {
       polyNum: 0,
       dataReady: false,
       data:[],
-      url:null
+      url:[]
     }
 
-    this.setImgUrl = this.setImgUrl.bind(this);
+    
   }
 
   toggleDrawingTools(callback) {
@@ -186,6 +186,7 @@ export default class OverlayContainer extends Component {
         let i = this.state.polygon.polygons.length-1;
         this.state.polygon.polygons[i].setMap(null);
         this.state.polygon.polygons.pop();
+        this.state.url.pop();
     }
 
     this.updatePolygonData();
@@ -209,19 +210,22 @@ export default class OverlayContainer extends Component {
   }
 
   finishClickCallback() {
-    this.updatePolygonData();
+    //this.updatePolygonData();
   }
 
   cancelClickCallback() {
+    //this.updatePolygonData();
   }
 
   addClickCallback() { 
     this.setState({isDrawing:true});
-    this.updatePolygonData();
+    //this.updatePolygonData();
   }
 
   updatePolygonData() {
       let that = this;
+      this.state.url=[];
+      that.state.url=[];
       this.state.data=[];
       that.state.data=[];
       if(that.state.polygon.polygons.length!=this.state.polyNum){
@@ -239,13 +243,16 @@ export default class OverlayContainer extends Component {
                           that.setState({dataReady: false});
                       }
                   });
-                  this.setImgUrl(polygon);
+                  that.setImgUrl(polygon);
+                  
                   
               }
           }
+          
           if(that.state.polygon.polygons.length==0){
               that.setState({polyNum: 0,
                              dataReady: false,
+                             
                              data: []});
           }
       }
@@ -261,11 +268,11 @@ export default class OverlayContainer extends Component {
       polygon.forEach(function(position){
           url += "|"+position["lat"]+ ","+ position["lng"];
       });
-      this.setState({url:url});
+      this.state.url.push(url);
     }
 
   render() {
-    let image = <img className="image" src= {this.state.url}/>
+    
     return (
       <div className={ this.props.active && "nav-panel"}>
         <Overlay
@@ -300,9 +307,8 @@ export default class OverlayContainer extends Component {
                     <li >Urban: {this.state.dataReady ? itemData["urban service"]:"?"}</li>
                     <li >Other: {this.state.dataReady ? itemData["other"]:"?"}</li>
                 </ul>
-                { this.state.url != null ?
-                  <a href={this.state.url} download="map">{image}</a> : null
-                }
+                <a href={this.state.url[i]} download="map">{<img className="image" src= {this.state.url[i]}/>}</a>
+                
               </div>
             ): null}
           </div>

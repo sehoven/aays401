@@ -22,7 +22,7 @@ export class PolygonTools extends Component {
     }
     
 
-    console.log(this.state.polyNum);
+    
     if(this.state.polyNum==0){
       polygonOptions.fillColor = '#000000';
       polygonOptions.fillOpacity = 0.20;
