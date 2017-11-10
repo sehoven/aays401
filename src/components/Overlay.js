@@ -62,7 +62,7 @@ class Overlay extends Component {
     return (
       <div>
         { this.state.isDrawing ? null : drawButton }
-        { this.state.isDrawing ? null : clearButton }
+        { this.state.isDrawing || !this.props.canClear ? null : clearButton }
         { this.state.isDrawing ? cancelButton : null }
         { this.state.isDrawing ? finishButton : null }
       </div>
@@ -146,6 +146,7 @@ export default class OverlayContainer extends Component {
           toggleDrawingTools={this.toggleDrawingTools.bind(this)}
           drawClickCallback={this.drawClickCallback.bind(this)}
           clearClickCallback={this.clearClickCallback.bind(this)}
+          canClear={ (this.state.polygon != null) }
           finishClickCallback={this.finishClickCallback.bind(this)}
           cancelClickCallback={this.cancelClickCallback.bind(this)} />
         { this.state.isDrawing && this.state.polygon != null ?

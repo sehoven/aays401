@@ -59,7 +59,7 @@ export class NavList extends React.Component {
     if (this.willInject){
       this.polygon = null;
     } else {
-      this.polygon.setMap(null);
+      if (this.polygon) this.polygon.setMap(null);
     }
   }
 
