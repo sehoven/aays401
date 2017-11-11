@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { NavList } from './NavList.js';
+import NavList from './NavList.js';
 const HTTPService = require('./HTTPService.js');
 
 /*================================
