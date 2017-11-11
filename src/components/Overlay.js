@@ -4,14 +4,14 @@ import DrawingTools, { PolygonTools } from './DrawingTools.js';
 const HTTPService = require('./HTTPService.js');
 const notificationTimer = 2000;
 
-class Overlay extends Component {
+export class Overlay extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
       isDrawing: false,
-      notification:null,
-      banner:null
+      notification: null,
+      banner: null
     }
   }
 
@@ -139,7 +139,6 @@ class Overlay extends Component {
     let addButton = <button id="add-draw-button" onClick={this.addClick.bind(this)}>ADD</button>;
 
     return (
-
       <div>
         {this.state.banner}
         <NotificationContainer/>
@@ -168,8 +167,26 @@ export default class OverlayContainer extends Component {
       data:[],
       url:[]
     }
+  }
 
+  toggleDrawingTools(callback) {
+    this.setState({isDrawing: !this.state.isDrawing}, callback);
+  }
 
+  convertToLatLng(polygon) {
+    let latLngs;
+    if(polygon != null) {
+      latLngs = [];
+      let path = polygon.getPath();
+      for(let j = 0; j < path.getLength(); ++j) {
+        let vertex = path.getAt(j);
+        latLngs.push({
+          lat: vertex.lat(),
+          lng: vertex.lng()
+        });
+      }
+    }
+    return latLngs;
   }
 
   toggleDrawingTools(callback) {
@@ -191,22 +208,6 @@ export default class OverlayContainer extends Component {
     return polycount;
   }
 
-  convertToLatLng(polygon) {
-    let latLngs;
-    if(polygon != null) {
-      latLngs = [];
-      let path = polygon.getPath();
-      for(let j = 0; j < path.getLength(); ++j) {
-        let vertex = path.getAt(j);
-        latLngs.push({
-          lat: vertex.lat(),
-          lng: vertex.lng()
-        });
-      }
-    }
-    return latLngs;
-  }
-
   finishClickCallback() {
     //this.updatePolygonData();
   }
@@ -223,36 +224,30 @@ export default class OverlayContainer extends Component {
 
   updatePolygonData() {
       let that = this;
-      if(that.state.polygons.polygons.length!=this.state.polyNum){
+      if(this.state.polygons.polygons.length!=this.state.polyNum){
           this.state.url=[];
-          that.state.url=[];
           this.state.data=[];
-          that.state.data=[];
-          that.state.polyNum=that.state.polygons.polygons.length;
-          for(var i = 0;i<that.state.polygons.polygons.length;++i){
-              let polygon = that.convertToLatLng(this.state.polygons.polygons[i]);
+          this.state.polyNum=this.state.polygons.polygons.length;
+          for(var i = 0;i<this.state.polygons.polygons.length;++i){
+              let polygon = this.convertToLatLng(this.state.polygons.polygons[i]);
               if(polygon){
                   HTTPService.countPolyResidences(
                     { points: polygon, center:  0.1, radius: 0.1 }
                   ).then(function(json){
-                      that.state.data.push(json);
-                      if(that.state.data.length>0){
-                          that.setState({dataReady: true});
-                      }else {
-                          that.setState({dataReady: false});
-                      }
+                    let dataList = that.state.data;
+                    dataList.push(json);
+                    if(that.state.data.length>0){
+                        that.setState({dataReady: true, data: dataList});
+                    } else {
+                        that.setState({dataReady: false});
+                    }
                   });
                   that.setImgUrl(polygon);
-
-
               }
           }
 
-          if(that.state.polygons.polygons.length==0){
-              that.setState({polyNum: 0,
-                             dataReady: false,
-
-                             data: []});
+          if(this.state.polygons.polygons.length==0){
+              this.setState({polyNum: 0, dataReady: false, data: []});
           }
       }
   }

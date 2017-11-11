@@ -1,16 +1,12 @@
 import React, { Component } from 'react';
 import NavPanel from './NavPanel.js';
 import OverlayContainer from './Overlay';
-import {Enum} from 'enumify';
-
-class PanelType extends Enum {}
-PanelType.initEnum(['SEARCH', 'DRAW']);
 
 export default class Tabs extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentPanel: PanelType.SEARCH,
+      currentPanel: this.props.PanelType.SEARCH,
       overlay: null
     }
   }
@@ -24,7 +20,7 @@ export default class Tabs extends Component {
   }
 
   injectNeighborhood(polygon){
-    this.setState({ currentPanel : PanelType.DRAW });
+    this.setState({ currentPanel : this.props.PanelType.DRAW });
     this.overlay.resetPolygon();
     let polygonList = this.overlay.state.polygons;
     polygonList.add(polygon);
@@ -39,35 +35,31 @@ export default class Tabs extends Component {
         <NavPanel
           map={this.props.map}
           maps={this.props.maps}
-          active={ currentPanel == PanelType.SEARCH }
+          active={ currentPanel == this.props.PanelType.SEARCH }
           overlayRef={this.state.overlay}
-          tabsRef={this}
-        />
+          tabsRef={this} />
         <OverlayContainer
           ref={(instance) => {this.overlay = instance}}
-          active={ currentPanel == PanelType.DRAW }
+          active={ currentPanel == this.props.PanelType.DRAW }
           map={this.props.map}
-          maps={this.props.maps}
-        />
+          maps={this.props.maps} />
         <div id="tabButtons">
           <div
             className= {
               "tabButton " +
-              ((currentPanel == PanelType.SEARCH)?"activeTabButton":"")
+              ((currentPanel == this.props.PanelType.SEARCH) ? "activeTabButton" : "")
             }
-            id="topTabButton"
-            onClick={() => { this.swapState(PanelType.SEARCH) }}
-          >
+            id="search-tab"
+            onClick={() => { this.swapState(this.props.PanelType.SEARCH) }} >
             <div className="buttonText"><p>Search</p></div>
           </div>
           <div
             className={
               "tabButton " +
-              ((currentPanel == PanelType.DRAW)? "activeTabButton":"")
+              ((currentPanel == this.props.PanelType.DRAW) ? "activeTabButton" : "")
             }
-            id="bottomTabButton"
-            onClick={() => { this.swapState(PanelType.DRAW) }}
-          >
+            id="draw-tab"
+            onClick={() => { this.swapState(this.props.PanelType.DRAW) }} >
             <div className="buttonText"><p>Draw</p></div>
           </div>
         </div>

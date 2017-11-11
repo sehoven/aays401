@@ -1,19 +1,31 @@
 import React from "react";
-import ReactDOM from "React-dom";
-import { shallow } from 'enzyme';
+import { configure, mount } from 'enzyme';
 import GoogleMap from 'google-map-react';
-import { configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-15';
-import sinon from "sinon";
 
 import Map from "../src/components/Map.js";
 
 configure({ adapter: new Adapter() });
-// We are still investigating the best way to test components that use the Google Maps API.
-it("initiate map with correct states", ()=>{
 
-});
+describe("Map", () => {
+  let mountedMap;
+  let props;
 
-it("should render google map", ()=>{
+  const map = () => {
+    if(!mountedMap) {
+      mountedMap = mount(<Map {...props}/>);
+    }
+    return mountedMap;
+  }
 
+  beforeEach(() => {
+    props = {
+      setMapRef: function() {}
+    }
+    mountedMap = null;
+  });
+
+  it("always renders GoogleMap", () => {
+    expect(map().find(GoogleMap).length).toBe(1);
+  });
 });

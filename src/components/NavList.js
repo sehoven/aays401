@@ -14,25 +14,27 @@ class IconCanvas extends Component {
     updateCanvas() {
       let size = 100;
       const context = this.refs.canvas.getContext("2d");
-      let item = this.props.item;
-      let points = item.points;
 
-      let scaleFactor = (size*0.9)/Math.max(item.width, item.height);
-      let xx = (size/2) + (points[0].lat - item.center.lat) * scaleFactor;
-      let yy = (size/2) + (points[0].lng - item.center.lng) * scaleFactor;
-      context.moveTo(xx, yy);
-      context.beginPath();
-      for (let i = 1; i < points.length; i += 1){
-        let xx = (size/2) + (points[i].lat - item.center.lat) * scaleFactor;
-        let yy = (size/2) + (points[i].lng - item.center.lng) * scaleFactor;
-        context.lineTo(xx, yy);
+      if (context != null) {
+        let item = this.props.item;
+        let points = item.points;
+        let scaleFactor = (size*0.9)/Math.max(item.width, item.height);
+        let xx = (size/2) + (points[0].lat - item.center.lat) * scaleFactor;
+        let yy = (size/2) + (points[0].lng - item.center.lng) * scaleFactor;
+        context.moveTo(xx, yy);
+        context.beginPath();
+        for (let i = 1; i < points.length; i += 1){
+          let xx = (size/2) + (points[i].lat - item.center.lat) * scaleFactor;
+          let yy = (size/2) + (points[i].lng - item.center.lng) * scaleFactor;
+          context.lineTo(xx, yy);
+        }
+        context.closePath();
+        context.fillStyle = "rgb(150,150,255)";
+        context.lineWidth = 2;
+        context.strokeStyle = "black";
+        context.fill();
+        context.stroke();
       }
-      context.closePath();
-      context.fillStyle = "rgb(150,150,255)";
-      context.lineWidth = 2;
-      context.strokeStyle = "black";
-      context.fill();
-    	context.stroke();
     }
 
     render() {
@@ -46,7 +48,7 @@ class IconCanvas extends Component {
     }
 }
 
-export class NavList extends React.Component {
+export default class NavList extends React.Component {
   constructor(props){
     super(props);
     this.geocoder;
@@ -65,7 +67,7 @@ export class NavList extends React.Component {
 
   centerMapOnId(placeId){
     if (!this.geocoder){
-       this.geocoder = new google.maps.Geocoder();
+       this.geocoder = new this.props.maps.Geocoder();
     }
     let map = this.props.map;
     this.geocoder.geocode({'placeId': placeId}, function(results, status) {
@@ -88,15 +90,15 @@ export class NavList extends React.Component {
     map.setZoom(Math.floor(zoomFactor));
     map.setCenter(center);
     let that = this;
-    HTTPService.countPolyResidences(itemData).then(function(json){
-      let dataList = this.props.overlayRef.state.data == null ? this.props.overlayRef.state.data : [];
-      dataList.push(json);
-      that.props.overlayRef.setState({dataReady: true, data: dataList});
-    });
+    // HTTPService.countPolyResidences(itemData).then(function(json){
+    //   let dataList = that.props.overlayRef.state.data == null ? that.props.overlayRef.state.data : [];
+    //   dataList.push(json);
+    //   that.props.overlayRef.setState({dataReady: true, data: dataList});
+    // });
     if (this.polygon){
       this.polygon.setMap(null);
     }
-    this.polygon = new google.maps.Polygon({
+    this.polygon = new this.props.maps.Polygon({
           paths: itemData.points,
           strokeWeight: 0,
           fillOpacity: 0.45,
@@ -105,9 +107,6 @@ export class NavList extends React.Component {
     this.polygon.setMap(map);
     that.willInject = true;
     that.props.tabsRef.injectNeighborhood(this.polygon);
-    let polygonListener = google.maps.event.addListener(this.polygon, "click", function(e) {
-        
-    });
   }
 
   render() {
@@ -120,12 +119,12 @@ export class NavList extends React.Component {
             <div className="navbar-list-autocomplete-item"
               key={i}
               onClick={
-                () => { this.centerMapOnId(this.props.placeIds[i].place_id)}
+                () => {this.centerMapOnId(this.props.placeIds[i].place_id)}
             }>
-            <div className="navbar-list-autocomplete-text">
-              {itemData}
+              <div className="navbar-list-autocomplete-text">
+                {itemData}
+              </div>
             </div>
-        </div>
         )}
         {this.props.data.data.map((itemData, i) =>
           <div className="navbar-list-item"
