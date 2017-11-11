@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import Map from './Map.js'
 import Tabs from './Tabs';
+import {Enum} from 'enumify';
+
+class PanelType extends Enum {}
+PanelType.initEnum(['SEARCH', 'DRAW']);
 
 /*================================
 Receives a pointer to setMapRef method in index.js for callback
@@ -31,7 +35,7 @@ export default class MapContainer extends Component {
           <Tabs
             map={this.state.map}
             maps={this.state.maps}
-          />
+            PanelType={PanelType} />
         }
         <Map setMapRef={this.setMapRef.bind(this)} />
       </div>

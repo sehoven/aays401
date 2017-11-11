@@ -1,16 +1,62 @@
 import React from "react";
-import ReactDOM from "React-dom";
-import { shallow } from 'enzyme';
-import GoogleMap from 'google-map-react';
-import { configure } from 'enzyme';
+import { configure, mount } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-15';
-import sinon from "sinon";
 
 import NavPanel from "../src/components/NavPanel.js";
+import NavList from "../src/components/NavList.js";
 
 configure({ adapter: new Adapter() });
 
-// We are still investigating the best way to test components that use the Google Maps API.
-it("should initiate component with correct state", ()=>{
+describe("NavPanel", () => {
+  let mountedNavPanel;
+  let props;
 
+  const navPanel = () => {
+    if(!mountedNavPanel) {
+      mountedNavPanel = mount(<NavPanel {...props}/>);
+    }
+    return mountedNavPanel;
+  }
+
+  beforeEach(() => {
+    mountedNavPanel = null;
+  });
+
+  describe("when active", () => {
+    beforeEach(() => {
+      props = {
+        active: true
+      }
+    });
+
+    it("always renders a div", () => {
+      expect(navPanel().find("div").length).toBeGreaterThan(0);
+    });
+
+    it("always renders input", () => {
+      expect(navPanel().find("input").length).toBe(1);
+    });
+
+    it("always renders NavList", () => {
+      expect(navPanel().find(NavList).length).toBe(1);
+    });
+
+    it("input change", () => {
+      // TODO
+      // This test will require a Google Maps Mock
+      // navPanel().find("input").simulate("change", {target: {value: "test"}});
+    });
+  });
+
+  describe("when not active", () => {
+    beforeEach(() => {
+      props = {
+        active: false
+      }
+    });
+
+    it("always renders nothing", () => {
+      expect(navPanel().children().length).toBe(0);
+    });
+  });
 });

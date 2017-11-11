@@ -23,11 +23,9 @@ export class PolygonTools extends Component {
     if(this.props.polyNum==0){
       polygonOptions.fillColor = '#000000';
       polygonOptions.fillOpacity = 0.20;
-    }
-    else{
+    } else {
       polygonOptions.fillColor = randomColor();
       polygonOptions.fillOpacity = 0.45;
-
     }
 
   }
@@ -35,8 +33,8 @@ export class PolygonTools extends Component {
   // Before the component mounts, set the polygon and add the listeners
   componentWillMount() {
     for(var i=0;i<this.state.polygons.polygons.length;++i){
-        this.state.polygonListener.push(null);
-        this.state.isSelected.push(false);
+      this.state.polygonListener.push(null);
+      this.state.isSelected.push(false);
     }
     this.setState({mapListener:null});
     this.selectPolygon();
@@ -44,7 +42,7 @@ export class PolygonTools extends Component {
     let that = this;
     for(var i=0;i<this.state.polygons.polygons.length;++i){
         if(this.state.polygonListener[i] == null) {
-          let polygonListener = google.maps.event.addListener(this.state.polygons.polygons[i], "click", function(e) {
+          let polygonListener = this.props.maps.event.addListener(this.state.polygons.polygons[i], "click", function(e) {
             // When the user clicks on a node, that node will be deleted from the polygon.
             if(e.vertex != null) {
               let path = that.state.polygons.polygons[i].getPaths().getAt(e.path);
@@ -61,14 +59,14 @@ export class PolygonTools extends Component {
         }
 
         // if(this.state.mapListener[i] == null) {
-        //   let mapListener = google.maps.event.addListener(this.props.map, "click", function(e) {
+        //   let mapListener = this.props.maps.event.addListener(this.props.map, "click", function(e) {
         //     that.deselectPolygon();
         //   });
         //   that.state.mapListener[i]=mapListener;
         // }
     }
     if(this.state.mapListener == null) {
-      //let mapListener = google.maps.event.addListener(this.props.map, "click", function(e) {
+      //let mapListener = this.props.maps.event.addListener(this.props.map, "click", function(e) {
       //  that.deselectPolygon();
       //});
       //that.state.mapListener=mapListener;
@@ -92,11 +90,11 @@ export class PolygonTools extends Component {
     // Remove listeners
     for(var i=0;i<this.state.polygons.polygons.length;++i){
         if(this.state.polygonListener[i] != null) {
-          google.maps.event.removeListener(this.state.polygonListener[i]);
+          this.props.maps.event.removeListener(this.state.polygonListener[i]);
         }
     }
     if(this.state.mapListener != null) {
-      google.maps.event.removeListener(this.state.mapListener);
+      this.props.maps.event.removeListener(this.state.mapListener);
     }
   }
 
@@ -104,7 +102,7 @@ export class PolygonTools extends Component {
   setPolygon(map, coords) {
     let newPolygonOptions = polygonOptions;
     newPolygonOptions.paths = coords;
-    let polygon = new google.maps.Polygon(newPolygonOptions);
+    let polygon = new this.props.maps.Polygon(newPolygonOptions);
     polygon.setMap(map);
     this.state.polygon = polygon;
   }
@@ -153,7 +151,6 @@ export default class DrawingTools extends Component {
     this.state = {
       polygon: null,
       isSelected: false,
-      drawingTools: this,
       drawingManager: null,
       polygonListener: null,
       mapListener: null
@@ -176,13 +173,13 @@ export default class DrawingTools extends Component {
       this.state.polygon.setEditable(false);
     }
     if(this.state.polygonListener) {
-      google.maps.event.removeListener(this.state.polygonListener);
+      this.props.maps.event.removeListener(this.state.polygonListener);
     }
     if(this.state.drawingManager) {
       this.state.drawingManager.setMap(null);
     }
     if(this.state.mapListener) {
-      google.maps.event.removeListener(this.state.mapListener);
+      this.props.maps.event.removeListener(this.state.mapListener);
     }
   }
 
@@ -207,18 +204,18 @@ export default class DrawingTools extends Component {
     // When the polygon is deleted, the user can draw a polygon again (limit to one)
     this.resetDrawingTools();
     if(this.state.polygonListener) {
-      google.maps.event.removeListener(this.state.polygonListener);
+      this.props.maps.event.removeListener(this.state.polygonListener);
       this.setState({polygonListener: null});
     }
     if(this.state.polygon != null) {
       this.state.polygon.setMap(null);
-      this.setState({polygon: null});
+      this.setState({polygon: null, isSelected: false});
     }
   }
 
   resetDrawingTools() {
     if(this.state.drawingManager != null) {
-      this.state.drawingManager.setDrawingMode(google.maps.drawing.OverlayType.POLYGON);
+      this.state.drawingManager.setDrawingMode(this.props.maps.drawing.OverlayType.POLYGON);
       this.state.drawingManager.setOptions({
         drawingControl: true
       });
@@ -229,51 +226,51 @@ export default class DrawingTools extends Component {
 
 
     const drawingToolsOptions = {
-      drawingMode: google.maps.drawing.OverlayType.POLYGON,
+      drawingMode: this.props.maps.drawing.OverlayType.POLYGON,
       drawingControl: true,
       drawingControlOptions: {
-        position: google.maps.ControlPosition.TOP_RIGHT,
+        position: this.props.maps.ControlPosition.TOP_RIGHT,
         drawingModes: ["polygon"]
       },
       polygonOptions: polygonOptions,
       map: map
     }
 
-    let drawingTools = this.state.drawingTools;
-    var drawingManager = new google.maps.drawing.DrawingManager(drawingToolsOptions);
+    let that = this;
+    var drawingManager = new this.props.maps.drawing.DrawingManager(drawingToolsOptions);
     this.setState({drawingManager: drawingManager});
 
-    google.maps.event.addListener(drawingManager, "polygoncomplete", function(polygon) {
+    this.props.maps.event.addListener(drawingManager, "polygoncomplete", function(polygon) {
       //console.log(polygon);
       // After drawing, switch to non-drawing mode and remove drawing controls to limit to one polygon.
       drawingManager.setDrawingMode(null);
       drawingManager.setOptions({
         drawingControl: false
       });
-      drawingTools.setState({polygon: polygon, isSelected: true});
+      that.setState({polygon: polygon, isSelected: true});
 
-      let polygonListener = google.maps.event.addListener(polygon, "click", function(e) {
+      let polygonListener = that.props.maps.event.addListener(polygon, "click", function(e) {
         // When the user clicks on a node, that node will be deleted from the polygon.
         if(e.vertex != null) {
           let path = polygon.getPaths().getAt(e.path);
           path.removeAt(e.vertex);
           if(path.length < 3) {
-            drawingTools.deletePolygon();
+            that.deletePolygon();
           }
         }
-        drawingTools.selectPolygon();
+        that.selectPolygon();
       });
-      drawingTools.setState({polygonListener: polygonListener});
+      that.setState({polygonListener: polygonListener});
 
-      drawingTools.selectPolygon();
+      that.selectPolygon();
     });
 
-    if(this.state.mapListener == null) {
-     // let mapListener = google.maps.event.addListener(map, "click", function(e) {
-     //   drawingTools.deselectPolygon();
-     // });
-      //drawingTools.setState({mapListener: mapListener});
-    }
+    // if(this.state.mapListener == null) {
+    //  // let mapListener = this.props.maps.event.addListener(map, "click", function(e) {
+    //  //   drawingTools.deselectPolygon();
+    //  // });
+    //   //drawingTools.setState({mapListener: mapListener});
+    // }
 
   }
 
