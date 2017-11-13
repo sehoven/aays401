@@ -84,22 +84,23 @@ describe("DrawingTools", () => {
     }
   });
 
-  it("selectPolygon updates isSelected state", () => {
-    drawingTools().setState({polygon: new google.maps.Polygon()});
+  it("selectPolygon updates isSelected", () => {
+    drawingTools().instance().polygon = new google.maps.Polygon();
     drawingTools().instance().selectPolygon();
-    expect(drawingTools().state().isSelected).toEqual(true);
+    expect(drawingTools().instance().isSelected).toEqual(true);
   });
 
-  it("deselectPolygon updates isSelected state", () => {
-    drawingTools().setState({polygon: new google.maps.Polygon(), isSelected: true});
+  it("deselectPolygon updates isSelected", () => {
+    drawingTools().instance().polygon = new google.maps.Polygon();
+    drawingTools().instance().isSelected = true;
     drawingTools().instance().deselectPolygon();
-    expect(drawingTools().state().isSelected).toEqual(false);
+    expect(drawingTools().instance().isSelected).toEqual(false);
   });
 
-  it("deletePolygon updates correct states", () => {
-    drawingTools().setState({polygon: new google.maps.Polygon()});
+  it("deletePolygon updates isSelected", () => {
+    drawingTools().instance().polygon = new google.maps.Polygon();
     drawingTools().instance().deletePolygon();
-    expect(drawingTools().state().isSelected).toEqual(false);
+    expect(drawingTools().instance().isSelected).toEqual(false);
   });
 
   // TODO More robust tests
