@@ -51,11 +51,12 @@ export class PolygonTools extends Component {
             if(path.length < 3) {
               that.deletePolygon(index);
             }
-          }
-          if(that.isSelected[index]) {
-            that.deselectPolygon(index);
           } else {
-            that.selectPolygon(index);
+            if(that.isSelected[index]) {
+              that.deselectPolygon(index);
+            } else {
+              that.selectPolygon(index);
+            }
           }
         });
         this.polygonListeners[i] = polygonListener;
@@ -154,7 +155,7 @@ export default class DrawingTools extends Component {
   }
 
   componentWillUnmount() {
-    this.props.setPolygon(this.polygon);
+    this.props.addPolygon(this.polygon);
     this.removeDrawingTools();
   }
 
@@ -244,11 +245,12 @@ export default class DrawingTools extends Component {
           if(path.length < 3) {
             that.deletePolygon();
           }
-        }
-        if(that.isSelected) {
-          that.deselectPolygon();
         } else {
-          that.selectPolygon();
+          if(that.isSelected) {
+            that.deselectPolygon();
+          } else {
+            that.selectPolygon();
+          }
         }
       });
       that.polygonListener = polygonListener;
