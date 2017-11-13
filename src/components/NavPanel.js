@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import NavList from './NavList.js';
 const HTTPService = require('./HTTPService.js');
+const locality = "Edmonton Canada";
 
 /*================================
 Receives a pointer to map object in props
@@ -33,9 +34,8 @@ export default class NavPanel extends Component {
       if(!this.AutocompleteService){
         this.AutocompleteService = new google.maps.places.AutocompleteService();
       }
-      let searchtext = event.target.value + "Edmonton Canada";
+      let searchtext = event.target.value + " " + locality;
 
-      //console.log(event.target.value);
       this.AutocompleteService.getQueryPredictions(
         {input:searchtext},
         function(predictions, status) {
