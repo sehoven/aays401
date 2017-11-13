@@ -67,8 +67,7 @@ export default class NavPanel extends Component {
           autocomplete={this.state.autocomplete}
           placeIds={this.state.placeIds}
           data={this.state.list}
-          tabsRef={this.props.tabsRef}
-          overlayRef={this.props.overlayRef} />
+          tabsRef={this.props.tabsRef} />
       </div>
     )
   }

@@ -203,20 +203,23 @@ export default class OverlayContainer extends Component {
   cancelClickCallback() { }
 
   addClickCallback() {
-    this.setState({isDrawing:true});
+    this.setState({isDrawing: true});
     return this.state.polygons.size() != this.state.polyNum;
   }
 
   addPolygonData(polygon) {
-    polygon = this.state.polygons.convertToLatLng(polygon);
     if(polygon != null) {
+      polygon = this.state.polygons.convertToLatLng(polygon);
+
       let that = this;
       HTTPService.countPolyResidences(
         { points: polygon, center:  0.1, radius: 0.1 }
       ).then(function(json){
-        let dataList = that.state.data;
-        dataList.push(json);
-        that.setState({dataReady: true, data: dataList});
+        that.setState(prevState => ({
+          dataReady: true,
+          data: [...prevState.data, json],
+          polyNum: ++prevState.polyNum
+        }));
       });
       that.setImgUrl(polygon);
     }
@@ -237,7 +240,7 @@ export default class OverlayContainer extends Component {
       polygon.forEach(function(position) {
         url += "|"+position["lat"]+ ","+ position["lng"];
       });
-      this.setState({prevState => ({
+      this.setState(prevState => ({
         url: [...prevState.url, url]
       }));
     }
