@@ -56,7 +56,7 @@ export class Overlay extends Component {
     if(this.props.clearClickCallback) {
       polycount = this.props.clearClickCallback();
     }
-    if(polycount > 0){
+    if(polycount > 0) {
       this.state.notification = 'clear';
     }
     this.createNotification(this.state.notification);
@@ -161,26 +161,15 @@ export default class OverlayContainer extends Component {
       polygons: new PolygonArray(),
       polyNum: 0,
       dataReady: false,
-      data:[],
-      url:[]
+      data: [],
+      url: []
     }
+
+    this.lock = false;
   }
 
   toggleDrawingTools(value, callback) {
     this.setState({isDrawing: value}, callback);
-  }
-
-  addFirstPolygon(polygon) {
-    let polygonList = this.state.polygons;
-    if(polygonList != null) {
-      polygonList.clear();
-    }
-    polygonList.push(polygon);
-    this.setState({ polygons: polygonList, data: [], url: [], polyNum: 0},
-      () => {
-        this.updatePolygonData();
-      }
-    );
   }
 
   drawClickCallback() { }
@@ -191,27 +180,29 @@ export default class OverlayContainer extends Component {
     polygonArray.pop();
     this.setState((prevState) => ({
       polygons: polygonArray,
-      url: [...prevState.url.slice(0,this.state.url.length - 1)],
-      data: [...prevState.data.slice(0,this.state.data.length - 1)]
+      url: [...prevState.url.slice(0, this.state.url.length - 1)],
+      data: [...prevState.data.slice(0, this.state.data.length - 1)],
+      polyNum: --prevState.polyNum
     }));
 
     return polycount;
   }
 
   finishClickCallback() {
-    this.updatePolygonData();
+    //this.updatePolygonData();
   }
 
   cancelClickCallback() {
-    this.updatePolygonData();
+    //this.updatePolygonData();
   }
 
   addClickCallback() {
-    this.setState({isDrawing: true});
-    this.updatePolygonData();
-    return this.state.polygons.size() != this.state.polyNum;
+    this.setState(prevState => ({
+      isDrawing: true,
+      polyNum: ++prevState.polyNum
+    }));
+    //this.updatePolygonData();
   }
-
 
   updatePolygonData() {
     let that = this;
@@ -226,18 +217,46 @@ export default class OverlayContainer extends Component {
           that.setState(prevState => ({
             dataReady: true,
             data: [...prevState.data, json]
-          }));
+          }), () => {
+            console.log(that.state.data.length, that.state.data);
+          });
         });
         this.setImgUrl(polygon);
       }
     }
   }
 
+  addFirstPolygon(polygon) {
+    let polygonArray = this.state.polygons;
+    polygonArray.clear();
+    polygonArray.push(polygon);
+    console.log("POLYGON ARRAY 3");
+    console.log(polygonArray);
+    this.setState({polygons: polygonArray}, () => {
+      this.updatePolygonData();
+    });
+  }
+
   addPolygon(polygon) {
     if(polygon != null) {
       let polygonArray = this.state.polygons;
       polygonArray.push(polygon);
-      this.setState({polygons: polygonArray});
+      console.log("POLYGON ARRAY 2");
+      console.log(polygonArray);
+      this.setState({polygons: polygonArray}, () => {
+        //this.updatePolygonData();
+      });
+    }
+  }
+
+  setPolygonArray(polygons) {
+    if(polygons != null) {
+      let polygonArray = new PolygonArray(...polygons);
+      console.log("POLYGON ARRAY 3");
+      console.log(polygonArray);
+      this.setState({polygons: polygonArray}, () => {
+        this.updatePolygonData();
+      });
     }
   }
 
@@ -269,7 +288,8 @@ export default class OverlayContainer extends Component {
           <PolygonTools map={this.props.map}
                         maps={this.props.maps}
                         polygons={this.state.polygons}
-                        polyNum = {this.state.polyNum} /> : null
+                        polyNum = {this.state.polyNum}
+                        setPolygonArray={(polygons) => this.setPolygonArray(polygons)} /> : null
         }
         { this.state.isDrawing ?
           <DrawingTools map={this.props.map}
@@ -300,7 +320,7 @@ export default class OverlayContainer extends Component {
 }
 
 // Class to handle the polygon objects visible on the map.
-class PolygonArray {
+export class PolygonArray {
   constructor(...x) {
     this.arr = [...x];
   }

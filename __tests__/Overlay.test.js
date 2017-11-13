@@ -1,9 +1,9 @@
 import React from "react";
 import { configure, shallow, mount } from "enzyme";
 import Adapter from "enzyme-adapter-react-15";
-import {NotificationContainer, NotificationManager} from 'react-notifications';
+import { NotificationContainer, NotificationManager } from "react-notifications";
 
-import OverlayContainer, { Overlay } from "../src/components/Overlay.js";
+import OverlayContainer, { Overlay, PolygonArray } from "../src/components/Overlay.js";
 import DrawingTools, { PolygonTools } from "../src/components/DrawingTools.js";
 
 // TO MOVE MOCK OBJECT TO GLOBAL LEVEL FOR ALL TESTS
@@ -163,7 +163,7 @@ describe("Overlay", () => {
   });
 });
 
-describe("OverlayContainer", () => {
+describe("OverlayContainer mount", () => {
   let mountedOverlayContainer;
   let props;
 
@@ -221,8 +221,95 @@ describe("OverlayContainer", () => {
       });
     });
   });
+});
 
-  // TODO TESTS FOR CALLBACKS
+describe("OverlayContainer shallow", () => {
+  let mountedOverlayContainer;
+  let props;
+
+  const overlayContainer = () => {
+    if(!mountedOverlayContainer) {
+      mountedOverlayContainer = shallow(<OverlayContainer {...props}/>);
+    }
+    return mountedOverlayContainer;
+  }
+
+  beforeEach(() => {
+    mountedOverlayContainer = null;
+    props = {
+      map: new google.maps.Map(),
+      maps: google.maps
+    }
+  });
+
+  describe("callbacks", () => {
+    it("toggleDrawingTools to true with callback argument", () => {
+      let mockCallback = jest.fn();
+      overlayContainer().setState({isDrawing: false});
+      overlayContainer().instance().toggleDrawingTools(true, mockCallback);
+      expect(overlayContainer().state().isDrawing).toEqual(true);
+      expect(mockCallback).toHaveBeenCalled();
+    });
+
+    it("toggleDrawingTools to false with callback argument", () => {
+      let mockCallback = jest.fn();
+      overlayContainer().setState({isDrawing: true});
+      overlayContainer().instance().toggleDrawingTools(false, mockCallback);
+      expect(overlayContainer().state().isDrawing).toBe(false);
+      expect(mockCallback).toHaveBeenCalled();
+    });
+
+    it("toggleDrawingTools with null callback argument", () => {
+      let mockCallback = null;
+      overlayContainer().setState({isDrawing: false});
+      overlayContainer().instance().toggleDrawingTools(true, mockCallback);
+      expect(overlayContainer().state().isDrawing).toBe(true);
+    });
+
+    it("drawClickCallback", () => {
+      // no behaviour right now, so no need for a test
+    });
+
+    it("clearClickCallback", () => {
+      let polygon = new google.maps.Polygon();
+      let polygonArray = new PolygonArray(polygon, polygon);
+      overlayContainer().setState({
+        polygons: polygonArray,
+        url: ["a", "b"],
+        data: ["a", "b"],
+        polyNum: polygonArray.size()
+      });
+      let polyCount = overlayContainer().instance().clearClickCallback();
+      expect(polyCount).toBe(2);
+      expect(overlayContainer().state().data.length).toBe(1);
+      expect(overlayContainer().state().url.length).toBe(1);
+      expect(overlayContainer().state().polyNum).toBe(1);
+      expect(overlayContainer().state().polygons.size()).toBe(1);
+    });
+
+    describe("spy on updatePolygonData", () => {
+      let spy;
+
+      beforeEach(() => {
+        spy = jest.spyOn(overlayContainer().instance(), "updatePolygonData");
+      });
+
+      it("finishClickCallback", () => {
+        overlayContainer().instance().finishClickCallback();
+        expect(spy).toHaveBeenCalled();
+      });
+
+      it("clearClickCallback", () => {
+        overlayContainer().instance().clearClickCallback();
+        expect(spy).toHaveBeenCalled();
+      });
+
+      it("addClickCallback", () => {
+        overlayContainer().setState({isDrawing: false});
+        overlayContainer().instance().addClickCallback();
+      });
+    });
+  });
 });
 
 
