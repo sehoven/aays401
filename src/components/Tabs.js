@@ -21,11 +21,7 @@ export default class Tabs extends Component {
 
   injectNeighborhood(polygon){
     this.setState({ currentPanel : this.props.PanelType.DRAW });
-    this.overlay.resetPolygon();
-    let polygonList = this.overlay.state.polygons;
-    polygonList.add(polygon);
-    this.overlay.setState({ polygons: polygonList});
-    this.overlay.updatePolygonData();
+    this.overlay.addFirstPolygon(polygon);
   }
 
   render() {
