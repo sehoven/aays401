@@ -56,7 +56,7 @@ export class Overlay extends Component {
     if(this.props.clearClickCallback) {
       polycount = this.props.clearClickCallback();
     }
-    if(polycount>0){
+    if(polycount > 0){
       this.state.notification = 'clear';
     }
     this.createNotification(this.state.notification);
@@ -177,85 +177,75 @@ export default class OverlayContainer extends Component {
     }
     polygonList.push(polygon);
     this.setState({ polygons: polygonList, data: [], url: [], polyNum: 0},
-      () => { this.updatePolygonData() }
+      () => {
+        this.addPolygonData(polygon);
+      }
     );
   }
 
-  drawClickCallback() {
-    this.updatePolygonData();
-  }
+  drawClickCallback() { }
 
   clearClickCallback() {
     let polycount = this.state.polygons.size();
-    this.state.polygons.pop();
-    if(this.state.polygons.size()>0) {
-        this.state.url.pop();
-    }
+    let polygonArray = this.state.polygons;
+    polygonArray.pop();
+    this.setState((prevState) => ({
+      polygons: polygonArray,
+      url: [...prevState.url.slice(0,this.state.url.length - 1)],
+      data: [...prevState.data.slice(0,this.state.data.length - 1)]
+    }));
 
-    this.updatePolygonData();
     return polycount;
   }
 
-  finishClickCallback() {
-    //this.updatePolygonData();
-  }
+  finishClickCallback() { }
 
-  cancelClickCallback() {
-    //this.updatePolygonData();
-  }
+  cancelClickCallback() { }
 
   addClickCallback() {
     this.setState({isDrawing:true});
     return this.state.polygons.size() != this.state.polyNum;
-    //this.updatePolygonData();
   }
 
-  updatePolygonData() {
+  addPolygonData(polygon) {
+    polygon = this.state.polygons.convertToLatLng(polygon);
+    if(polygon != null) {
       let that = this;
-      if(this.state.polygons.size() != this.state.polyNum) {
-          this.state.polyNum = this.state.polygons.size();
-          console.log(this.state.polygons);
-          for(var i = 0; i < this.state.polygons.size(); ++i) {
-              let polygon = this.state.polygons.convertToLatLng(i);
-              if(polygon){
-                  HTTPService.countPolyResidences(
-                    { points: polygon, center:  0.1, radius: 0.1 }
-                  ).then(function(json){
-                    let dataList = that.state.data;
-                    dataList.push(json);
-                    if(that.state.data.length>0){
-                        that.setState({dataReady: true, data: dataList});
-                    } else {
-                        that.setState({dataReady: false});
-                    }
-                  });
-                  that.setImgUrl(polygon);
-              }
-          }
-
-          if(this.state.polygons.size() == 0){
-              this.setState({polyNum: 0, dataReady: false, data: []});
-          }
-      }
+      HTTPService.countPolyResidences(
+        { points: polygon, center:  0.1, radius: 0.1 }
+      ).then(function(json){
+        let dataList = that.state.data;
+        dataList.push(json);
+        that.setState({dataReady: true, data: dataList});
+      });
+      that.setImgUrl(polygon);
+    }
   }
 
   setPolygon(polygon) {
-    this.state.polygons.push(polygon);
-    this.updatePolygonData();
+    if(polygon != null) {
+      let polygonArray = this.state.polygons;
+      polygonArray.push(polygon);
+      this.setState({polygons: polygonArray});
+      this.addPolygonData(polygon);
+    }
   }
 
   setImgUrl(polygon){
+    if(polygon != null) {
       let url="https://maps.googleapis.com/maps/api/staticmap?&size=1000x1000&path=color:0x00000000|weight:5|fillcolor:0x00BDBDBD";
-      polygon.forEach(function(position){
-          url += "|"+position["lat"]+ ","+ position["lng"];
+      polygon.forEach(function(position) {
+        url += "|"+position["lat"]+ ","+ position["lng"];
       });
-      this.state.url.push(url);
+      this.setState({prevState => ({
+        url: [...prevState.url, url]
+      }));
     }
+  }
 
   render() {
-
     return (
-      <div className={ this.props.active && "nav-panel"}>
+      <div className={this.props.active && "nav-panel"}>
         <Overlay
           active={this.props.active}
           toggleDrawingTools={this.toggleDrawingTools.bind(this)}
@@ -342,9 +332,9 @@ class PolygonArray {
     return this.arr.length;
   }
 
-  convertToLatLng(i) {
+  convertToLatLng(polygon) {
     let latLngs = [];
-    let path = this.arr[i].getPath();
+    let path = polygon.getPath();
     for(let j = 0; j < path.getLength(); ++j) {
       let vertex = path.getAt(j);
       latLngs.push({
@@ -360,7 +350,7 @@ class PolygonArray {
   convertAllToLatLng() {
     let allPolygons = [];
     for(let i = 0; i < this.arr.length; ++i) {
-      allPolygons.push(convertToLatLng(i));
+      allPolygons.push(convertToLatLng(this.arr[i]));
     }
 
     return allPolygons;
