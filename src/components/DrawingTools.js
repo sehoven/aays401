@@ -15,6 +15,7 @@ export class PolygonTools extends Component {
     super(props);
 
     this.data = [];
+    this.mapListener = null;
 
     if(this.props.polyNum == 0) {
       polygonOptions.fillColor = '#000000';
@@ -69,7 +70,6 @@ export class PolygonTools extends Component {
   }
 
   componentWillUnmount() {
-    console.log("UNMOUNTING");
     // Before unmounting, "deselect" all polygons and remove all listeners
     this.deselectAllPolygons();
     this.removeAllListeners();
@@ -196,7 +196,6 @@ export default class DrawingTools extends Component {
   }
 
   removeDrawingTools() {
-    // Basically deselecting the polygon, but we don't want to set the state
     if(this.polygon) {
       this.polygon.setEditable(false);
     }
