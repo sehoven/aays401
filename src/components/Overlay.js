@@ -228,7 +228,7 @@ export default class OverlayContainer extends Component {
       let polygonArray = this.state.polygons;
       polygonArray.clear();
       polygonArray.push(polygon);
-      this.setState({polygons: polygonArray});  
+      this.setState({polygons: polygonArray});
     }
   }
 
@@ -333,8 +333,9 @@ export class PolygonArray {
       if(removed[0] != null) {
         removed[0].setMap(null);
       }
+      return removed[0];
     }
-    return removed[0];
+    return null;
   }
 
   getAt(i) {
