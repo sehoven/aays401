@@ -3,6 +3,7 @@ import { configure, shallow, mount } from "enzyme";
 import Adapter from "enzyme-adapter-react-15";
 
 import DrawingTools, { PolygonTools } from "../src/components/DrawingTools.js";
+import { PolygonArray } from "../src/components/Overlay.js";
 
 // TO MOVE MOCK OBJECT TO GLOBAL LEVEL FOR ALL TESTS
 const google = {
@@ -71,7 +72,7 @@ describe("DrawingTools", () => {
 
   const drawingTools = () => {
     if(!mountedDrawingTools) {
-      mountedDrawingTools = mount(<DrawingTools {...props}/>);
+      mountedDrawingTools = shallow(<DrawingTools {...props}/>);
     }
     return mountedDrawingTools;
   }
@@ -104,84 +105,36 @@ describe("DrawingTools", () => {
   });
 
   // TODO More robust tests
+  // Cannot really test setting the drawing tools with just a mock google object
 });
 
 describe("PolygonTools", () => {
   let mountedPolygonTools;
-  let props;
+  let props, polygon, polygons;
 
   const polygonTools = () => {
     if(!mountedPolygonTools) {
-      mountedPolygonTools = mount(<PolygonTools {...props}/>);
+      mountedPolygonTools = shallow(<PolygonTools {...props}/>);
     }
     return mountedPolygonTools;
   }
 
   beforeEach(() => {
     mountedPolygonTools = null;
+    polygon = new google.maps.Polygon();
+    polygons = new PolygonArray(polygon);
     props = {
       map: new google.maps.Map(),
-      maps: google.maps
+      maps: google.maps,
+      polygons: polygons
     }
   });
 
-  // TODO Write tests
+  it("component mounted", () => {
+    expect(polygonTools().instance().data.length).toBe(polygons.size());
+    expect(polygonTools().instance().mapListener).not.toBeNull();
+  });
+
+  // TODO Write useful tests for this component
+  // A lot of it is hard to test because it depends on google maps objects
 });
-
-
-
-///////
-///
-/// TESTS FROM DRAWING TOOLS PRE-REFACTOR THAT COULD BE USEFUL IN WRITING MORE TESTS
-///
-///////
-
-// describe("DrawingTools", () => {
-//   let wrapper, props;
-//
-//   beforeEach(() => {
-//     wrapper = shallow(<DrawingTools map={google.maps.Map} maps={google.maps}/>);
-//   });
-//
-//   afterEach(() => {
-//
-//   });
-//
-//   it("initial state of drawing manager not null", () => {
-//     expect(wrapper.state().drawingManager).not.toBeNull();
-//   });
-//
-//   it("initial state of map listener not null", () => {
-//     expect(wrapper.state().mapListener).not.toBeNull();
-//   });
-//
-//   it("selectPolygon updates isSelected state", () => {
-//     wrapper.setState({polygon: new google.maps.Polygon()});
-//     wrapper.instance().selectPolygon();
-//     expect(wrapper.state().isSelected).toEqual(true);
-//   });
-//
-//   it("deselectPolygon updates isSelected state", () => {
-//     wrapper.setState({polygon: new google.maps.Polygon(), isSelected: true});
-//     wrapper.instance().deselectPolygon();
-//     expect(wrapper.state().isSelected).toEqual(false);
-//   });
-//
-//   it("deletePolygon updates correct states", () => {
-//     wrapper.setState({polygon: new google.maps.Polygon()});
-//     wrapper.instance().deletePolygon();
-//     expect(wrapper.state().isSelected).toEqual(false);
-//   });
-// });
-//
-// describe("PolygonTools", () => {
-//   let wrapper;
-//
-//   beforeEach(() => {
-//     wrapper = mount(<PolygonTools map={google.maps.Map} maps={google.maps}/>);
-//   });
-//
-//   afterEach(() => {
-//     wrapper.detach();
-//   });
-// });
