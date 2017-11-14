@@ -189,11 +189,11 @@ export default class OverlayContainer extends Component {
   }
 
   finishClickCallback() {
-    //this.updatePolygonData();
+    this.updatePolygonData();
   }
 
   cancelClickCallback() {
-    //this.updatePolygonData();
+    this.updatePolygonData();
   }
 
   addClickCallback() {
@@ -201,7 +201,6 @@ export default class OverlayContainer extends Component {
       isDrawing: true,
       polyNum: ++prevState.polyNum
     }));
-    //this.updatePolygonData();
   }
 
   updatePolygonData() {
@@ -217,9 +216,7 @@ export default class OverlayContainer extends Component {
           that.setState(prevState => ({
             dataReady: true,
             data: [...prevState.data, json]
-          }), () => {
-            console.log(that.state.data.length, that.state.data);
-          });
+          }));
         });
         this.setImgUrl(polygon);
       }
@@ -227,36 +224,26 @@ export default class OverlayContainer extends Component {
   }
 
   addFirstPolygon(polygon) {
-    let polygonArray = this.state.polygons;
-    polygonArray.clear();
-    polygonArray.push(polygon);
-    console.log("POLYGON ARRAY 3");
-    console.log(polygonArray);
-    this.setState({polygons: polygonArray}, () => {
-      this.updatePolygonData();
-    });
+    if(polygon != null) {
+      let polygonArray = this.state.polygons;
+      polygonArray.clear();
+      polygonArray.push(polygon);
+      this.setState({polygons: polygonArray});  
+    }
   }
 
   addPolygon(polygon) {
     if(polygon != null) {
       let polygonArray = this.state.polygons;
       polygonArray.push(polygon);
-      console.log("POLYGON ARRAY 2");
-      console.log(polygonArray);
-      this.setState({polygons: polygonArray}, () => {
-        //this.updatePolygonData();
-      });
+      this.setState({polygons: polygonArray});
     }
   }
 
   setPolygonArray(polygons) {
     if(polygons != null) {
       let polygonArray = new PolygonArray(...polygons);
-      console.log("POLYGON ARRAY 3");
-      console.log(polygonArray);
-      this.setState({polygons: polygonArray}, () => {
-        this.updatePolygonData();
-      });
+      this.setState({polygons: polygonArray});
     }
   }
 
@@ -264,7 +251,7 @@ export default class OverlayContainer extends Component {
     if(polygon != null) {
       let url="https://maps.googleapis.com/maps/api/staticmap?&size=1000x1000&path=color:0x00000000|weight:5|fillcolor:0x00BDBDBD";
       polygon.forEach(function(position) {
-        url += "|"+position["lat"]+ ","+ position["lng"];
+        url += "|" + position.lat + "," + position.lng;
       });
       this.setState(prevState => ({
         url: [...prevState.url, url]

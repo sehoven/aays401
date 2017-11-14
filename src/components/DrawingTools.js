@@ -23,8 +23,6 @@ export class PolygonTools extends Component {
       polygonOptions.fillColor = randomColor();
       polygonOptions.fillOpacity = 0.45;
     }
-
-    // TODO props should not be modified (i.e. this.props.polygons)
   }
 
   // Before the component mounts, set the polygon and add the listeners
@@ -72,14 +70,17 @@ export class PolygonTools extends Component {
 
   componentWillUnmount() {
     console.log("UNMOUNTING");
-    // Before the component unmounts, "deselect" the polygon by making in uneditable
+    // Before unmounting, "deselect" all polygons and remove all listeners
     this.deselectAllPolygons();
     this.removeAllListeners();
+    this.setPolygonArray();
+  }
+
+  setPolygonArray() {
     let polygons = [];
     for(let i = 0; i < this.data.length; ++i) {
       polygons.push(this.data[i].polygon);
     }
-    console.log(polygons);
     this.props.setPolygonArray(polygons);
   }
 
@@ -144,7 +145,9 @@ export class PolygonTools extends Component {
   }
 
   deleteAllPolygons() {
-    this.removeAllListeners();
+    for(let i = 0; i < this.data.length; ++i) {
+      this.deletePolygon(this.data[i]);
+    }
   }
 
   deleteOnePolygon(polygon) {
@@ -163,6 +166,7 @@ export class PolygonTools extends Component {
         removed[0].polygon.setMap(null);
       }
     }
+    this.setPolygonArray();
   }
 
   render() {
@@ -187,7 +191,6 @@ export default class DrawingTools extends Component {
   }
 
   componentWillUnmount() {
-    console.log(this.polygon);
     this.props.addPolygon(this.polygon);
     this.removeDrawingTools();
   }
