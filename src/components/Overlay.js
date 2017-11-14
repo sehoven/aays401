@@ -164,8 +164,6 @@ export default class OverlayContainer extends Component {
       data: [],
       url: []
     }
-
-    this.lock = false;
   }
 
   toggleDrawingTools(value, callback) {
@@ -228,7 +226,9 @@ export default class OverlayContainer extends Component {
       let polygonArray = this.state.polygons;
       polygonArray.clear();
       polygonArray.push(polygon);
-      this.setState({polygons: polygonArray});
+      this.setState({polygons: polygonArray}, () => {
+        this.updatePolygonData();
+      });
     }
   }
 
