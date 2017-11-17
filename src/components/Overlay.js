@@ -283,6 +283,7 @@ export default class OverlayContainer extends Component {
           <DrawingTools map={this.props.map}
                         maps={this.props.maps}
                         addPolygon={(polygon) => this.addPolygon(polygon)} /> : null
+                        polyNum = {this.state.polyNum} /> : null
         }
         { this.props.active &&
           <div id="navbar-list">
