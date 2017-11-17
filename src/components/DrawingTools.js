@@ -17,13 +17,6 @@ export class PolygonTools extends Component {
     this.data = [];
     this.mapListener = null;
 
-    if(this.props.polyNum == 0) {
-      polygonOptions.fillColor = '#000000';
-      polygonOptions.fillOpacity = 0.20;
-    } else {
-      polygonOptions.fillColor = randomColor();
-      polygonOptions.fillOpacity = 0.45;
-    }
   }
 
   // Before the component mounts, set the polygon and add the listeners

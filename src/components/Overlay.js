@@ -276,7 +276,6 @@ export default class OverlayContainer extends Component {
           <PolygonTools map={this.props.map}
                         maps={this.props.maps}
                         polygons={this.state.polygons}
-                        polyNum = {this.state.polyNum}
                         setPolygonArray={(polygons) => this.setPolygonArray(polygons)} /> : null
         }
         { this.state.isDrawing ?
