@@ -30,14 +30,23 @@ export default class MapContainer extends Component {
 
   render() {
     return (
-      <div className="fullScreen">
-        { this.state.mapLoaded &&
-          <Tabs
-            map={this.state.map}
-            maps={this.state.maps}
-            PanelType={PanelType} />
-        }
-        <Map setMapRef={this.setMapRef.bind(this)} />
+      <div>
+        <div className="header">
+          Anthony At Your Service
+        </div>
+        <div className="container">
+          <div className="left">
+            { this.state.mapLoaded &&
+              <Tabs
+                map={this.state.map}
+                maps={this.state.maps}
+                PanelType={PanelType} />
+            }
+          </div>
+          <div className="right">
+            <Map setMapRef={this.setMapRef.bind(this)} />
+          </div>
+        </div>
       </div>
     )
   }

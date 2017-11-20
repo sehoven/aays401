@@ -260,48 +260,51 @@ export default class OverlayContainer extends Component {
   }
 
   render() {
+    if (!this.props.active) return null;
     return (
-      <div className={this.props.active && "nav-panel"}>
-        <Overlay
-          active={this.props.active}
-          toggleDrawingTools={this.toggleDrawingTools.bind(this)}
-          drawClickCallback={this.drawClickCallback.bind(this)}
-          clearClickCallback={this.clearClickCallback.bind(this)}
-          canClear={ (this.state.polygons != null) }
-          finishClickCallback={this.finishClickCallback.bind(this)}
-          addClickCallback = {this.addClickCallback.bind(this)}
-          cancelClickCallback={this.cancelClickCallback.bind(this)} />
-        { this.state.isDrawing && this.state.polygons.size() > 0 ?
-          <PolygonTools map={this.props.map}
-                        maps={this.props.maps}
-                        polygons={this.state.polygons}
-                        polyNum = {this.state.polyNum}
-                        setPolygonArray={(polygons) => this.setPolygonArray(polygons)} /> : null
-        }
-        { this.state.isDrawing ?
-          <DrawingTools map={this.props.map}
-                        maps={this.props.maps}
-                        addPolygon={(polygon) => this.addPolygon(polygon)} /> : null
-        }
-        { this.props.active &&
-          <div id="navbar-list">
-            {this.state.dataReady ? this.state.data.map((itemData, i)=>
-              <div className="navbar-count-poly-box" key={i}>
-                <div className="navbar-count-poly-title">Polygon {i}</div>
-                <ul className="navbar-count-poly-text">
-                    <li >Residences: {this.state.dataReady ? itemData["residential"]:"?"}</li>
-                    <li >Industrial: {this.state.dataReady ? itemData["industrial"]:"?"}</li>
-                    <li >Commercial: {this.state.dataReady ? itemData["commercial"]:"?"}</li>
-                    <li >Urban: {this.state.dataReady ? itemData["urban service"]:"?"}</li>
-                    <li >Other: {this.state.dataReady ? itemData["other"]:"?"}</li>
-                </ul>
-                <a href={this.state.url[i]} download="map">{<img className="image" src= {this.state.url[i]}/>}</a>
-
-              </div>
-            ): null}
-          </div>
-        }
+      <div className="navPanel">
       </div>
+      // <div className={this.props.active && "nav-panel"}>
+      //   <Overlay
+      //     active={this.props.active}
+      //     toggleDrawingTools={this.toggleDrawingTools.bind(this)}
+      //     drawClickCallback={this.drawClickCallback.bind(this)}
+      //     clearClickCallback={this.clearClickCallback.bind(this)}
+      //     canClear={ (this.state.polygons != null) }
+      //     finishClickCallback={this.finishClickCallback.bind(this)}
+      //     addClickCallback = {this.addClickCallback.bind(this)}
+      //     cancelClickCallback={this.cancelClickCallback.bind(this)} />
+      //   { this.state.isDrawing && this.state.polygons.size() > 0 ?
+      //     <PolygonTools map={this.props.map}
+      //                   maps={this.props.maps}
+      //                   polygons={this.state.polygons}
+      //                   polyNum = {this.state.polyNum}
+      //                   setPolygonArray={(polygons) => this.setPolygonArray(polygons)} /> : null
+      //   }
+      //   { this.state.isDrawing ?
+      //     <DrawingTools map={this.props.map}
+      //                   maps={this.props.maps}
+      //                   addPolygon={(polygon) => this.addPolygon(polygon)} /> : null
+      //   }
+      //   { this.props.active &&
+      //     <div id="navbar-list">
+      //       {this.state.dataReady ? this.state.data.map((itemData, i)=>
+      //         <div className="navbar-count-poly-box" key={i}>
+      //           <div className="navbar-count-poly-title">Polygon {i}</div>
+      //           <ul className="navbar-count-poly-text">
+      //               <li >Residences: {this.state.dataReady ? itemData["residential"]:"?"}</li>
+      //               <li >Industrial: {this.state.dataReady ? itemData["industrial"]:"?"}</li>
+      //               <li >Commercial: {this.state.dataReady ? itemData["commercial"]:"?"}</li>
+      //               <li >Urban: {this.state.dataReady ? itemData["urban service"]:"?"}</li>
+      //               <li >Other: {this.state.dataReady ? itemData["other"]:"?"}</li>
+      //           </ul>
+      //           <a href={this.state.url[i]} download="map">{<img className="image" src= {this.state.url[i]}/>}</a>
+      //
+      //         </div>
+      //       ): null}
+      //     </div>
+      //   }
+      // </div>
     )
   }
 }

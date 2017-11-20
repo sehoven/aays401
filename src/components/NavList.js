@@ -112,27 +112,25 @@ export default class NavList extends React.Component {
     } else {
       return (
         <div id="navbar-list">
-        {this.props.autocomplete.map((itemData, i) =>
-          <div className="navbar-list-autocomplete-item"
-          key={i}
-          onClick={
-            () => {this.centerMapOnId(this.props.placeIds[i].place_id)}
-          }>
-          <div className="navbar-list-autocomplete-text">
-          {itemData}
-          </div>
-          </div>
-        )}
-        {this.props.data.data.map((itemData, i) =>
-          <div className="navbar-list-item"
-          key={i}
-          onClick={
-            () => { this.neighbourhoodClicked(itemData.center, itemData) }
-          }>
-          <IconCanvas key={i} item={itemData} />
-          <div className="navbar-list-text"><p>{itemData.name}</p></div>
-          </div>
-        )}
+          {this.props.autocomplete.map((itemData, i) =>
+            <div className="navbar-list-autocomplete-item"
+            key={i}
+            onClick={
+              () => {this.centerMapOnId(this.props.placeIds[i].place_id)}
+            }>
+              <div className="navbar-list-autocomplete-text">{itemData}</div>
+            </div>
+          )}
+          {this.props.data.data.map((itemData, i) =>
+            <div className="navbar-list-item"
+            key={i}
+            onClick={
+              () => { this.neighbourhoodClicked(itemData.center, itemData) }
+            }>
+              <IconCanvas key={i} item={itemData} />
+              <div className="navbar-list-text">{itemData.name}</div>
+            </div>
+          )}
         </div>
       );
     }
