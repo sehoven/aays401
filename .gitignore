@@ -6,3 +6,10 @@
 *.css
 # Everyone is responsible for adding the required dependencies for building.
 node_modules/*
+
+#doc files to ignore
+docs/databaseDoc/*
+docs/apidoc/*
+
+#ignore enviroment variables
+.env
