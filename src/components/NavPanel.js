@@ -58,9 +58,8 @@ export default class NavPanel extends Component {
   render() {
     if (!this.props.active) return null;
     return (
-      <div className="nav-panel">
-        <input type="text" id="search-box"
-          onChange={this.onChange} />
+      <div className="navPanel">
+        <input type="text" id="search-box" onChange={this.onChange}/>
         <NavList
           map={this.props.map}
           maps={this.props.maps}
@@ -69,6 +68,11 @@ export default class NavPanel extends Component {
           data={this.state.list}
           tabsRef={this.props.tabsRef} />
       </div>
+      // <div className="nav-panel">
+      //   <input type="text" id="search-box"
+      //     onChange={this.onChange} />
+      //
+      // </div>
     )
   }
 }
