@@ -1,23 +1,21 @@
+/*You will need to fill in the password for the "postgres" database user you created
+in the .env file
+*/
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const inside = require('point-in-polygon');
+const inside = require('point-in-geopolygon');
 const fs = require('fs');
+const Client = require('pg');
+require('dotenv').load();
+const connectionString = 'postgresql://'+process.env.databaseUser+':'+process.env.databasePassword+'@localhost:'+process.env.databasePort+'/'+process.env.databaseName+''
+
+
 
 // Load local neighbourhood data synchronously
-console.log("Loading data into memory...");
-var neighborhood_data = require('./data/neighborhoods.json');
-var neighborhoods = fs.readFileSync('./data/neighborhoods.json', 'utf8');
-neighborhoods = JSON.parse(neighborhoods);
-neighborhoods = neighborhoods.neighborhoods;
 
-// Load local neighbourhood data synchronously
-console.log("Loading data into memory...");
-var locations_data = require('./data/locations.json');
-var locations = fs.readFileSync('./data/locations.json', 'utf8');
-locations = JSON.parse(locations);
-locations = locations.addresses;
 
+console.log("Ready. Listening on port 3000.");
 
 
 app.use(bodyParser.json());
@@ -118,24 +116,74 @@ app.get('/nearby', function(req, res) {
  */
 app.get('/locations', function(req, res) {
   console.log("Location request handler invoked");
+  
   if (!req.query) return res.sendStatus(400);
-  if (req.query.name == '') {
+  if ((typeof req.query.name==undefined) || (req.query.name == '')) {
     res.end(JSON.stringify([]));
     return;
   }
 
-  let searchTerm = req.query.name.toLowerCase();
-  let resBody = [];
-  for (var i = 0; i < neighborhoods.length; i++) {
-    if (searchTerm) {
-      if (!neighborhoods[i].name.toLowerCase().includes(searchTerm)) continue;
-    }
-    resBody.push(neighborhoods[i]);
-  }
 
-  res.writeHead(200, {"Content-Type": "application/json"});
-  var json = JSON.stringify(resBody);
-  res.end(json);
+  //Connect to DB
+  const client = new Client.Client({
+    connectionString: connectionString,
+  })
+  client.connect()
+  .catch(e => console.error('Connection Error', e.stack))
+
+
+  let searchTerm = req.query.name.toLowerCase();
+  var queryText = "SELECT * from aays.tblNeighbourhood where lower(Title) like '%"+searchTerm+"%';";
+  client.query(queryText,function(err,result) {
+      if(err){
+        res.end(JSON.stringify([]));
+        client.end()
+        return;
+      }
+      client.end()
+
+      let resBody = [];
+
+      for (let i=0;i<result.rowCount;i++){
+
+        let latLngs = [];
+
+         // Converting to format requested by API
+         for(let j = 0; j < result.rows[i].latitude.length; ++j) {
+           
+           latLngs.push({
+             lat: result.rows[i].latitude[j],
+             lng: result.rows[i].longitude[j]
+           });
+         }
+         
+         let centerLatLng = {
+            lat:result.rows[i].centerlat,
+            lng:result.rows[i].centerlng
+          };
+
+         resBody.push({
+           name:result.rows[i].title,
+           points:latLngs,
+           radius: result.rows[i].radius,
+           width:result.rows[i].width,
+           height:result.rows[i].height,
+           center:centerLatLng
+         });
+         
+         
+      }
+      
+
+      
+      
+      
+      
+      var json = JSON.stringify(resBody);
+      res.writeHead(200, {"Content-Type": "application/json"});
+      res.end(json);
+
+  });
 });
 
 
@@ -166,55 +214,106 @@ app.get('/locations', function(req, res) {
  *      "error":"Polygon points dont exist or have less that two points (Not a shape)."
  *    }
  */
+
 app.post('/addressCount', function(req, res) {
   console.log("Count request handler invoked");
   if (!req.body) return res.sendStatus(400);
-  if (!req.body.poly || !req.body.center || !req.body.radius) {
+  if (!req.body.poly) {
     return res.sendStatus(400);
   }
   if (req.body.poly.length < 2) {
     res.sendStatus(400);
     return;
   }
-  var top = -999,
-      bot = 999,
-      lft = 999,
-      rgt = -999;
 
-  for (let i = 0; i < req.body.poly.length; i++){
-    top = Math.max(req.body.poly[i].lat, top);
-    bot = Math.min(req.body.poly[i].lat, bot);
-    rgt = Math.max(req.body.poly[i].lng, rgt);
-    lft = Math.min(req.body.poly[i].lng, lft);
-  }
-  let filtrate = filterBinary(locations, bot, top, "lat")
-    .sort(function(a, b){
-      return a.center.lng - b.center.lng;
-  });
-  filtrate = filterBinary(filtrate, lft, rgt, "lng");
-  let resBody = { "residential": 0,
-                  "commercial": 0,
-                  "industrial": 0,
-                  "urban service": 0,
-                  "other": 0};
-  let polygon = [];
-  for (let i = 0; i < req.body.poly.length; i++){
-    polygon.push([req.body.poly[i].lat, req.body.poly[i].lng]);
-  }
-  for (let i = 0; i < filtrate.length; i++){
-    let point = [filtrate[i].center.lat, filtrate[i].center.lng];
-    if (inside(point, polygon)) {
-      resBody[filtrate[i].type] += 1;
+  var results = [];
+
+  let resBody = { "Residential": 0,
+                  "Apartment": 0,
+                  "Industrial": 0,
+                  "Commercial": 0,
+                  "UrbanService": 0,
+                  "DirectDevelopmentControlProvision": 0,
+                  "Other": 0,
+                  "Agriculture":0
+                  };
+  
+
+
+  //Connect to DB
+  const client = new Client.Client({
+    connectionString: connectionString,
+  })
+  client.connect()
+  .catch(e => console.error('Connection Error', e.stack))
+
+
+  var queryText = 'SELECT code.value as type, prop.latitude as lat, prop.longitude as lng from aays.tblProperty prop left join aays.luzoningcodes code on code.zoningcode = prop.zoningcode;';
+  client.query(queryText,function(err,result) {
+    if(err){
+      client.end()
+      return res.status(400).send(err);
     }
-  }
-  res.writeHead(200, {"Content-Type": "application/json"});
-  var json = JSON.stringify(resBody);
-  res.end(json);
+    client.end()
+    
+    
+    //inside call required format to be [[[#,#],[#,#]...[#,#]]]
+    let polygon = [];
+    let polygonOuter=[];
+    
+
+    for (let i = 0; i < req.body.poly.length; i++){
+      polygon.push([req.body.poly[i].lat, req.body.poly[i].lng]);
+    }
+    polygonOuter.push(polygon);
+  
+    for(var item in result.rows){
+      let point = [result.rows[item].lat,result.rows[item].lng];
+      
+      if(inside.polygon(polygonOuter,point)){
+        switch(result.rows[item].type){
+
+          case 'Residential':
+            resBody.Residential++;
+            break
+          case 'Apartment':
+            resBody.Apartment++;
+            break;
+          case 'Industrial':
+            resBody.Industrial++;
+            break;
+          case 'Commercial':
+            resBody.Commercial++;
+            break;
+          case 'Urban Service':
+            resBody.UrbanService++;
+            break;
+          case 'Direct Development Control Provision':
+            resBody.DirectDevelopmentControlProvision++;
+            break;
+          case 'Agriculture':
+            resBody.Agriculture++;
+            break;
+          case 'Other':
+            resBody.Other++;
+            break;
+        }
+      }
+    }
+
+    
+    res.writeHead(200, {"Content-Type": "application/json"});
+    var json = JSON.stringify(resBody);
+    res.end(json);
+    
+  });
 });
+
 
 app.listen(3000, function() {  
   console.log('API up and running...');
 });
+
 function binaryIndexOf(array, searchElement, property) {
   var minIndex = 0;
   var maxIndex = array.length - 1;
@@ -240,3 +339,4 @@ function filterBinary(arr, min, max, property){
  let rightIndex = binaryIndexOf(arr, max, property) + 1;
  return arr.slice(leftIndex, rightIndex);
 }
+
