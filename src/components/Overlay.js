@@ -65,6 +65,7 @@ export class Overlay extends Component {
   }
 
   finishClick() {
+
     let callback;
     if(this.props.finishClickCallback) {
       callback = () => { this.props.finishClickCallback(); };
