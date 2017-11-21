@@ -68,11 +68,6 @@ export default class NavPanel extends Component {
           data={this.state.list}
           tabsRef={this.props.tabsRef} />
       </div>
-      // <div className="nav-panel">
-      //   <input type="text" id="search-box"
-      //     onChange={this.onChange} />
-      //
-      // </div>
     )
   }
 }
