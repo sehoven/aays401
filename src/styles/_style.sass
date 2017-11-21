@@ -7,12 +7,17 @@ $mapControlPadding: 10px
 $navMarginTop: calc(#{$mapControlHeight} + (2 * #{$mapControlMargin}))
 
 $navPanelPadding: 5px
-$navPanelMinWidth: 300px
+$navPanelMinWidth: 320px
 
 $navBarListMargin: 10px
 
 $headerHeight: 40px
 $headerPadding: 10px
+$totalHeaderHeight: calc(#{$headerHeight} + (2 * #{$headerPadding}))
+
+$tabButtonsHeight: 40px
+
+$overlayContainerHeight: 70px
 
 h1
   color: blue
@@ -28,10 +33,17 @@ body
   padding: 10px
   color: white
 
+.tabContainer
+  height: 100%
+
+.overlayContainer
+  height: $overlayContainerHeight
+
 .tabButtons
   display: table
   width: 100%
   table-layout: fixed
+  height: $tabButtonsHeight
 
 .tabButton
   width: 100%
@@ -46,17 +58,18 @@ body
   background-color: white
 
 .navPanel
-  height: 100%
+  height: calc(100% - #{$totalHeaderHeight} - #{$tabButtonsHeight} - 10px)
   width: calc(100% - (2 * #{$navPanelPadding})
   display: table
   padding: $navPanelPadding
 
 .container
   position: absolute
-  top: calc(#{$headerHeight} + (2 * #{$headerPadding}))
+  top: $totalHeaderHeight
   bottom: 0
   width: 100%
   display: flex
+  overflow: hidden
 
 .container .left
   max-width: 30%
@@ -81,10 +94,11 @@ body
   vertical-align: bottom
   box-sizing: border-box
   position: relative
+  margin-bottom: 10px
 
 #navbar-list
-  margin-top: 10px
   overflow-y: auto
+  height: 100%
 
 .navbar-list-autocomplete-item
   height: 60px
@@ -141,28 +155,28 @@ body
   word-wrap: break-word
 
 .navbar-count-poly-box
-  //height: 110px
   padding-top: 10px
   padding-bottom: 10px
   border-top: 1px solid gray
-  //transition: background-color 0.1s
+  display: table
+  width: 100%
 
 .navbar-count-poly-title
-  display: inline-block
+  display: table-row
   vertical-align: bottom
-  width: calc(#{$uiWidth} - 40px)
-  //height: 100px
-  margin-left: 10px
   font-size: 20px
 
 .navbar-count-poly-text
-  display: inline-block
+  display: table-row
   vertical-align: bottom
   width: calc(#{$uiWidth} - 40px)
   //height: 100px
   margin-top: 5px
   margin-left: 10px
   font-size: 20px
+
+.navbar-count-poly-box a
+  display: table-row
 
 .buttonText
   font-size: 25px
@@ -206,7 +220,7 @@ button
   text-align: center
   font-size: 14px
   padding: 20px
-  width: 120px
+  width: 30%
   transition: all 0.2s
   cursor: pointer
   margin: 5px

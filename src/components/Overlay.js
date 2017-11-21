@@ -136,7 +136,7 @@ export class Overlay extends Component {
     let addButton = <button id="add-draw-button" onClick={this.addClick.bind(this)}>ADD</button>;
 
     return (
-      <div>
+      <div className="overlayContainer">
         {this.state.banner}
         <NotificationContainer/>
         { this.state.isDrawing ? null : drawButton }
@@ -261,6 +261,7 @@ export default class OverlayContainer extends Component {
 
   render() {
     if (!this.props.active) return null;
+    console.log(this.state.dataReady, this.state.data, this.state.data["0"]);
     return (
       <div className={this.props.active && "navPanel"}>
         <Overlay
@@ -289,13 +290,18 @@ export default class OverlayContainer extends Component {
             {this.state.dataReady ? this.state.data.map((itemData, i)=>
               <div className="navbar-count-poly-box" key={i}>
                 <div className="navbar-count-poly-title">Polygon {i}</div>
-                <ul className="navbar-count-poly-text">
-                    <li >Residences: {this.state.dataReady ? itemData["residential"]:"?"}</li>
-                    <li >Industrial: {this.state.dataReady ? itemData["industrial"]:"?"}</li>
-                    <li >Commercial: {this.state.dataReady ? itemData["commercial"]:"?"}</li>
-                    <li >Urban: {this.state.dataReady ? itemData["urban service"]:"?"}</li>
-                    <li >Other: {this.state.dataReady ? itemData["other"]:"?"}</li>
-                </ul>
+                <div className="navbar-count-poly-text">
+                  <ul>
+                    <li>Residences: {this.state.dataReady ? itemData["Residential"]:"?"}</li>
+                    <li>Apartments: {this.state.dataReady ? itemData["Apartment"]:"?"}</li>
+                    <li>Industrial: {this.state.dataReady ? itemData["Industrial"]:"?"}</li>
+                    <li>Commercial: {this.state.dataReady ? itemData["Commercial"]:"?"}</li>
+                    <li>Development Control Provision: {this.state.dataReady ? itemData["DirectDevelopmentControlProvision"]:"?"}</li>
+                    <li>Urban: {this.state.dataReady ? itemData["UrbanService"]:"?"}</li>
+                    <li>Agriculture: {this.state.dataReady ? itemData["Agriculture"]:"?"}</li>
+                    <li>Other: {this.state.dataReady ? itemData["Other"]:"?"}</li>
+                  </ul>
+                </div>
                 <a href={this.state.url[i]} download="map">{<img className="image" src= {this.state.url[i]}/>}</a>
 
               </div>

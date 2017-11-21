@@ -22,7 +22,7 @@ export default class Tabs extends Component {
   render() {
     const { currentPanel } = this.state;
     return (
-      <div>
+      <div className="tabContainer">
         <div className="tabButtons">
         <div
           className= {
