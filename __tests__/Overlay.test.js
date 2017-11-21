@@ -1,9 +1,9 @@
 import React from "react";
 import { configure, shallow, mount } from "enzyme";
 import Adapter from "enzyme-adapter-react-15";
-import {NotificationContainer, NotificationManager} from 'react-notifications';
+import { NotificationContainer, NotificationManager } from "react-notifications";
 
-import OverlayContainer, { Overlay } from "../src/components/Overlay.js";
+import OverlayContainer, { Overlay, PolygonArray } from "../src/components/Overlay.js";
 import DrawingTools, { PolygonTools } from "../src/components/DrawingTools.js";
 
 // TO MOVE MOCK OBJECT TO GLOBAL LEVEL FOR ALL TESTS
@@ -33,6 +33,13 @@ const google = {
         },
         setMap: function() {
           return {};
+        },
+        getPath: function() {
+          return {
+            getLength: function() {
+              return {};
+            }
+          };
         }
       };
     },
@@ -163,7 +170,7 @@ describe("Overlay", () => {
   });
 });
 
-describe("OverlayContainer", () => {
+describe("OverlayContainer mount", () => {
   let mountedOverlayContainer;
   let props;
 
@@ -221,195 +228,226 @@ describe("OverlayContainer", () => {
       });
     });
   });
-
-  // TODO TESTS FOR CALLBACKS
 });
 
+describe("OverlayContainer shallow", () => {
+  let mountedOverlayContainer;
+  let props;
 
-///////
-///
-/// TESTS FROM OVERLAY PRE-REFACTOR THAT COULD BE USEFUL IN WRITING MORE TESTS
-///
-///////
+  const overlayContainer = () => {
+    if(!mountedOverlayContainer) {
+      mountedOverlayContainer = shallow(<OverlayContainer {...props}/>);
+    }
+    return mountedOverlayContainer;
+  }
 
-//
-//   beforeEach(() => {
-//     wrapper = shallow(<OverlayContainer />);
-//   });
-//   it("initial state of OverlayContainer renders correct children", () => {
-//     expect(wrapper.children().length).toEqual(2);
-//     expect(wrapper.childAt(0).type()).toEqual(Overlay);
-//     expect(wrapper.childAt(1).type()).toEqual("ol");
-//   });
-//
-//   it("drawing state of OverlayContainer renders correct children", () => {
-//     wrapper.setState({isDrawing: true});
-//     expect(wrapper.children().length).toEqual(3);
-//     expect(wrapper.childAt(0).type()).toEqual(Overlay);
-//     expect(wrapper.childAt(1).type()).toEqual(DrawingTools);
-//     expect(wrapper.childAt(2).type()).toEqual("ol");
-//   });
-//
-//   it("drawing and polygon states of OverlayContainer render correct children", () => {
-//     wrapper.setState({isDrawing: true, polygon: new window.google.maps.Polygon()});
-//     expect(wrapper.children().length).toEqual(3);
-//     expect(wrapper.childAt(0).type()).toEqual(Overlay);
-//     expect(wrapper.childAt(1).type()).toEqual(PolygonTools);
-//     expect(wrapper.childAt(2).type()).toEqual("ol");
-//   });
-//
-//   it("toggleDrawingTools from initial state sets correct drawing state", () => {
-//     wrapper.instance().toggleDrawingTools();
-//     expect(wrapper.state().isDrawing).toEqual(true);
-//   });
-//
-//   it("toggleDrawingTools from drawing state sets correct drawing state", () => {
-//     wrapper.setState({isDrawing: true});
-//     wrapper.instance().toggleDrawingTools();
-//     wrapper.update();
-//     expect(wrapper.state().isDrawing).toEqual(false);
-//   });
-//
-//   it("setPolygon from initial state sets correct polygon state", () => {
-//     polygon = new window.google.maps.Polygon();
-//     wrapper.instance().setPolygon(polygon);
-//     expect(wrapper.state().polygon).toEqual(polygon);
-//   });
-//
-//   it("setPolygon from existing polygon state to null state sets correct states", () => {
-//     polygon = new window.google.maps.Polygon();
-//     wrapper.instance().setPolygon(polygon);
-//     wrapper.setState({dataReady: true, data: {}});
-//
-//     wrapper.instance().setPolygon(null);
-//     expect(wrapper.state().polygon).toBeNull();
-//     expect(wrapper.state().dataReady).toEqual(false);
-//     expect(wrapper.state().data).toBeNull();
-//   });
-//
-//   it("convertToLatLng converts polygon into correct format", () => {
-//     // DO WE NEED THIS?
-//     // IF YES, NEED TO MOCK THE POLYGON OBJECT DIFFERENTLY
-//
-//     // TO WRITE
-//     expect(false).toEqual(true);
-//   });
-//
-//   it("draw click callback behaviour is expected", () => {
-//     wrapper.instance().drawClickCallback();
-//
-//     // THIS METHOD HAS NOT BEHAVIOUR CURRENTLY SO THERE IS NOTHING TO TEST FOR
-//   });
-//
-//   it("clear click callback behaviour is expected", () => {
-//     wrapper.instance().clearClickCallback();
-//     expect(wrapper.state().polygon).toBeNull();
-//
-//     wrapper.setState({polygon: new window.google.maps.Polygon()});
-//     wrapper.instance().clearClickCallback();
-//     expect(wrapper.state().polygon).toBeNull();
-//   });
-//
-//   it("cancel click callback behaviour is expected", () => {
-//     wrapper.instance().cancelClickCallback();
-//
-//     // THIS METHOD HAS NOT BEHAVIOUR CURRENTLY SO THERE IS NOTHING TO TEST FOR
-//   });
-//
-//   it("finish click callback behaviour is expected", () => {
-//     wrapper.setState({polygon: new window.google.maps.Polygon()});
-//     wrapper.instance().finishClickCallback();
-//     // TO WRITE
-//     expect(false).toEqual(true);
-//   });
-// })
-//
-// describe("Overlay", () => {
-//   let wrapper;
-//
-//   beforeEach(() => {
-//     wrapper = shallow(<Overlay />);
-//   });
-//
-//   it("initial drawing state of Overlay is false", () => {
-//     expect(wrapper.state().isDrawing).toEqual(false);
-//   });
-//
-//   it("initial state should have DRAW button and CLEAR button", () => {
-//     expect(wrapper.find("#draw-button").length).toEqual(1);
-//     expect(wrapper.find("#clear-button").length).toEqual(1);
-//   });
-//
-//   it("onClick DRAW button sets correct drawing state and renders correct buttons", () => {
-//     wrapper.find("#draw-button").simulate("click", {stopPropagation: () => undefined})
-//     expect(wrapper.state().isDrawing).toEqual(true);
-//     expect(wrapper.find("#cancel-draw-button").length).toEqual(1);
-//     expect(wrapper.find("#finish-draw-button").length).toEqual(1);
-//   });
-//
-//   it("onClick CLEAR button sets correct drawing state and renders correct buttons", () => {
-//     wrapper.find("#clear-button").simulate("click", {stopPropagation: () => undefined})
-//     expect(wrapper.state().isDrawing).toEqual(false);
-//     expect(wrapper.find("#draw-button").length).toEqual(1);
-//     expect(wrapper.find("#clear-button").length).toEqual(1);
-//   });
-//
-//   it("onClick CANCEL button sets correct drawing state and renders correct buttons", () => {
-//     wrapper.setState({ isDrawing: true });
-//     wrapper.find("#cancel-draw-button").simulate("click", {stopPropagation: () => undefined})
-//     expect(wrapper.state().isDrawing).toEqual(false);
-//     expect(wrapper.find("#draw-button").length).toEqual(1);
-//     expect(wrapper.find("#clear-button").length).toEqual(1);
-//   });
-//
-//   it("onClick FINISH button sets correct drawing state and renders correct buttons", () => {
-//     wrapper.setState({ isDrawing: true });
-//     wrapper.find("#finish-draw-button").simulate("click", {stopPropagation: () => undefined})
-//     expect(wrapper.state().isDrawing).toEqual(false);
-//     expect(wrapper.find("#draw-button").length).toEqual(1);
-//     expect(wrapper.find("#clear-button").length).toEqual(1);
-//   });
-// });
+  beforeEach(() => {
+    mountedOverlayContainer = null;
+    props = {
+      map: new google.maps.Map(),
+      maps: google.maps
+    }
+  });
 
+  describe("testing methods", () => {
+    it("toggleDrawingTools to true with callback argument", () => {
+      let mockCallback = jest.fn();
+      overlayContainer().setState({isDrawing: false});
+      overlayContainer().instance().toggleDrawingTools(true, mockCallback);
+      expect(overlayContainer().state().isDrawing).toEqual(true);
+      expect(mockCallback).toHaveBeenCalled();
+    });
 
-// //investigating the best way to test this part of the component that uses the google api.
-// it("polygon is not added to the polygon list when clicked on CANCEL button", ()=>{
-//
-// });
-//
-// it("polygon array is empty when clicked on CLEAR button", ()=>{
-//     var triangle = [{lat: 25.774, lng: -80.190},
-//          {lat: 18.466, lng: -66.118},
-//          {lat: 32.321, lng: -64.757}];
-//
-//     var p = new window.google.maps.Polygon({paths: triangle});
-//
-//     const wrapper =shallow(<Overlay/>);
-//     wrapper.state().polygons.polygons.push(p);
-//     wrapper.find("#clear-button").simulate("click", {stopPropagation: ()=> undefined});
-//     expect(wrapper.state().polygons.polygons.length).toEqual(0);
-// });
+    it("toggleDrawingTools to false with callback argument", () => {
+      let mockCallback = jest.fn();
+      overlayContainer().setState({isDrawing: true});
+      overlayContainer().instance().toggleDrawingTools(false, mockCallback);
+      expect(overlayContainer().state().isDrawing).toBe(false);
+      expect(mockCallback).toHaveBeenCalled();
+    });
 
-////////////////////////////////
-//DrawingTools Component Testing
-// ////////////////////////////////
-// // We are still investigating the best way to test components that use the Google Maps API.
-// it("testing initial states of DrawingTools", ()=>{
-//
-// });
-//
-// it("calling method should getPolygon will return polygon state", ()=>{
-//
-// });
-//
-// it("calling method selectPolygon should call deselectPolygon and set correct states", ()=>{
-//
-// });
-//
-// it("calling method deselectPolygon should set correct states", ()=>{
-//
-// });
-//
-// it("calling method deletePolygon should set the map of the polygon to null", ()=>{
-//
-// });
+    it("toggleDrawingTools with null callback argument", () => {
+      let mockCallback = null;
+      overlayContainer().setState({isDrawing: false});
+      overlayContainer().instance().toggleDrawingTools(true, mockCallback);
+      expect(overlayContainer().state().isDrawing).toBe(true);
+    });
+
+    it("drawClickCallback", () => {
+      // no behaviour right now, so no need for a test
+    });
+
+    it("clearClickCallback", () => {
+      let polygon = new google.maps.Polygon();
+      let polygonArray = new PolygonArray(polygon, polygon);
+      overlayContainer().setState({
+        polygons: polygonArray,
+        url: ["a", "b"],
+        data: ["a", "b"],
+        polyNum: polygonArray.size()
+      });
+      let polyCount = overlayContainer().instance().clearClickCallback();
+      expect(polyCount).toBe(2);
+      expect(overlayContainer().state().data.length).toBe(1);
+      expect(overlayContainer().state().url.length).toBe(1);
+      expect(overlayContainer().state().polyNum).toBe(1);
+      expect(overlayContainer().state().polygons.size()).toBe(1);
+    });
+
+    it("addClickCallback", () => {
+      overlayContainer().setState({isDrawing: false, polyNum: 0});
+      overlayContainer().instance().addClickCallback();
+      expect(overlayContainer().state().isDrawing).toBe(true);
+      expect(overlayContainer().state().polyNum).toBe(1);
+    });
+
+    it("addFirstPolygon", () => {
+      let polygon = new google.maps.Polygon();
+      overlayContainer().instance().addFirstPolygon(polygon);
+      expect(overlayContainer().state().polygons.size()).toBe(1);
+      expect(overlayContainer().state().polygons.getAt(0)).toEqual(polygon);
+    });
+
+    it("addFirstPolygon with previous polygons", () => {
+      let polygon = new google.maps.Polygon();
+      overlayContainer().setState({polygons: new PolygonArray(polygon)});
+      let newPolygon = new google.maps.Polygon();
+      overlayContainer().instance().addFirstPolygon(newPolygon);
+      expect(overlayContainer().state().polygons.size()).toBe(1);
+      expect(overlayContainer().state().polygons.getAt(0)).toEqual(newPolygon);
+    });
+
+    it("addPolygon", () => {
+      let polygon = new google.maps.Polygon();
+      overlayContainer().instance().addPolygon(polygon);
+      expect(overlayContainer().state().polygons.size()).toBe(1);
+      expect(overlayContainer().state().polygons.getAt(0)).toEqual(polygon);
+    });
+
+    it("addPolygon with previous polygons", () => {
+      let polygon0 = new google.maps.Polygon();
+      let polygon1 = new google.maps.Polygon();
+      overlayContainer().setState({polygons: new PolygonArray(polygon0)});
+      overlayContainer().instance().addPolygon(polygon1);
+      expect(overlayContainer().state().polygons.size()).toBe(2);
+      expect(overlayContainer().state().polygons.getAt(0)).toEqual(polygon0);
+      expect(overlayContainer().state().polygons.getAt(1)).toEqual(polygon1);
+    });
+
+    it("setPolygonArray", () => {
+      let polygon0 = new google.maps.Polygon();
+      let polygon1 = new google.maps.Polygon();
+      overlayContainer().instance().setPolygonArray([polygon0, polygon1]);
+      expect(overlayContainer().state().polygons.size()).toBe(2);
+      expect(overlayContainer().state().polygons.getAt(0)).toEqual(polygon0);
+      expect(overlayContainer().state().polygons.getAt(1)).toEqual(polygon1);
+    });
+
+    it("setImgUrl", () => {
+      overlayContainer().setState({url: []});
+      overlayContainer().instance().setImgUrl([]);
+      expect(overlayContainer().state().url.length).toBe(1);
+    });
+
+    it("updatePolygonData", () => {
+      //let polygon = new google.maps.Polygon();
+      //overlayContainer().setState({polygons: new PolygonArray(polygon)});
+      //overlayContainer().instance().updatePolygonData();
+
+      // TODO Can we test this? Needs to make call to server to retrieve address count
+    });
+
+    describe("spy on updatePolygonData", () => {
+      let spy;
+
+      beforeEach(() => {
+        spy = jest.spyOn(overlayContainer().instance(), "updatePolygonData");
+      });
+
+      it("finishClickCallback", () => {
+        overlayContainer().instance().finishClickCallback();
+        expect(spy).toHaveBeenCalled();
+      });
+
+      it("cancelClickCallback", () => {
+        overlayContainer().instance().cancelClickCallback();
+        expect(spy).toHaveBeenCalled();
+      });
+    });
+  });
+});
+
+describe("PolygonArray", () => {
+  it("contructor with one element", () => {
+    let polygon = new google.maps.Polygon();
+    let polygons = new PolygonArray(polygon);
+    expect(polygons.arr.length).toBe(1);
+    expect(polygons.arr[0]).toEqual(polygon);
+  });
+
+  it("constructor with multiple elements", () => {
+    let polygon0 = new google.maps.Polygon();
+    let polygon1 = new google.maps.Polygon();
+    let polygons = new PolygonArray(polygon0, polygon1);
+    expect(polygons.arr.length).toBe(2);
+    expect(polygons.arr[0]).toEqual(polygon0);
+    expect(polygons.arr[1]).toEqual(polygon1);
+  });
+
+  it("empty constructor", () => {
+    let polygons = new PolygonArray();
+    expect(polygons.arr.length).toBe(0);
+  });
+
+  it("push", () => {
+    let polygon = new google.maps.Polygon();
+    let polygons = new PolygonArray();
+    polygons.push(polygon);
+    expect(polygons.arr.length).toBe(1);
+    expect(polygons.arr[0]).toEqual(polygon);
+  });
+
+  it("pop", () => {
+    let polygon = new google.maps.Polygon();
+    let polygons = new PolygonArray(polygon);
+    let popped = polygons.pop();
+    expect(polygons.arr.length).toBe(0);
+    expect(popped).toEqual(polygon);
+  });
+
+  it("remove", () => {
+    let polygon0 = new google.maps.Polygon();
+    let polygon1 = new google.maps.Polygon();
+    let polygons = new PolygonArray(polygon0, polygon1);
+    let removed = polygons.remove(0);
+    expect(polygons.arr.length).toBe(1);
+    expect(polygons.arr[0]).toEqual(polygon1);
+    expect(removed).toEqual(polygon0);
+  });
+
+  it("getAt", () => {
+    let polygon = new google.maps.Polygon();
+    let polygons = new PolygonArray(polygon);
+    expect(polygons.getAt(0)).toEqual(polygons.arr[0]);
+  });
+
+  it("indexOf", () => {
+    let polygon = new google.maps.Polygon();
+    let polygons = new PolygonArray(polygon);
+    expect(polygons.indexOf(polygon)).toBe(0);
+  });
+
+  it("clear", () => {
+    let polygon0 = new google.maps.Polygon();
+    let polygon1 = new google.maps.Polygon();
+    let polygons = new PolygonArray(polygon0, polygon1);
+    polygons.clear();
+    expect(polygons.arr.length).toBe(0);
+  });
+
+  it("size", () => {
+    let polygon = new google.maps.Polygon();
+    let polygons = new PolygonArray(polygon);
+    expect(polygons.size()).toBe(polygons.arr.length);
+  })
+});

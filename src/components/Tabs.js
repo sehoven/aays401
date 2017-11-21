@@ -7,12 +7,7 @@ export default class Tabs extends Component {
     super(props);
     this.state = {
       currentPanel: this.props.PanelType.SEARCH,
-      overlay: null
     }
-  }
-
-  componentDidMount(){
-    this.setState({ overlay: this.overlay })
   }
 
   swapState(toggle){
@@ -21,11 +16,7 @@ export default class Tabs extends Component {
 
   injectNeighborhood(polygon){
     this.setState({ currentPanel : this.props.PanelType.DRAW });
-    this.overlay.resetPolygon();
-    let polygonList = this.overlay.state.polygons;
-    polygonList.add(polygon);
-    this.overlay.setState({ polygons: polygonList});
-    this.overlay.updatePolygonData();
+    this.overlay.addFirstPolygon(polygon);
   }
 
   render() {
@@ -36,7 +27,6 @@ export default class Tabs extends Component {
           map={this.props.map}
           maps={this.props.maps}
           active={ currentPanel == this.props.PanelType.SEARCH }
-          overlayRef={this.state.overlay}
           tabsRef={this} />
         <OverlayContainer
           ref={(instance) => {this.overlay = instance}}
