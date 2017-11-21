@@ -22,11 +22,11 @@ export default class Tabs extends Component {
   render() {
     const { currentPanel } = this.state;
     return (
-      <div id="outer-nav-panel">
+      <div>
         <div className="tabButtons">
         <div
           className= {
-            "tabButtonTest " +
+            "tabButton " +
             ((currentPanel == this.props.PanelType.SEARCH) ? "activeTabButton" : "")
           }
           id="search-tab"
@@ -35,7 +35,7 @@ export default class Tabs extends Component {
         </div>
         <div
           className={
-            "tabButtonTest " +
+            "tabButton " +
             ((currentPanel == this.props.PanelType.DRAW) ? "activeTabButton" : "")
           }
           id="draw-tab"
