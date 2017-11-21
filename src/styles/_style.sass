@@ -26,9 +26,12 @@ body
   margin: 0
   font-family: 'Roboto', sans-serif
 
+.center-horizontal
+  margin: 0 auto
+
 .header
   height: $headerHeight
-  background-color: rgb(150, 150, 150)
+  background-color: rgb(192, 57, 43)
   font-size: 32px
   padding: 10px
   color: white
@@ -47,7 +50,8 @@ body
 
 .tabButton
   width: 100%
-  background-color: rgb(117,117,117)
+  background-color: rgb(150, 150, 150)
+  color: white
   display: table-cell
 
 .tabButton p
@@ -56,6 +60,7 @@ body
 .activeTabButton
   border-bottom: none
   background-color: white
+  color: black
 
 .navPanel
   height: calc(100% - #{$totalHeaderHeight} - #{$tabButtonsHeight} - 10px)

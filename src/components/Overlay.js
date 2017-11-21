@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
 import DrawingTools, { PolygonTools } from './DrawingTools.js';
+
 const HTTPService = require('./HTTPService.js');
 const notificationTimer = 2000;
 
@@ -204,21 +205,23 @@ export default class OverlayContainer extends Component {
   updatePolygonData() {
     let that = this;
 
-    this.setState({url: [], data: [], polyNum: this.state.polygons.size()});
-    for(let i = 0; i < this.state.polygons.size(); ++i) {
-      let polygon = this.state.polygons.convertToLatLng(i);
-      if(polygon) {
-        HTTPService.countPolyResidences(
-          { points: polygon, center:  0.1, radius: 0.1 }
-        ).then(function(json){
-          that.setState(prevState => ({
-            dataReady: true,
-            data: [...prevState.data, json]
-          }));
-        });
-        this.setImgUrl(polygon);
-      }
-    }
+    this.setState({url: [], data: [], polyNum: this.state.polygons.size(), dataReady: false}, () => {
+      Promise.all(this.state.polygons.getAll().map((polygon, i) => {
+        polygon = this.state.polygons.convertToLatLng(i);
+        if(polygon) {
+          HTTPService.countPolyResidences(
+            { points: polygon, center:  0.1, radius: 0.1 }
+          ).then(function(json){
+            that.setState(prevState => ({
+              data: [...prevState.data, json]
+            }));
+          });
+          this.setImgUrl(polygon);
+        }
+      })).then(() => {
+        this.setState({dataReady: true});
+      });
+    });
   }
 
   addFirstPolygon(polygon) {
@@ -261,7 +264,6 @@ export default class OverlayContainer extends Component {
 
   render() {
     if (!this.props.active) return null;
-    console.log(this.state.dataReady, this.state.data, this.state.data["0"]);
     return (
       <div className={this.props.active && "navPanel"}>
         <Overlay
@@ -317,6 +319,10 @@ export default class OverlayContainer extends Component {
 export class PolygonArray {
   constructor(...x) {
     this.arr = [...x];
+  }
+
+  getAll() {
+    return this.arr;
   }
 
   push(polygon) {
