@@ -1,4 +1,6 @@
 import React, {Component} from 'react';
+import ReactLoading from 'react-loading';
+
 const HTTPService = require('./HTTPService.js');
 
 /*================================
@@ -107,8 +109,15 @@ export default class NavList extends React.Component {
   }
 
   render() {
+    // There is a loading spinner component but it doesn't seem to load fast enough to be seen
+    // <ReactLoading className="center-horizontal" type={"spin"} color={"#888"} height="100px" width="100px"/>
+    // Try replacing "Loading..." with the line above to try it
     if (!this.props.data.ready){
-      return <div id="navbar-list">Loading...</div>
+      return (
+        <div id="navbar-list">
+          Loading...
+        </div>
+      )
     } else {
       return (
         <div id="navbar-list">
