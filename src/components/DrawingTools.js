@@ -178,7 +178,6 @@ export default class DrawingTools extends Component {
     this.polygonListener = null;
     this.mapListener = null;
 
-    console.log("Polynum:" + this.props.polyNum);
     if(this.props.polyNum == 0){
       polygonOptions.fillColor = '#000000';
       polygonOptions.fillOpacity = 0.20;
@@ -190,6 +189,16 @@ export default class DrawingTools extends Component {
 
   componentDidMount() {
     this.setDrawingTools(this.props.map);
+  }
+
+  componentWillUpdate() {
+    if(this.props.polyNum == 0){
+      polygonOptions.fillColor = '#000000';
+      polygonOptions.fillOpacity = 0.20;
+    } else {
+      polygonOptions.fillColor = randomColor();
+      polygonOptions.fillOpacity = 0.45;
+    }
   }
 
   componentWillUnmount() {

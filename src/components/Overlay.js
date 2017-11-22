@@ -197,29 +197,30 @@ export default class OverlayContainer extends Component {
   }
 
   addClickCallback() {
-    this.setState(prevState => ({
-      isDrawing: true
-    }));
-    this.appendPolygonData();
+    let that = this;
+    let appendPromise = new Promise(function(resolve, reject) {
+      that.appendPolygonData();
+      resolve();
+    });
+    appendPromise.then(() => {
+      that.setState({isDrawing: true});
+    });
   }
 
   appendPolygonData() {
     let that = this;
 
-    console.log(this.state.polyNum, this.state.polygons.size());
     if(this.state.polyNum < this.state.polygons.size()) {
       let polygon = this.state.polygons.convertToLatLng(this.state.polyNum);
-      console.log(polygon);
       if(polygon.length > 0) {
         HTTPService.countPolyResidences(
           { points: polygon }
         ).then(function(json){
-          console.log(json);
           that.setState(prevState => ({
             data: [...prevState.data, json],
             polyNum: ++prevState.polyNum,
             dataReady: true
-          }), () => {console.log(that.state)});
+          }));
           that.setImgUrl(polygon);
         });
       }
@@ -309,7 +310,7 @@ export default class OverlayContainer extends Component {
           <DrawingTools map={this.props.map}
                         maps={this.props.maps}
                         addPolygon={(polygon) => this.addPolygon(polygon)}
-                        polyNum = {this.state.polyNum} /> : null
+                        polyNum={this.state.polyNum} /> : null
         }
         { this.props.active &&
           <div id="navbar-list">
