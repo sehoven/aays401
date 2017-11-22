@@ -4,7 +4,7 @@ in the .env file
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const inside = require('point-in-geopolygon');
+const inside = require('point-in-polygon');
 const fs = require('fs');
 const Client = require('pg');
 require('dotenv').load();
@@ -259,18 +259,17 @@ app.post('/addressCount', function(req, res) {
     
     //inside call required format to be [[[#,#],[#,#]...[#,#]]]
     let polygon = [];
-    let polygonOuter=[];
+
     
 
     for (let i = 0; i < req.body.poly.length; i++){
       polygon.push([req.body.poly[i].lat, req.body.poly[i].lng]);
     }
-    polygonOuter.push(polygon);
   
     for(var item in result.rows){
       let point = [result.rows[item].lat,result.rows[item].lng];
       
-      if(inside.polygon(polygonOuter,point)){
+      if(inside(point,polygon)){
         switch(result.rows[item].type){
 
           case 'Residential':
