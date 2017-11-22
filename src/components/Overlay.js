@@ -208,16 +208,16 @@ export default class OverlayContainer extends Component {
 
     this.setState({url: [], data: [], polyNum: this.state.polygons.size(), dataReady: false}, () => {
       Promise.all(this.state.polygons.getAll().map((polygon, i) => {
-        polygon = this.state.polygons.convertToLatLng(i);
-        if(polygon) {
+        let polygonPoints = this.state.polygons.convertOneToLatLng(polygon);
+        if(polygonPoints.length > 0) {
           HTTPService.countPolyResidences(
-            { points: polygon, center:  0.1, radius: 0.1 }
+            { points: polygonPoints }
           ).then(function(json){
             that.setState(prevState => ({
               data: [...prevState.data, json]
             }));
           });
-          this.setImgUrl(polygon);
+          this.setImgUrl(polygonPoints);
         }
       })).then(() => {
         this.setState({dataReady: true});
@@ -373,6 +373,21 @@ export class PolygonArray {
 
   size() {
     return this.arr.length;
+  }
+
+  convertOneToLatLng(polygon) {
+    let latLngs = [];
+    if(polygon != null) {
+      let path = polygon.getPath();
+      for(let i = 0; i < path.getLength(); ++i) {
+        let vertex = path.getAt(i);
+        latLngs.push({
+          lat: vertex.lat(),
+          lng: vertex.lng()
+        });
+      }
+    }
+    return latLngs;
   }
 
   convertToLatLng(i) {
