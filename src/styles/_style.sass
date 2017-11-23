@@ -177,6 +177,7 @@ body
   font-size: 20px
 
 .navbar-count-inner-poly-text
+  font-family: 'Notification'
   display: inline-block
   vertical-align: bottom
   width: calc(#{$uiWidth} - 40px)
@@ -205,7 +206,7 @@ button
   text-align: center
   font-size: 14px
   padding: 20px
-  width: 120px
+  width: 185px
   transition: all 0.2s
   cursor: pointer
   margin: 5px
@@ -221,7 +222,7 @@ buttonLarge
   text-align: center
   font-size: 14px
   padding: 20px
-  width: 360px
+  width: 160px
   transition: all 0.2s
   cursor: pointer
   margin: 5px
@@ -355,7 +356,7 @@ img:hover
   &:hover input ~ .checkmark
     background-color: #ccc
   input:checked ~ .checkmark
-    background-color: #2196F3
+    background-color: #5B84A2
 
 .checkmark:after
   content: ""
@@ -370,6 +371,20 @@ img:hover
     top: 5px
     width: 5px
     height: 10px
+    border: solid white
+    border-width: 0 3px 3px 0
+    -webkit-transform: rotate(45deg)
+    -ms-transform: rotate(45deg)
+    transform: rotate(45deg)
+
+.smallcontainer
+  input:checked ~ .checkmark:after
+    display: block
+  .checkmark:after
+    left: 9px
+    top: 5px
+    width: 2px
+    height: 5px
     border: solid white
     border-width: 0 3px 3px 0
     -webkit-transform: rotate(45deg)

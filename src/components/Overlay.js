@@ -132,9 +132,9 @@ export class Overlay extends Component {
 
     let drawButton = <button id="draw-button" onClick={this.drawClick.bind(this)}>DRAW</button>;
     let clearButton = <button id="clear-button" onClick={this.clearClick.bind(this)}>CLEAR</button>;
-    let cancelButton = <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)}>RETURN</button>;
-    let finishButton = <button id="finish-draw-button" onClick={this.finishClick.bind(this)}>FINISH</button>;
-    let addButton = <button id="add-draw-button" onClick={this.addClick.bind(this)}>ADD</button>;
+    let cancelButton = <button id="cancel-draw-button" style={{width: 120}} onClick={this.cancelClick.bind(this)}>RETURN</button>;
+    let finishButton = <button id="finish-draw-button" style={{width: 120}} onClick={this.finishClick.bind(this)}>FINISH</button>;
+    let addButton = <button id="add-draw-button" style={{width: 120}}  onClick={this.addClick.bind(this)}>ADD</button>;
 
     return (
       <div>
