@@ -1,4 +1,6 @@
 import React, {Component} from 'react';
+import ReactLoading from 'react-loading';
+
 const HTTPService = require('./HTTPService.js');
 
 /*================================
@@ -14,7 +16,7 @@ class IconCanvas extends Component {
   updateCanvas() {
     let size = 100;
     const context = this.refs.canvas.getContext("2d");
-    
+
     if (context != null) {
       let item = this.props.item;
       let points = item.points;
@@ -108,32 +110,37 @@ export default class NavList extends React.Component {
   }
 
   render() {
+    // There is a loading spinner component but it doesn't seem to load fast enough to be seen
+    // <ReactLoading className="center-horizontal" type={"spin"} color={"#888"} height="100px" width="100px"/>
+    // Try replacing "Loading..." with the line above to try it
     if (!this.props.data.ready){
-      return <div id="navbar-list">Loading...</div>
+      return (
+        <div id="navbar-list">
+          Loading...
+        </div>
+      )
     } else {
       return (
         <div id="navbar-list">
-        {this.props.autocomplete.map((itemData, i) =>
-          <div className="navbar-list-autocomplete-item"
-          key={i}
-          onClick={
-            () => {this.centerMapOnId(this.props.placeIds[i].place_id)}
-          }>
-          <div className="navbar-list-autocomplete-text">
-          {itemData}
-          </div>
-          </div>
-        )}
-        {this.props.data.data.map((itemData, i) =>
-          <div className="navbar-list-item"
+          {this.props.autocomplete.map((itemData, i) =>
+            <div className="navbar-list-autocomplete-item"
+            key={i}
+            onClick={
+              () => {this.centerMapOnId(this.props.placeIds[i].place_id)}
+            }>
+              <div className="navbar-list-autocomplete-text">{itemData}</div>
+            </div>
+          )}
+          {this.props.data.data.map((itemData, i) =>
+            <div className="navbar-list-item"
             key={i}
             onClick={
               () => { this.neighbourhoodClicked(itemData.center, itemData) }
-          }>
-          <IconCanvas key={i} item={itemData} />
-          <div className="navbar-list-text"><p>{itemData.name}</p></div>
-          </div>
-        )}
+            }>
+              <IconCanvas key={i} item={itemData} />
+              <div className="navbar-list-text">{itemData.name}</div>
+            </div>
+          )}
         </div>
       );
     }
