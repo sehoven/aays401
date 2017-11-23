@@ -38,6 +38,11 @@ After obtaining a copy of the codebase, initialize npm in the top directory. Run
 * The database should be created. Test by running the application.
 * If you want a better look at the database, download pgadmin.
 
+## Creating users
+* Users can signup on the homepage
+* For users to be able to login, it is necessary for the DBA to authenticate the user in the database.
+* Until this occurs a user is not able to login
+
 ## Running the tests
 
 run ">npm test" which runs jest
