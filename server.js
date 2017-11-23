@@ -224,14 +224,21 @@ app.post('/addressCount', function(req, res) {
 
   var results = [];
 
-  let resBody = { "Residential": 0,
-                  "Apartment": 0,
-                  "Industrial": 0,
-                  "Commercial": 0,
-                  "UrbanService": 0,
-                  "DirectDevelopmentControlProvision": 0,
-                  "Other": 0,
-                  "Agriculture":0
+  let resBody = { "Residential":{"title":"Residential",
+                                "total":0,
+                                "Single Detached Home":0,
+                                "Single Detached Home / Duplex":0,
+                                "Townhome":0,
+                                "Mobile Home": 0
+                                },
+                  "Apartment":{"title":"Apartment",
+                              "total":0,
+                              "Low Rise Apartments":0,
+                              "Medium Rise Apartments":0,
+                              "High Rise Apartments":0
+                  },
+                  "Industrial": {"title":"Industrial","total":0},
+                  "Commercial": {"title":"Commercial","total":0}
                   };
   
 
@@ -270,7 +277,7 @@ app.post('/addressCount', function(req, res) {
 
   
 
-  var queryText = 'SELECT code.value as type, prop.latitude as lat, prop.longitude as lng from aays.tblProperty prop left join aays.luzoningcodes code on code.zoningcode = prop.zoningcode where prop.latitude BETWEEN $1 AND $2 AND prop.longitude BETWEEN $3 AND $4;';
+  var queryText = 'SELECT code.subvalue as subvalue,code.value as type, prop.latitude as lat, prop.longitude as lng from aays.tblProperty prop left join aays.luzoningcodes code on code.zoningcode = prop.zoningcode where prop.latitude BETWEEN $1 AND $2 AND prop.longitude BETWEEN $3 AND $4;';
   var values = [minLat,maxLat,minLng,maxLng];
   client.query(queryText,values,function(err,result) {
     if(err){
@@ -287,28 +294,41 @@ app.post('/addressCount', function(req, res) {
         switch(result.rows[item].type){
 
           case 'Residential':
-            resBody.Residential++;
+            resBody.Residential.total++;
+            switch(result.rows[item].subvalue){
+              case 'Single Detached Home':
+                resBody.Residential["Single Detached Home"]++;
+                break;
+              case 'Single Detached Home / Duplex':
+                resBody.Residential["Single Detached Home / Duplex"]++;
+                break;
+              case 'Townhome':
+                resBody.Residential["Townhome"]++;
+                break;
+              case 'Motor Home':
+                resBody.Residential["Motor Home"]++;
+                break;
+            }
             break
           case 'Apartment':
-            resBody.Apartment++;
+            resBody.Apartment.total++;
+            switch(result.rows[item].subvalue){
+              case 'Low Rise Apartments':
+                resBody.Apartment["Low Rise Apartments"]++;
+                break;
+              case 'Medium Rise Apartment':
+                resBody.Apartment["Medium Rise Apartments"]++;
+                break;
+              case 'High Rise Apartments':
+                resBody.Apartment["High Rise Apartments"]++;
+                break;
+            }
             break;
           case 'Industrial':
-            resBody.Industrial++;
+            resBody.Industrial.total++;
             break;
           case 'Commercial':
-            resBody.Commercial++;
-            break;
-          case 'Urban Service':
-            resBody.UrbanService++;
-            break;
-          case 'Direct Development Control Provision':
-            resBody.DirectDevelopmentControlProvision++;
-            break;
-          case 'Agriculture':
-            resBody.Agriculture++;
-            break;
-          case 'Other':
-            resBody.Other++;
+            resBody.Commercial.total++;
             break;
         }
       }

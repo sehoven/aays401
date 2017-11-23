@@ -298,16 +298,23 @@ export default class OverlayContainer extends Component {
           <div id="navbar-list">
             {this.state.dataReady ? this.state.data.map((itemData, i)=>
               <div className="navbar-count-poly-box" key={i}>
-                <div className="navbar-count-poly-title">Polygon {i}</div>
+                <div className="navbar-count-poly-title">Polygon {i+1}</div>
                 <ul className="navbar-count-poly-text">
-                    <li>Residences: {this.state.dataReady? itemData["Residential"]:"?"}</li>
-                    <li>Apartments: {this.state.dataReady? itemData["Apartment"]:"?"}</li>
-                    <li>Industrial: {this.state.dataReady? itemData["Industrial"]:"?"}</li>
-                    <li>Commercial: {this.state.dataReady? itemData["Commercial"]:"?"}</li>
-                    <li>Development Control Provision: {this.state.dataReady? itemData["DirectDevelopmentControlProvision"]:"?"}</li>
-                    <li>Urban: {this.state.dataReady? itemData["UrbanService"]:"?"}</li>
-                    <li>Agriculture: {this.state.dataReady? itemData["Agriculture"]:"?"}</li>
-                    <li>Other: {this.state.dataReady? itemData["Other"]:"?"}</li>
+                    <li>Residences: {this.state.dataReady? itemData.Residential.total:"?"}</li>
+                      <ul className="navbar-count-inner-poly-text">
+                        <li>Single House: {this.state.dataReady? itemData.Residential["Single Detached Home"]:"?"}</li>
+                        <li>House / Duplex: {this.state.dataReady? itemData.Residential["Single Detached Home / Duplex"]:"?"}</li>
+                        <li>Townhouse: {this.state.dataReady? itemData.Residential["Townhome"]:"?"}</li>
+                        <li>Motor Home: {this.state.dataReady? itemData.Residential["Mobile Home"]:"?"}</li>
+                      </ul>
+                    <li>Apartments: {this.state.dataReady? itemData.Apartment.total:"?"}</li>
+                      <ul className="navbar-count-inner-poly-text">
+                          <li>Low Rise Apartment: {this.state.dataReady? itemData.Apartment["Low Rise Apartments"]:"?"}</li>
+                          <li>Medium Rise Apartment: {this.state.dataReady? itemData.Apartment["Medium Rise Apartments"]:"?"}</li>
+                          <li>High Rise Apartment: {this.state.dataReady? itemData.Apartment["High Rise Apartments"]:"?"}</li>
+                      </ul>
+                    <li>Industrial: {this.state.dataReady? itemData.Industrial.total:"?"}</li>
+                    <li>Commercial: {this.state.dataReady? itemData.Commercial.total:"?"}</li>
                 </ul>
                 <a href={this.state.url[i]} download="map">{<img className="image" src= {this.state.url[i]}/>}</a>
 
