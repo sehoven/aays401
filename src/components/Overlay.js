@@ -290,21 +290,39 @@ export default class OverlayContainer extends Component {
               <div className="navbar-count-poly-box" key={i}>
                 <div className="navbar-count-poly-title">Polygon {i+1}</div>
                 <ul className="navbar-count-poly-text">
-                    <li>Residences: {this.state.dataReady? itemData.Residential.total:"?"}</li>
+                  <label className="container">Residences: {this.state.dataReady? itemData.Residential.total:"?"}
+                    <input type="checkbox" defaultChecked={true}></input>
+                    <span className="checkmark"></span>
                       <ul className="navbar-count-inner-poly-text">
                         <li>Single House: {this.state.dataReady? itemData.Residential["Single Detached Home"]:"?"}</li>
                         <li>House / Duplex: {this.state.dataReady? itemData.Residential["Single Detached Home / Duplex"]:"?"}</li>
                         <li>Townhouse: {this.state.dataReady? itemData.Residential["Townhome"]:"?"}</li>
                         <li>Motor Home: {this.state.dataReady? itemData.Residential["Mobile Home"]:"?"}</li>
                       </ul>
-                    <li>Apartments: {this.state.dataReady? itemData.Apartment.total:"?"}</li>
+                  </label>
+                  
+                  <label className="container">Apartments: {this.state.dataReady? itemData.Apartment.total:"?"}
+                  <input type="checkbox" defaultChecked={true}></input>
+                  <span className="checkmark"></span>
+                    
                       <ul className="navbar-count-inner-poly-text">
                           <li>Low Rise Apartment: {this.state.dataReady? itemData.Apartment["Low Rise Apartments"]:"?"}</li>
                           <li>Medium Rise Apartment: {this.state.dataReady? itemData.Apartment["Medium Rise Apartments"]:"?"}</li>
                           <li>High Rise Apartment: {this.state.dataReady? itemData.Apartment["High Rise Apartments"]:"?"}</li>
                       </ul>
-                    <li>Industrial: {this.state.dataReady? itemData.Industrial.total:"?"}</li>
-                    <li>Commercial: {this.state.dataReady? itemData.Commercial.total:"?"}</li>
+                  </label>
+                  
+                  <label className="container">Industrial: {this.state.dataReady? itemData.Industrial.total:"?"}
+                    <input type="checkbox" defaultChecked={true}></input>
+                    <span className="checkmark"></span>
+                  </label> 
+
+                    
+                  <label className="container">Commercial: {this.state.dataReady? itemData.Commercial.total:"?"}
+                    <input type="checkbox" defaultChecked={true}></input>
+                    <span className="checkmark"></span>
+                  </label> 
+
                 </ul>
                 <a href={this.state.url[i]} download="map">{<img className="image" src= {this.state.url[i]}/>}</a>
 
@@ -322,7 +340,7 @@ export class PolygonArray {
   constructor(...x) {
     this.arr = [...x];
   }
-
+  
   push(polygon) {
     if(polygon != null) {
       this.arr.push(polygon);
@@ -386,7 +404,6 @@ export class PolygonArray {
     }
     return latLngs;
   }
-
   // Converts the whole array of polygons to objects with the lat/lng pairs for each point
   convertAllToLatLng() {
     let allPolygons = [];
