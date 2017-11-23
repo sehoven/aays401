@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
 import DrawingTools, { PolygonTools } from './DrawingTools.js';
+
 const HTTPService = require('./HTTPService.js');
 const notificationTimer = 2000;
 
@@ -137,7 +138,7 @@ export class Overlay extends Component {
     let addButton = <button id="add-draw-button" onClick={this.addClick.bind(this)}>ADD</button>;
 
     return (
-      <div>
+      <div className="overlayContainer">
         {this.state.banner}
         <NotificationContainer/>
         { this.state.isDrawing ? null : drawButton }
@@ -196,30 +197,56 @@ export default class OverlayContainer extends Component {
   }
 
   addClickCallback() {
-    this.setState(prevState => ({
-      isDrawing: true,
-      polyNum: ++prevState.polyNum
-    }));
+    let that = this;
+    let appendPromise = new Promise(function(resolve, reject) {
+      that.appendPolygonData();
+      resolve();
+    });
+    appendPromise.then(() => {
+      that.setState({isDrawing: true});
+    });
+  }
+
+  appendPolygonData() {
+    let that = this;
+
+    if(this.state.polyNum < this.state.polygons.size()) {
+      let polygon = this.state.polygons.convertToLatLng(this.state.polyNum);
+      if(polygon.length > 0) {
+        HTTPService.countPolyResidences(
+          { points: polygon }
+        ).then(function(json){
+          that.setState(prevState => ({
+            data: [...prevState.data, json],
+            polyNum: ++prevState.polyNum,
+            dataReady: true
+          }));
+          that.setImgUrl(polygon);
+        });
+      }
+    }
   }
 
   updatePolygonData() {
     let that = this;
 
-    this.setState({url: [], data: [], polyNum: this.state.polygons.size()});
-    for(let i = 0; i < this.state.polygons.size(); ++i) {
-      let polygon = this.state.polygons.convertToLatLng(i);
-      if(polygon) {
-        HTTPService.countPolyResidences(
-          { points: polygon, center:  0.1, radius: 0.1 }
-        ).then(function(json){
-          that.setState(prevState => ({
-            dataReady: true,
-            data: [...prevState.data, json]
-          }));
-        });
-        this.setImgUrl(polygon);
-      }
-    }
+    this.setState({url: [], data: [], polyNum: this.state.polygons.size(), dataReady: false}, () => {
+      Promise.all(this.state.polygons.getAll().map((polygon, i) => {
+        let polygonPoints = this.state.polygons.convertOneToLatLng(polygon);
+        if(polygonPoints.length > 0) {
+          HTTPService.countPolyResidences(
+            { points: polygonPoints }
+          ).then(function(json){
+            that.setState(prevState => ({
+              data: [...prevState.data, json]
+            }));
+            that.setImgUrl(polygonPoints);
+          });
+        }
+      })).then(() => {
+        this.setState({dataReady: true});
+      });
+    });
   }
 
   addFirstPolygon(polygon) {
@@ -261,8 +288,9 @@ export default class OverlayContainer extends Component {
   }
 
   render() {
+    if (!this.props.active) return null;
     return (
-      <div className={this.props.active && "nav-panel"}>
+      <div className={this.props.active && "navPanel"}>
         <Overlay
           active={this.props.active}
           toggleDrawingTools={this.toggleDrawingTools.bind(this)}
@@ -282,23 +310,25 @@ export default class OverlayContainer extends Component {
           <DrawingTools map={this.props.map}
                         maps={this.props.maps}
                         addPolygon={(polygon) => this.addPolygon(polygon)}
-                        polyNum = {this.state.polyNum} /> : null
+                        polyNum={this.state.polyNum} /> : null
         }
         { this.props.active &&
           <div id="navbar-list">
             {this.state.dataReady ? this.state.data.map((itemData, i)=>
               <div className="navbar-count-poly-box" key={i}>
                 <div className="navbar-count-poly-title">Polygon {i}</div>
-                <ul className="navbar-count-poly-text">
-                    <li>Residences: {this.state.dataReady? itemData["Residential"]:"?"}</li>
-                    <li>Apartments: {this.state.dataReady? itemData["Apartment"]:"?"}</li>
-                    <li>Industrial: {this.state.dataReady? itemData["Industrial"]:"?"}</li>
-                    <li>Commercial: {this.state.dataReady? itemData["Commercial"]:"?"}</li>
-                    <li>Development Control Provision: {this.state.dataReady? itemData["DirectDevelopmentControlProvision"]:"?"}</li>
-                    <li>Urban: {this.state.dataReady? itemData["UrbanService"]:"?"}</li>
-                    <li>Agriculture: {this.state.dataReady? itemData["Agriculture"]:"?"}</li>
-                    <li>Other: {this.state.dataReady? itemData["Other"]:"?"}</li>
-                </ul>
+                <div className="navbar-count-poly-text">
+                  <ul>
+                    <li>Residences: {this.state.dataReady ? itemData["Residential"]:"?"}</li>
+                    <li>Apartments: {this.state.dataReady ? itemData["Apartment"]:"?"}</li>
+                    <li>Industrial: {this.state.dataReady ? itemData["Industrial"]:"?"}</li>
+                    <li>Commercial: {this.state.dataReady ? itemData["Commercial"]:"?"}</li>
+                    <li>Development Control Provision: {this.state.dataReady ? itemData["DirectDevelopmentControlProvision"]:"?"}</li>
+                    <li>Urban: {this.state.dataReady ? itemData["UrbanService"]:"?"}</li>
+                    <li>Agriculture: {this.state.dataReady ? itemData["Agriculture"]:"?"}</li>
+                    <li>Other: {this.state.dataReady ? itemData["Other"]:"?"}</li>
+                  </ul>
+                </div>
                 <a href={this.state.url[i]} download="map">{<img className="image" src= {this.state.url[i]}/>}</a>
 
               </div>
@@ -314,6 +344,10 @@ export default class OverlayContainer extends Component {
 export class PolygonArray {
   constructor(...x) {
     this.arr = [...x];
+  }
+
+  getAll() {
+    return this.arr;
   }
 
   push(polygon) {
@@ -363,6 +397,21 @@ export class PolygonArray {
 
   size() {
     return this.arr.length;
+  }
+
+  convertOneToLatLng(polygon) {
+    let latLngs = [];
+    if(polygon != null) {
+      let path = polygon.getPath();
+      for(let i = 0; i < path.getLength(); ++i) {
+        let vertex = path.getAt(i);
+        latLngs.push({
+          lat: vertex.lat(),
+          lng: vertex.lng()
+        });
+      }
+    }
+    return latLngs;
   }
 
   convertToLatLng(i) {
