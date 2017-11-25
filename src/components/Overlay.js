@@ -65,7 +65,6 @@ export class Overlay extends Component {
   }
 
   finishClick() {
-
     let callback;
     if(this.props.finishClickCallback) {
       callback = () => { this.props.finishClickCallback(); };
@@ -240,7 +239,9 @@ export default class OverlayContainer extends Component {
             that.setState(prevState => ({
               data: [...prevState.data, json]
             }));
-            that.setImgUrl(polygonPoints);
+            that.setImgUrl( polygonPoints,
+                            polygon.fillColor.replace("#","0x"),
+                            polygon.fillOpacity);
           });
         }
       })).then(() => {
@@ -275,12 +276,15 @@ export default class OverlayContainer extends Component {
     }
   }
 
-  setImgUrl(polygon){
+  setImgUrl(polygon, rgb, a){
+    let rgba = rgb + Math.floor((a*256).toString(16));
     if(polygon != null) {
-      let url="https://maps.googleapis.com/maps/api/staticmap?&size=1000x1000&path=color:0x00000000|weight:5|fillcolor:0x00BDBDBD";
+      let url="https://maps.googleapis.com/maps/api/staticmap?&size=1000x1000&path=color:"+rgb+"|weight:5|fillcolor:"+rgba;
       polygon.forEach(function(position) {
         url += "|" + position.lat + "," + position.lng;
       });
+      // Static API doesn't have polygon autocomplete. Close the path manually.
+      url += "|" + polygon[0].lat + "," + polygon[0].lng;
       this.setState(prevState => ({
         url: [...prevState.url, url]
       }));
