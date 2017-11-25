@@ -239,8 +239,10 @@ export default class OverlayContainer extends Component {
             that.setState(prevState => ({
               data: [...prevState.data, json]
             }));
+            let fillColor = (polygon.fillColor == null)?"0x000000":
+                            polygon.fillColor.replace("#","0x");
             that.setImgUrl( polygonPoints,
-                            polygon.fillColor.replace("#","0x"),
+                            fillColor,
                             polygon.fillOpacity);
           });
         }

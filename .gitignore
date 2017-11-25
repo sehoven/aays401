@@ -12,7 +12,5 @@ database/aaysDB.sql
 docs/databaseDoc/*
 docs/apidoc/*
 
-#ignore enviroment variables. The other versions are files made by vim
+#Ignore changes to .env
 .env
-.env~
-..env.un~
