@@ -17,6 +17,7 @@ export default class NavPanel extends Component {
     this.onChange = this.onChange.bind(this);
     this.AutocompleteService;
   }
+
   // Fires when the search bar's text changes, unless it is emptied.
   onChange(event) {
     if(event.target != null && event.target.value != ""){
