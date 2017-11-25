@@ -42,7 +42,7 @@ export default class NavPanel extends Component {
           if (status != that.props.maps.places.PlacesServiceStatus.OK) {
             return;
           }
-          let results = predictions.map(
+          let results = predictions.filter(prediction => prediction.id).map(
           function(x){
             return x.terms[0].value
                     + (x.terms.length>1?(", " + x.terms[1].value):"");
