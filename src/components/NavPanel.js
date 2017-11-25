@@ -42,14 +42,15 @@ export default class NavPanel extends Component {
           if (status != that.props.maps.places.PlacesServiceStatus.OK) {
             return;
           }
-          let results = predictions.filter(prediction => prediction.id).map(
+          let validPredictions = predictions.filter(prediction => prediction.id);
+          let results = validPredictions.map(
           function(x){
             return x.terms[0].value
                     + (x.terms.length>1?(", " + x.terms[1].value):"");
           });
           that.setState({
             autocomplete: results,
-            placeIds: predictions
+            placeIds: validPredictions
           });
         });
     }
