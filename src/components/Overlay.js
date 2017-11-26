@@ -220,7 +220,7 @@ export default class OverlayContainer extends Component {
             polyNum: ++prevState.polyNum,
             dataReady: true
           }));
-          let poly = that.state.polygons.getAt(that.state.polyNum - 1);
+          let poly = that.state.polygons.getAt(that.state.polygons.size() - 1);
           let fillColor = (poly.fillColor == null)?"0x000000":
                           poly.fillColor.replace("#","0x");
           that.setImgUrl( polygon,
