@@ -166,6 +166,8 @@ export default class OverlayContainer extends Component {
       data: [],
       url: []
     }
+
+    this.circles = []; // Changing this data shouldn't cause re-render
   }
 
   toggleDrawingTools(value, callback) {
@@ -244,8 +246,61 @@ export default class OverlayContainer extends Component {
           });
         }
       })).then(() => {
-        this.setState({dataReady: true});
+        this.setState({dataReady: true}, this.showUnits());
       });
+    });
+  }
+
+  showUnits(){
+    // Creates a circle for each point, and a marker for the number
+    // Circles are much faster than Markers, so markers are used sparingly
+    // for numbers. It's slower to render squares with Markers despite
+    // squares having far fewer edges.
+    let polygon = this.state.polygons.getAt(0);
+    if (!polygon) return null;
+    let that = this;
+    let points = this.state.polygons.convertOneToLatLng(polygon);
+    HTTPService.getUnits(points)
+    .then(function(json){
+      if (that.circles.length > 0){
+        for (var circle in json){
+          if (that.circles[circle]){
+            that.circles[circle].setMap(null);
+          }
+        }
+      }
+      that.circles = []; // Delete old circles by removing references
+      for (var item in json){
+        // radius = 3 @ 1, 6 @ 10, 9 @ 100, 12 @ 1000
+        let radius = (1 + Math.floor(Math.log10(json[item]["count"]))) * 3;
+        let newCircle = new google.maps.Circle({
+          strokeWeight: 0,
+          fillColor: '#FF0000',
+          fillOpacity: (radius == 3)?1:0.3,
+          map: that.props.map,
+          center: { lat: json[item]["lat"], lng: json[item]["lng"] },
+          radius: radius
+        });
+        that.circles.push(newCircle);
+        if (json[item]["count"] > 1){
+          var newNumber = new google.maps.Marker({
+            title: json[item]["type"] + ", count: " + json[item]["count"],
+            position: { lat: json[item]["lat"], lng: json[item]["lng"] },
+            icon: {
+              path: 'M 1,1 -1,1 -1,-1 1,-1 z', // This is hacky, but alternatives are >100 lines
+              strokeWeight: 0,
+              scale: radius
+            },
+            label: (json[item]["count"]==1)?null:{
+              text: "" + json[item]["count"],
+              color: 'white',
+              fontSize: "8px"
+            },
+            map: that.props.map
+          });
+          that.circles.push(newNumber);
+        }
+      }
     });
   }
 

@@ -39,7 +39,7 @@ app.use(function (req, res, next) {
 /**
  * @api {get} /nearby/{Object[]} Get nearby neighbourhoods
  * @apiGroup Polygon
- * 
+ *
  * @apiSuccessExample Success-Response:
  *    HTTP/1.1 200 OK
  *    {
@@ -116,7 +116,7 @@ app.get('/nearby', function(req, res) {
  */
 app.get('/locations', function(req, res) {
   console.log("Location request handler invoked");
-  
+
   if (!req.query) return res.sendStatus(400);
   if ((typeof req.query.name==undefined) || (req.query.name == '')) {
     res.end(JSON.stringify([]));
@@ -150,13 +150,13 @@ app.get('/locations', function(req, res) {
 
          // Converting to format requested by API
          for(let j = 0; j < result.rows[i].latitude.length; ++j) {
-           
+
            latLngs.push({
              lat: result.rows[i].latitude[j],
              lng: result.rows[i].longitude[j]
            });
          }
-         
+
          let centerLatLng = {
             lat:result.rows[i].centerlat,
             lng:result.rows[i].centerlng
@@ -170,15 +170,15 @@ app.get('/locations', function(req, res) {
            height:result.rows[i].height,
            center:centerLatLng
          });
-         
-         
-      }
-      
 
-      
-      
-      
-      
+
+      }
+
+
+
+
+
+
       var json = JSON.stringify(resBody);
       res.writeHead(200, {"Content-Type": "application/json"});
       res.end(json);
@@ -237,7 +237,7 @@ app.post('/addressCount', function(req, res) {
                   "Other": 0,
                   "Agriculture":0
                   };
-  
+
 
 
   //Connect to DB
@@ -255,20 +255,20 @@ app.post('/addressCount', function(req, res) {
       return res.status(400).send(err);
     }
     client.end()
-    
-    
+
+
     //inside call required format to be [[[#,#],[#,#]...[#,#]]]
     let polygon = [];
 
-    
+
 
     for (let i = 0; i < req.body.poly.length; i++){
       polygon.push([req.body.poly[i].lat, req.body.poly[i].lng]);
     }
-  
+
     for(var item in result.rows){
       let point = [result.rows[item].lat,result.rows[item].lng];
-      
+
       if(inside(point,polygon)){
         switch(result.rows[item].type){
 
@@ -300,16 +300,87 @@ app.post('/addressCount', function(req, res) {
       }
     }
 
-    
+
     res.writeHead(200, {"Content-Type": "application/json"});
     var json = JSON.stringify(resBody);
     res.end(json);
-    
+
   });
 });
 
+app.post('/getUnits', function(req, res) {
+  console.log("Unit request handler invoked");
+  if (!req.body) return res.sendStatus(400);
+  if (!req.body.poly) {
+    return res.sendStatus(400);
+  }
+  if (req.body.poly.length < 2) {
+    res.sendStatus(400);
+    return;
+  }
 
-app.listen(3000, function() {  
+  //Connect to DB
+  const client = new Client.Client({
+    connectionString: connectionString,
+  })
+  client.connect()
+  .catch(e => console.error('Connection Error', e.stack));
+
+  let polygon = [];
+
+  var maxLat=0;
+  var maxLng=0;
+  var minLat=0;
+  var minLng=0;
+
+  for (let i = 0; i < req.body.poly.length; i++){
+    polygon.push([req.body.poly[i].lat, req.body.poly[i].lng]);
+    if(maxLat<req.body.poly[i].lat){
+      maxLat = req.body.poly[i].lat
+    }
+    if(maxLng<req.body.poly[i].lng){
+      maxLng = req.body.poly[i].lng
+    }
+    if(minLng>req.body.poly[i].lng){
+      minLng = req.body.poly[i].lng
+    }
+    if(minLat>req.body.poly[i].lat){
+      minLat = req.body.poly[i].lat
+    }
+  }
+
+  var queryText =   "SELECT latitude as lat, longitude as lng, zoningcode as zc, count(*) ct "
+                  + "FROM aays.tblProperty "
+                  + "WHERE latitude BETWEEN 52 and 54 AND longitude BETWEEN -114 and -113 "
+                  + "GROUP BY latitude, longitude, zoningcode;";
+
+  var values = [minLat,maxLat,minLng,maxLng];
+
+  let resBody = [];
+  client.query(queryText, function(err, result) {//values,
+    if(err){
+      client.end();
+      return res.status(400).send(err);
+    }
+    client.end();
+
+    for (var item in result.rows){
+      let point = [result.rows[item].lat, result.rows[item].lng];
+      if(inside(point, polygon)){
+        resBody.push({lat: result.rows[item].lat,
+                      lng: result.rows[item].lng,
+                      type: result.rows[item].zc,
+                      count: result.rows[item].ct });
+      }
+    }
+
+    res.writeHead(200, {"Content-Type": "application/json"});
+    var json = JSON.stringify(resBody);
+    res.end(json);
+  });
+});
+
+app.listen(3000, function() {
   console.log('API up and running...');
 });
 
@@ -338,4 +409,3 @@ function filterBinary(arr, min, max, property){
  let rightIndex = binaryIndexOf(arr, max, property) + 1;
  return arr.slice(leftIndex, rightIndex);
 }
-

@@ -1,9 +1,14 @@
 const fetch = require('node-fetch');
 
-export function getNearby(lat, lng, rad) {
-  return fetch(` http://localhost:3000/nearby?lat=${lat}&lng=${lng}&rad=${rad}` )
-    .then(function(response) {
-      return response.json();
+export function getUnits(points) {
+  let body = JSON.stringify({ "poly" : points});
+  return fetch( `http://localhost:3000/getUnits` ,
+                { "method": 'POST',
+                  "body": body,
+                  "headers": {  'Content-Type': 'application/json',
+                                'Content-Length': new Buffer(body).length }})
+    .then(function(res) {
+        return res.json();
     });
 }
 
@@ -12,7 +17,6 @@ export function searchLists(term) {
     .then(function(response) {
       return response.json();
     });
-
 }
 
 export function countPolyResidences(polyData) {

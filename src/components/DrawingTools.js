@@ -16,7 +16,6 @@ export class PolygonTools extends Component {
 
     this.data = [];
     this.mapListener = null;
-
   }
 
   // Before the component mounts, set the polygon and add the listeners
