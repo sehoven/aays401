@@ -39,6 +39,7 @@
     "dotenv": "^4.0.0",
     "enumify": "^1.0.4",
     "express": "^4.15.4",
+    "file-loader": "^1.1.5",
     "google-map-react": "^0.24.0",
     "immutable": "^3.8.1",
     "jquery": "^3.2.1",

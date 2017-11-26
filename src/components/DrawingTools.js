@@ -178,11 +178,13 @@ export default class DrawingTools extends Component {
     this.mapListener = null;
 
     if(this.props.polyNum == 0){
-      polygonOptions.fillColor = '#000000';
-      polygonOptions.fillOpacity = 0.20;
+      polygonOptions.fillOpacity = 0.1;
+      polygonOptions.strokeColor = '#000000';
+      polygonOptions.strokeWeight = 1;
     } else {
       polygonOptions.fillColor = randomColor();
       polygonOptions.fillOpacity = 0.45;
+      polygonOptions.strokeWeight = 0.2;
     }
   }
 

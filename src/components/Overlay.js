@@ -144,6 +144,7 @@ export default class OverlayContainer extends Component {
       polyNum: --prevState.polyNum
     }));
 
+    if (polygonArray.size() == 0) this.clearCircles();
     return polycount;
   }
 
@@ -220,21 +221,15 @@ export default class OverlayContainer extends Component {
     let points = this.state.polygons.convertOneToLatLng(polygon);
     HTTPService.getUnits(points)
     .then(function(json){
-      if (that.circles.length > 0){
-        for (var circle in json){
-          if (that.circles[circle]){
-            that.circles[circle].setMap(null);
-          }
-        }
-      }
-      that.circles = []; // Delete old circles by removing references
+      that.clearCircles();
       for (var item in json){
         // radius = 3 @ 1, 6 @ 10, 9 @ 100, 12 @ 1000
         let radius = (1 + Math.floor(Math.log10(json[item]["count"]))) * 3;
-        let newCircle = new google.maps.Circle({
+        let newCircle = new that.props.maps.Circle({
+          title: json[item]["type"] + ", count: " + json[item]["count"],
           strokeWeight: 0,
           fillColor: '#FF0000',
-          fillOpacity: (radius == 3)?1:0.3,
+          fillOpacity: (radius == 3)?0.9:0.6,
           map: that.props.map,
           center: { lat: json[item]["lat"], lng: json[item]["lng"] },
           radius: radius
@@ -247,7 +242,7 @@ export default class OverlayContainer extends Component {
             title: json[item]["type"] + ", count: " + json[item]["count"],
             position: { lat: json[item]["lat"], lng: json[item]["lng"] },
             icon: {
-              path: 'M 0,0 z', // This is hacky, but alternatives are >100 lines
+              path: 'M 1,1 -1,1 -1,-1 1,-1 z', // This is hacky, but alternatives are >100 lines
               strokeWeight: 0,
               scale: radius
             },
@@ -262,6 +257,17 @@ export default class OverlayContainer extends Component {
         }
       }
     });
+  }
+
+  clearCircles(){
+    if (this.circles.length > 0){
+      for (var circle in this.circles){
+        if (this.circles[circle]){
+          this.circles[circle].setMap(null);
+        }
+      }
+    }
+    this.circles = []; // Delete old circles by removing references
   }
 
   addFirstPolygon(polygon) {

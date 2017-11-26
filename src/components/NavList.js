@@ -100,8 +100,9 @@ export default class NavList extends React.Component {
     }
     this.polygon = new this.props.maps.Polygon({
       paths: itemData.points,
-      strokeWeight: 0,
-      fillOpacity: 0.45,
+      strokeColor: '#000000',
+      strokeWeight: 1,
+      fillOpacity: 0.1,
       zIndex: 1
     });
     this.polygon.setMap(map);

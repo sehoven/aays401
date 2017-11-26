@@ -354,7 +354,7 @@ app.post('/getUnits', function(req, res) {
                   + "WHERE latitude BETWEEN $1 and $2 AND longitude BETWEEN $3 and $4 "
                   + "GROUP BY latitude, longitude, zoningcode;";
 
-  var values = [minLat,maxLat,minLng,maxLng];
+  var values = [minLat, maxLat, minLng, maxLng];
 
   let resBody = [];
   client.query(queryText, values, function(err, result) {
