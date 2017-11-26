@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
 import DrawingTools, { PolygonTools } from './DrawingTools.js';
+import 'react-notifications/lib/notifications.css';
 
 const HTTPService = require('./HTTPService.js');
 const notificationTimer = 2000;
@@ -11,8 +12,6 @@ export class Overlay extends Component {
 
     this.state = {
       isDrawing: false,
-      notification: null,
-      banner: null
     }
   }
 
@@ -43,12 +42,8 @@ export class Overlay extends Component {
       callback = () => { this.props.drawClickCallback(); };
     }
     this.toggleIsDrawing(callback);
-    if(this.state.notification==null){
-      this.state.notification = 'draw';
-    }
 
-    this.createNotification(this.state.notification);
-    this.state.notification = 'nothing';
+    createNotification('draw');
   }
 
   clearClick() {
@@ -57,24 +52,17 @@ export class Overlay extends Component {
     if(this.props.clearClickCallback) {
       polycount = this.props.clearClickCallback();
     }
-    if(polycount > 0) {
-      this.state.notification = 'clear';
-    }
-    this.createNotification(this.state.notification);
-    this.state.notification = 'nothing';
+    createNotification('clear');
   }
 
   finishClick() {
-
     let callback;
     if(this.props.finishClickCallback) {
       callback = () => { this.props.finishClickCallback(); };
     }
     this.toggleIsDrawing(callback);
 
-    this.state.notification = 'finish';
-    this.createNotification(this.state.notification);
-    this.state.notification = 'nothing';
+    createNotification('finish');
   }
 
   cancelClick() {
@@ -84,9 +72,7 @@ export class Overlay extends Component {
     }
     this.toggleIsDrawing(callback);
 
-    this.state.notification = 'cancel';
-    this.createNotification(this.state.notification);
-    this.state.notification = 'nothing';
+    createNotification('cancel');
   }
 
   addClick(){
@@ -96,36 +82,8 @@ export class Overlay extends Component {
     }
     this.setIsDrawing(true, callback);
 
-    this.state.notification = 'inner';
-    this.createNotification(this.state.notification);
-    this.state.notification = 'nothing';
+    createNotification('inner');
   }
-
-  createNotification (type){
-
-    switch (type) {
-        case 'draw':
-          this.state.banner = NotificationManager.info('Draw Outer Delivery Zone','',notificationTimer);
-          break;
-        case 'inner':
-          this.state.banner = NotificationManager.info('Draw Individual Zones Routes','',notificationTimer);
-          break;
-        case 'finish':
-          this.state.banner = NotificationManager.success('Delivery Route Map Generated','',notificationTimer);
-          break;
-        //case 'cancel':
-        // this.state.banner = NotificationManager.warning('Removed Last Drawn Polygon','' ,notificationTimer);
-        //  break;
-        case 'clear':
-          this.state.banner = NotificationManager.warning('Cleared Polygon','', notificationTimer);
-          break;
-        case 'error':
-          this.state.banner = NotificationManager.error('Error message', 'Click me!', notificationTimer, () => {
-            alert('callback');
-          })
-          break;
-      };
-  };
 
   render() {
 
@@ -139,7 +97,6 @@ export class Overlay extends Component {
 
     return (
       <div className="overlayContainer">
-        {this.state.banner}
         <NotificationContainer/>
         { this.state.isDrawing ? null : drawButton }
         { this.state.isDrawing || !this.props.canClear ? null : clearButton }
@@ -252,6 +209,7 @@ export default class OverlayContainer extends Component {
   }
 
   showUnits(){
+    createNotification('loading-units');
     // Creates a circle for each point, and a marker for the number
     // Circles are much faster than Markers, so markers are used sparingly
     // for numbers. It's slower to render squares with Markers despite
@@ -282,12 +240,14 @@ export default class OverlayContainer extends Component {
           radius: radius
         });
         that.circles.push(newCircle);
+        // It's tempting to make an invisible marker for all points to give them
+        // all tooltips, but that makes the app unusable
         if (json[item]["count"] > 1){
           var newNumber = new google.maps.Marker({
             title: json[item]["type"] + ", count: " + json[item]["count"],
             position: { lat: json[item]["lat"], lng: json[item]["lng"] },
             icon: {
-              path: 'M 1,1 -1,1 -1,-1 1,-1 z', // This is hacky, but alternatives are >100 lines
+              path: 'M 0,0 z', // This is hacky, but alternatives are >100 lines
               strokeWeight: 0,
               scale: radius
             },
@@ -494,3 +454,31 @@ export class PolygonArray {
     return allPolygons;
   }
 }
+
+function createNotification(type, ){
+  switch (type) {
+      case 'draw':
+        NotificationManager.info('Draw Outer Delivery Zone','',notificationTimer);
+        break;
+      case 'inner':
+        NotificationManager.info('Draw Individual Zones Routes','',notificationTimer);
+        break;
+      case 'finish':
+        NotificationManager.success('Delivery Route Map Generated','',notificationTimer);
+        break;
+      //case 'cancel':
+      // NotificationManager.warning('Removed Last Drawn Polygon','' ,notificationTimer);
+      //  break;
+      case 'clear':
+        NotificationManager.warning('Cleared Polygon','', notificationTimer);
+        break;
+      case 'error':
+        NotificationManager.error('Error message', 'Click me!', notificationTimer, () => {
+          alert('callback');
+        });
+        break;
+      case 'loading-units':
+        NotificationManager.info('Loading Units','', notificationTimer);
+        break;
+    };
+};
