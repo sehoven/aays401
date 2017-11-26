@@ -351,13 +351,13 @@ app.post('/getUnits', function(req, res) {
 
   var queryText =   "SELECT latitude as lat, longitude as lng, zoningcode as zc, count(*) ct "
                   + "FROM aays.tblProperty "
-                  + "WHERE latitude BETWEEN 52 and 54 AND longitude BETWEEN -114 and -113 "
+                  + "WHERE latitude BETWEEN $1 and $2 AND longitude BETWEEN $3 and $4 "
                   + "GROUP BY latitude, longitude, zoningcode;";
 
   var values = [minLat,maxLat,minLng,maxLng];
 
   let resBody = [];
-  client.query(queryText, function(err, result) {//values,
+  client.query(queryText, values, function(err, result) {
     if(err){
       client.end();
       return res.status(400).send(err);
