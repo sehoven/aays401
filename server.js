@@ -138,15 +138,13 @@ app.get('/locations', function(req, res) {
         for(let j = 0; j < result.rows[i].latitude.length; ++j) {
           coords.push([result.rows[i].latitude[j], result.rows[i].longitude[j]]);
         }
-        //This constant 0.00001 is arbitrary. So is 500. Seems to work out.
-        //If any more edge cases are found, both numbers have to change.
-        //To be precise, 0.0001 is too high and 0.000001 is too low at
-        //a 500 point threshold
-        var simplified = (coords.length>500)?simplify(coords, 0.00001):coords;
+        //200 and 0.0001 are arbitrary thresholds, but I did a lot of testing
+        //to get to them
+        var simplified = (coords.length>200)?simplify(coords, 0.0001):coords;
         for(let j = 0; j < simplified.length; ++j) {
           latLngs.push({
-            lat: coords[j][0],
-            lng: coords[j][1]
+            lat: simplified[j][0],
+            lng: simplified[j][1]
           });
         }
 
