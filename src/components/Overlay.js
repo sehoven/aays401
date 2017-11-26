@@ -279,7 +279,7 @@ export default class OverlayContainer extends Component {
     if(polygon != null) {
       let url="https://maps.googleapis.com/maps/api/staticmap?&size=1000x1000&path=color:0x00000000|weight:5|fillcolor:0x00BDBDBD";
       polygon.forEach(function(position) {
-        url += "|" + position.lat + "," + position.lng;
+        url += "|" + position.lat.toFixed(6) + "," + position.lng.toFixed(6);
       });
       this.setState(prevState => ({
         url: [...prevState.url, url]
