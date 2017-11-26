@@ -1,6 +1,7 @@
 /*You will need to fill in the password for the "postgres" database user you created
 in the .env file
 */
+const simplify = require('simplify-geometry');
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
@@ -10,36 +11,28 @@ const Client = require('pg');
 require('dotenv').load();
 const connectionString = 'postgresql://'+process.env.databaseUser+':'+process.env.databasePassword+'@localhost:'+process.env.databasePort+'/'+process.env.databaseName+''
 
-
-
 // Load local neighbourhood data synchronously
 
-
 console.log("Ready. Listening on port 3000.");
-
 
 app.use(bodyParser.json());
 
 // Prepare Access-Control
 app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080');
-    res.setHeader('Access-Control-Allow-Methods', 'GET');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
     //'GET, POST, OPTIONS, PUT, PATCH, DELETE'); Add as required
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
     res.setHeader('Access-Control-Allow-Credentials', true);
     next();
 });
 
-
-
-
-
 // Handle requests to "/nearby"
 // Returns all known neighborhoods that are within rad from point (lat, lng)
 /**
  * @api {get} /nearby/{Object[]} Get nearby neighbourhoods
  * @apiGroup Polygon
- * 
+ *
  * @apiSuccessExample Success-Response:
  *    HTTP/1.1 200 OK
  *    {
@@ -80,10 +73,6 @@ app.get('/nearby', function(req, res) {
   res.end(json);
 });
 
-
-
-
-
 // Handle requests to "/locations"
 // Returns all known locations that match existing query items
 /**
@@ -116,13 +105,12 @@ app.get('/nearby', function(req, res) {
  */
 app.get('/locations', function(req, res) {
   console.log("Location request handler invoked");
-  
+
   if (!req.query) return res.sendStatus(400);
   if ((typeof req.query.name==undefined) || (req.query.name == '')) {
     res.end(JSON.stringify([]));
     return;
   }
-
 
   //Connect to DB
   const client = new Client.Client({
@@ -143,52 +131,46 @@ app.get('/locations', function(req, res) {
       client.end()
 
       let resBody = [];
-
       for (let i=0;i<result.rowCount;i++){
-
         let latLngs = [];
+        let coords = [];
+        // Converting to format requested by API
+        for(let j = 0; j < result.rows[i].latitude.length; ++j) {
+          coords.push([result.rows[i].latitude[j], result.rows[i].longitude[j]]);
+        }
+        //This constant 0.00001 is arbitrary. So is 500. Seems to work out.
+        //If any more edge cases are found, both numbers have to change.
+        //To be precise, 0.0001 is too high and 0.000001 is too low at
+        //a 500 point threshold
+        var simplified = (coords.length>500)?simplify(coords, 0.00001):coords;
+        for(let j = 0; j < simplified.length; ++j) {
+          latLngs.push({
+            lat: coords[j][0],
+            lng: coords[j][1]
+          });
+        }
 
-         // Converting to format requested by API
-         for(let j = 0; j < result.rows[i].latitude.length; ++j) {
-           
-           latLngs.push({
-             lat: result.rows[i].latitude[j],
-             lng: result.rows[i].longitude[j]
-           });
-         }
-         
-         let centerLatLng = {
-            lat:result.rows[i].centerlat,
-            lng:result.rows[i].centerlng
-          };
+        let centerLatLng = {
+          lat:result.rows[i].centerlat,
+          lng:result.rows[i].centerlng
+        };
 
          resBody.push({
            name:result.rows[i].title,
            points:latLngs,
-           radius: result.rows[i].radius,
+           radius:result.rows[i].radius,
            width:result.rows[i].width,
            height:result.rows[i].height,
            center:centerLatLng
          });
-         
-         
       }
-      
 
-      
-      
-      
-      
       var json = JSON.stringify(resBody);
       res.writeHead(200, {"Content-Type": "application/json"});
       res.end(json);
 
   });
 });
-
-
-
-
 
 /**
  * @api {post} /addressCount/{Object[]} Count addresses in a polygon
@@ -237,8 +219,6 @@ app.post('/addressCount', function(req, res) {
                   "Other": 0,
                   "Agriculture":0
                   };
-  
-
 
   //Connect to DB
   const client = new Client.Client({
@@ -255,20 +235,17 @@ app.post('/addressCount', function(req, res) {
       return res.status(400).send(err);
     }
     client.end()
-    
-    
+
     //inside call required format to be [[[#,#],[#,#]...[#,#]]]
     let polygon = [];
-
-    
 
     for (let i = 0; i < req.body.poly.length; i++){
       polygon.push([req.body.poly[i].lat, req.body.poly[i].lng]);
     }
-  
+
     for(var item in result.rows){
       let point = [result.rows[item].lat,result.rows[item].lng];
-      
+
       if(inside(point,polygon)){
         switch(result.rows[item].type){
 
@@ -300,16 +277,14 @@ app.post('/addressCount', function(req, res) {
       }
     }
 
-    
     res.writeHead(200, {"Content-Type": "application/json"});
     var json = JSON.stringify(resBody);
     res.end(json);
-    
+
   });
 });
 
-
-app.listen(3000, function() {  
+app.listen(3000, function() {
   console.log('API up and running...');
 });
 
@@ -338,4 +313,3 @@ function filterBinary(arr, min, max, property){
  let rightIndex = binaryIndexOf(arr, max, property) + 1;
  return arr.slice(leftIndex, rightIndex);
 }
-
