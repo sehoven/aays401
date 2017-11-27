@@ -320,7 +320,7 @@ export default class OverlayContainer extends Component {
           <div id="navbar-list">
             {this.state.dataReady ? this.state.data.map((itemData, i)=>
               <div className="navbar-count-poly-box" key={i}>
-                <div className="navbar-count-poly-title"><center>POLYGON {i+1}</center></div>
+                <div className="navbar-count-poly-title"><p style={{padding: 15}}>POLYGON {i+1}</p></div>
                 <ul className="navbar-count-poly-text">
                   <label className="containerButton">Residences: {this.state.dataReady? itemData.Residential.total:"?"}
                     <input type="checkbox" defaultChecked={true}></input>

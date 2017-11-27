@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Roboto')
+@import url('https://fonts.googleapis.com/css?family=Raleway:300')
 
 $uiWidth: 400px
 $mapControlHeight: 5vh
@@ -11,7 +11,7 @@ $navPanelMinWidth: 320px
 
 $navBarListMargin: 10px
 
-$headerHeight: 40px
+$headerHeight: 50px
 $headerPadding: 10px
 $totalHeaderHeight: calc(#{$headerHeight} + (2 * #{$headerPadding}))
 
@@ -24,16 +24,18 @@ h1
 
 body
   margin: 0
-  font-family: 'Roboto', sans-serif
+  font-family: 'Raleway', sans-serif;
 
 .center-horizontal
   margin: 0 auto
 
 .header
+  font-family: 'Raleway'
   height: $headerHeight
-  background-color: #5D5D5D
-  font-family: 'Notification'
+  background: linear-gradient(to bottom, #232526, #414345)
   font-size: 36px
+  font-weight: normal
+  text-align: center
   padding: 10px
   color: white
 
@@ -75,6 +77,8 @@ body
   width: calc(100% - (2 * #{$navPanelPadding})
   display: table
   padding: $navPanelPadding
+  background: linear-gradient(to bottom, #ada996, #f2f2f2, #dbdbdb, #eaeaea)
+
   
 
 .container
@@ -98,13 +102,16 @@ body
   width: 100%
 
 #search-box
+  font-family: 'Raleway'
   width: 100%
   height: 40px
   padding-left: 8px
   border-width: 1px
   border-radius: 5px
   border-color: rgb(117, 117, 117)
+  font: Raleway
   font-size: 24px
+  font-weight: bold
   vertical-align: bottom
   box-sizing: border-box
   position: relative
@@ -163,6 +170,7 @@ body
   width: 100%
   padding: $navPanelPadding
   font-size: 25px
+  font-weight:extra-light
   position: relative
   top: 50%
   left: 50%
@@ -181,7 +189,9 @@ body
   display: table-row
   vertical-align: bottom
   font-size: 20px
-  padding-bottom: 50px
+  text-align: center
+  text-decoration: underline
+  font-weight: bold
   width: 100%
 .navbar-count-poly-text
   display: table-row
@@ -194,7 +204,7 @@ body
 
 
 .navbar-count-inner-poly-text
-  font-family: 'Notification'
+  
   display: inline-block
   vertical-align: bottom
   width: 100%
@@ -202,6 +212,7 @@ body
   margin-top: 5px
   margin-left: 20px
   font-size: 15px
+  font-weight: extra-light
 .fullScreen
   height: 100vh
   width: 100vw
@@ -281,6 +292,7 @@ buttonLarge:hover
 @font-face
   font-weight: normal
   font-style: normal
+  font-family: 'Raleway', sans-serif;
 
 .notification-container
   box-sizing: border-box
@@ -337,10 +349,10 @@ buttonLarge:hover
   left: 15px
   margin-top: -14px
   display: block
-  font-family: 'Notification'
   width: 28px
   height: 28px
   font-size: 28px
+  font-weight: bold
   text-align: center
   line-height: 28px
 
@@ -368,6 +380,9 @@ img
   height: 250px
   border-radius: 2px
   width: 250px
+  border-style: solid
+  border-width: 5px
+  border-color: #5B84A2
 img:hover
   -webkit-transform: scale(1.1)
   -moz-transform: scale(1.1)
