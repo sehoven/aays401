@@ -6,7 +6,7 @@ const saltRounds = 10;
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const inside = require('point-in-geopolygon');
+const inside = require('point-in-polygon');
 const fs = require('fs');
 const Client = require('pg');
 require('dotenv').load();
@@ -134,7 +134,7 @@ app.get('/locations', function(req, res) {
   .catch(e => console.error('Connection Error', e.stack))
 
 
-  var searchTerm = "%"+req.query.name.toLowerCase()+"%";
+  var searchTerm = req.query.name.toLowerCase()+"%";
   var queryText = "SELECT * from aays.tblNeighbourhood where lower(Title) like $1;";
   var values = [searchTerm];
   client.query(queryText,values,function(err,result) {
@@ -143,41 +143,80 @@ app.get('/locations', function(req, res) {
         client.end()
         return;
       }
-      client.end()
+
       let resBody = [];
+      var searchTerm1 = "%"+req.query.name.toLowerCase()+"%";
+      queryText = "SELECT * from aays.tblNeighbourhood where lower(Title) like $1 and lower(Title) not like $2;";
+      values = [searchTerm1,searchTerm];
+      client.query(queryText,values,function(err1,resultinner) {
+          if(err1){
+            res.end(JSON.stringify([]));
+            client.end()
+            return;
+          }
+          client.end()
+          for (let i=0;i<result.rowCount;i++){
 
-      for (let i=0;i<result.rowCount;i++){
+            let latLngs = [];
 
-        let latLngs = [];
+            // Converting to format requested by API
+            for(let j = 0; j < result.rows[i].latitude.length; ++j) {
+              
+              latLngs.push({
+                lat: result.rows[i].latitude[j],
+                lng: result.rows[i].longitude[j]
+              });
+            }
+            
+            let centerLatLng = {
+                lat:result.rows[i].centerlat,
+                lng:result.rows[i].centerlng
+              };
 
-         // Converting to format requested by API
-         for(let j = 0; j < result.rows[i].latitude.length; ++j) {
-           
-           latLngs.push({
-             lat: result.rows[i].latitude[j],
-             lng: result.rows[i].longitude[j]
-           });
-         }
-         
-         let centerLatLng = {
-            lat:result.rows[i].centerlat,
-            lng:result.rows[i].centerlng
-          };
-
-         resBody.push({
-           name:result.rows[i].title,
-           points:latLngs,
-           radius: result.rows[i].radius,
-           width:result.rows[i].width,
-           height:result.rows[i].height,
-           center:centerLatLng
-         });
-         
-         
-      }
-      var json = JSON.stringify(resBody);
-      res.writeHead(200, {"Content-Type": "application/json"});
-      res.end(json);
+            resBody.push({
+              name:result.rows[i].title,
+              points:latLngs,
+              radius: result.rows[i].radius,
+              width:result.rows[i].width,
+              height:result.rows[i].height,
+              center:centerLatLng
+            });
+            
+            
+          }
+          for (let i=0;i<resultinner.rowCount;i++){
+            
+            let latLngs = [];
+            
+            // Converting to format requested by API
+            for(let j = 0; j < resultinner.rows[i].latitude.length; ++j) {
+                          
+            latLngs.push({
+              lat: resultinner.rows[i].latitude[j],
+              lng: resultinner.rows[i].longitude[j]
+              });
+            }
+                        
+            let centerLatLng = {
+              lat:resultinner.rows[i].centerlat,
+              lng:resultinner.rows[i].centerlng
+            };
+            
+            resBody.push({
+              name:resultinner.rows[i].title,
+              points:latLngs,
+              radius: resultinner.rows[i].radius,
+              width:resultinner.rows[i].width,
+              height:resultinner.rows[i].height,
+              center:centerLatLng
+            });
+                        
+                        
+          }
+          var json = JSON.stringify(resBody);
+          res.writeHead(200, {"Content-Type": "application/json"});
+          res.end(json);
+        });
 
   });
 });
@@ -252,7 +291,7 @@ app.post('/addressCount', function(req, res) {
 
   
   let polygon = [];
-  let polygonOuter=[];
+
   
   var maxLat=0;
   var maxLng=0;
@@ -273,8 +312,6 @@ app.post('/addressCount', function(req, res) {
       minLat = req.body.poly[i].lat
     }
   }
-  polygonOuter.push(polygon);
-
   
 
   var queryText = 'SELECT code.subvalue as subvalue,code.value as type, prop.latitude as lat, prop.longitude as lng from aays.tblProperty prop left join aays.luzoningcodes code on code.zoningcode = prop.zoningcode where prop.latitude BETWEEN $1 AND $2 AND prop.longitude BETWEEN $3 AND $4;';
@@ -285,12 +322,11 @@ app.post('/addressCount', function(req, res) {
       return res.status(400).send(err);
     }
     client.end()
-  
-  
+
     for(var item in result.rows){
       let point = [result.rows[item].lat,result.rows[item].lng];
       
-      if(inside.polygon(polygonOuter,point)){
+      if(inside(point,polygon)){
         switch(result.rows[item].type){
 
           case 'Residential':
@@ -309,7 +345,7 @@ app.post('/addressCount', function(req, res) {
                 resBody.Residential["Motor Home"]++;
                 break;
             }
-            break
+            break;
           case 'Apartment':
             resBody.Apartment.total++;
             switch(result.rows[item].subvalue){

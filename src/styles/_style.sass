@@ -6,6 +6,19 @@ $mapControlMargin: 4vh
 $mapControlPadding: 10px
 $navMarginTop: calc(#{$mapControlHeight} + (2 * #{$mapControlMargin}))
 
+$navPanelPadding: 5px
+$navPanelMinWidth: 320px
+
+$navBarListMargin: 10px
+
+$headerHeight: 40px
+$headerPadding: 10px
+$totalHeaderHeight: calc(#{$headerHeight} + (2 * #{$headerPadding}))
+
+$tabButtonsHeight: 40px
+
+$overlayContainerHeight: 70px
+
 h1
   color: blue
 
@@ -13,33 +26,187 @@ body
   margin: 0
   font-family: 'Roboto', sans-serif
 
-#leftContainer
-  margin: 5vh
-  width: calc(#{$uiWidth} + 70px)
-  position: absolute
-  height: 90vh
+.center-horizontal
+  margin: 0 auto
 
-#tabButtons
-  position: absolute
-  left: calc(#{$uiWidth} + 20px)
-  width: 50px
-  height: inherit
-  z-index: 6
+.header
+  height: $headerHeight
+  background-color: #5D5D5D
+  font-family: 'Notification'
+  font-size: 36px
+  padding: 10px
+  color: white
+
+.tabContainer
+  height: 100%
+
+.overlayContainer
+  display:block
+  overflow:auto
+  padding: 10px
+
+.tabButtons
+  display: table
+  width: 100%
+  table-layout: fixed
+  height: $tabButtonsHeight
 
 .tabButton
-  position: relative
-  border-top-right-radius: 8px
-  border-bottom-right-radius: 8px
-  height: 50%
-  border-left: 1px black solid
-  background-color: rgb(117,117,117)
+  width: 100%
+  background-color: rgb(150, 150, 150)
+  color: white
+  display: table-cell
+  &:hover
+    background-color: rgb(200, 200, 200)
+
+.tabButton p
+  text-align: center
 
 .activeTabButton
-  border-top: 1px black solid
-  border-right: 1px black solid
-  border-bottom: 1px black solid
-  border-left: none
+  border-style: solid
+  border-width: 5px
+  border-color: #5B84A2
   background-color: white
+  color: black
+
+
+.navPanel
+  height: calc(100% - #{$totalHeaderHeight} - #{$tabButtonsHeight} - 10px)
+  width: calc(100% - (2 * #{$navPanelPadding})
+  display: table
+  padding: $navPanelPadding
+  
+
+.container
+  position: absolute
+  top: $totalHeaderHeight
+  bottom: 0
+  width: 100%
+  display: flex
+  overflow: hidden
+
+.container .left
+  max-width: 30%
+  min-width: $navPanelMinWidth
+  float: left
+  box-shadow: 3px 0 5px -2px #888
+  z-index: 1
+  border: 1px solid black
+
+.container .right
+  height: 100%
+  width: 100%
+
+#search-box
+  width: 100%
+  height: 40px
+  padding-left: 8px
+  border-width: 1px
+  border-radius: 5px
+  border-color: rgb(117, 117, 117)
+  font-size: 24px
+  vertical-align: bottom
+  box-sizing: border-box
+  position: relative
+  margin-bottom: 10px
+
+#navbar-list
+  overflow-y: auto
+  height: 580px
+  padding-bottem: 50px
+
+.navbar-list-autocomplete-item
+  height: 60px
+  width: calc(100% - (2 * #{$navBarListMargin})
+  margin: $navBarListMargin
+  background-color: white
+  transition: background-color 0.1s
+  display: table
+  table-layout: fixed
+  -webkit-box-shadow: 2px 2px 3px 0px rgba(0,0,0,0.75)
+  -moz-box-shadow: 2px 2px 3px 0px rgba(0,0,0,0.75)
+  box-shadow: 2px 2px 3px 0px rgba(0,0,0,0.75)
+  border: 1px solid rgb(117, 117, 117)
+  &:hover
+    background-color: rgb(180,180,180)
+
+.navbar-list-autocomplete-text
+  display: table-cell
+  height: 50px
+  padding-left: 10px
+  font-size: 25px
+  vertical-align: middle
+  text-overflow: ellipsis
+  overflow: hidden
+  white-space: nowrap
+
+.navbar-list-item
+  height: calc(100px + #{$navBarListMargin})
+  width: calc(100% - (2 * #{$navBarListMargin})
+  margin: $navBarListMargin
+  -webkit-box-shadow: 2px 2px 3px 0px rgba(0,0,0,0.75)
+  -moz-box-shadow: 2px 2px 3px 0px rgba(0,0,0,0.75)
+  box-shadow: 2px 2px 3px 0px rgba(0,0,0,0.75)
+  border: 1px solid rgb(117, 117, 117)
+  background-color: white
+  transition: background-color 0.1s
+  &:hover
+    background-color: rgb(180,180,180)
+
+.navbar-list-icon
+  margin: 5px
+  width: 100px
+  height: 100px
+  float: left
+
+.navbar-list-text
+  width: 100%
+  padding: $navPanelPadding
+  font-size: 25px
+  position: relative
+  top: 50%
+  left: 50%
+  transform: translate(-50%, -50%)
+  word-wrap: break-word
+
+.navbar-count-poly-box
+  padding-top: 10px
+  padding-bottom: 10px
+  border-top: 1px solid gray
+  display: table
+  
+
+.navbar-count-poly-title
+  display: table-row
+  vertical-align: bottom
+  font-size: 20px
+  padding-bottom: 50px
+  width: 100%
+.navbar-count-poly-text
+  display: table-row
+  vertical-align: bottom
+  width: 100%
+  //height: 100px
+  margin-top: 5px
+  margin-left: 10px
+  font-size: 20px
+
+
+.navbar-count-inner-poly-text
+  font-family: 'Notification'
+  display: inline-block
+  vertical-align: bottom
+  width: 100%
+  //height: 100px
+  margin-top: 5px
+  margin-left: 20px
+  font-size: 15px
+.fullScreen
+  height: 100vh
+  width: 100vw
+
+.navbar-count-poly-box a
+  display: table-row
 
 .buttonText
   font-size: 25px
@@ -54,17 +221,6 @@ body
     -webkit-transform: translateX(-50%) translateY(-50%) rotate(90deg)
     transform: translateX(-50%) translateY(-50%) rotate(90deg)
 
-.nav-panel
-  width: #{$uiWidth}
-  height: calc(100% - 20px)
-  padding: 10px
-  position: absolute
-  z-index: 2
-  border-top: 1px black solid
-  border-left: 1px black solid
-  border-bottom: 1px black solid
-  background-color: white
-
 .show-number
   text-align: left
   list-style-type: none
@@ -77,117 +233,6 @@ body
   position: absolute
   z-index: 2
 
-#search-box
-  width: calc(#{$uiWidth} - 20px)
-  height: 40px
-  padding-left: 8px
-  border-width: 1px
-  border-radius: 5px
-  border-color: rgb(117, 117, 117)
-  margin-right: 0px
-  border-radius: 5px
-  font-size: 25px
-  vertical-align: bottom
-
-#navbar-list
-  margin-top: 10px
-  height: calc(90vh - 66px)
-  overflow-y: auto
-
-.navbar-list-autocomplete-item
-  height: 60px
-  margin: 10px
-  -webkit-box-shadow: 2px 2px 3px 0px rgba(0,0,0,0.75)
-  -moz-box-shadow: 2px 2px 3px 0px rgba(0,0,0,0.75)
-  box-shadow: 2px 2px 3px 0px rgba(0,0,0,0.75)
-  border: 1px solid rgb(117, 117, 117)
-  background-color: white
-  transition: background-color 0.1s
-  &:hover
-    background-color: rgb(180,180,180)
-
-.navbar-list-autocomplete-text
-  display: inline-block
-  vertical-align: top
-  width: calc(#{$uiWidth} - 70px)
-  height: 50px
-  padding-top: 15px
-  padding-left: 30px
-  font-size: 25px
-  vertical-align: bottom
-  text-overflow: ellipsis
-  overflow: hidden
-  white-space: nowrap
-
-.navbar-list-item
-  padding-left: 5px
-  height: 110px
-  margin: 10px
-  -webkit-box-shadow: 2px 2px 3px 0px rgba(0,0,0,0.75)
-  -moz-box-shadow: 2px 2px 3px 0px rgba(0,0,0,0.75)
-  box-shadow: 2px 2px 3px 0px rgba(0,0,0,0.75)
-  border: 1px solid rgb(117, 117, 117)
-  background-color: white
-  transition: background-color 0.1s
-  &:hover
-    background-color: rgb(180,180,180)
-
-.navbar-list-icon
-  margin: 5px
-  display: inline-block
-  width: 100px
-  height: 100px
-
-.navbar-list-text
-  display: inline-block
-  width: calc(#{$uiWidth} - 180px)
-  height: 100px
-  margin-left: 10px
-  font-size: 25px
-  position: relative
-  p
-    position: absolute
-    top: 20px
-    -ms-transform: translate(0, -50%)
-    -webkit-transform: translate(0, -50%)
-    transform: translate(0, -50%)
-
-.navbar-count-poly-box
-  //height: 110px
-  padding-top: 10px
-  padding-bottom: 10px
-  border-top: 1px solid gray
-  //transition: background-color 0.1s
-
-.navbar-count-poly-title
-  display: inline-block
-  vertical-align: bottom
-  width: calc(#{$uiWidth} - 40px)
-  //height: 100px
-  margin-left: 10px
-  font-size: 20px
-
-.navbar-count-poly-text
-  display: inline-block
-  vertical-align: bottom
-  width: calc(#{$uiWidth} - 40px)
-  //height: 100px
-  margin-top: 5px
-  margin-left: 10px
-  font-size: 20px
-
-.navbar-count-inner-poly-text
-  font-family: 'Notification'
-  display: inline-block
-  vertical-align: bottom
-  width: calc(#{$uiWidth} - 40px)
-  //height: 100px
-  margin-top: 5px
-  margin-left: 20px
-  font-size: 15px
-.fullScreen
-  height: 100vh
-  width: 100vw
 
 #map
   text-align: center
@@ -210,7 +255,7 @@ button
   transition: all 0.2s
   cursor: pointer
   margin: 5px
-
+  
 button:hover
   background-color: #5D5D5D
 
@@ -329,7 +374,7 @@ img:hover
   -ms-transform: scale(1.1)
   transform: scale(1.1)
 
-.container
+.containerButton
   display: block
   position: relative
   padding-left: 35px
@@ -352,7 +397,7 @@ img:hover
   width: 25px
   background-color: #eee
 
-.container
+.containerButton
   &:hover input ~ .checkmark
     background-color: #ccc
   input:checked ~ .checkmark
@@ -363,7 +408,7 @@ img:hover
   position: absolute
   display: none
 
-.container
+.containerButton
   input:checked ~ .checkmark:after
     display: block
   .checkmark:after
