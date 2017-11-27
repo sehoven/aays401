@@ -32,7 +32,7 @@ export default class MapContainer extends Component {
     return (
       <div>
         <div className="header">
-          <center>Anthony At Your Service</center>
+          ANTHONY AT YOUR SERVICE
         </div>
         <div className="container">
           <div className="left">
