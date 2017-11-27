@@ -17,7 +17,7 @@ export function searchLists(term) {
 
 export function countPolyResidences(polyData) {
   let body = JSON.stringify({ "poly" : polyData.points});
-  return fetch( ` http://localhost:3000/addressCount` ,
+  return fetch( `http://localhost:3000/addressCount` ,
                 { "method": 'POST',
                   "body": body,
                   "headers": {  'Content-Type': 'application/json',
