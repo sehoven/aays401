@@ -55,7 +55,6 @@ export class PolygonTools extends Component {
           }
         });
 
-        console.log("moutnig");
         data.polygonListener = polygonListener;
       }
     }
@@ -79,7 +78,6 @@ export class PolygonTools extends Component {
     for(let i = 0; i < this.data.length; ++i) {
       polygons.push(this.data[i].polygon);
     }
-    console.log("ssssss "+polygons);
     this.props.setPolygonArray(polygons);
   }
 
