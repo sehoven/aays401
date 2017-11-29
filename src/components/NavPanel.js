@@ -17,6 +17,7 @@ export default class NavPanel extends Component {
     this.onChange = this.onChange.bind(this);
     this.AutocompleteService;
   }
+
   // Fires when the search bar's text changes, unless it is emptied.
   onChange(event) {
     if(event.target != null && event.target.value != ""){
@@ -42,14 +43,15 @@ export default class NavPanel extends Component {
           if (status != that.props.maps.places.PlacesServiceStatus.OK) {
             return;
           }
-          let results = predictions.map(
+          let validPredictions = predictions.filter(prediction => prediction.id);
+          let results = validPredictions.map(
           function(x){
             return x.terms[0].value
                     + (x.terms.length>1?(", " + x.terms[1].value):"");
           });
           that.setState({
             autocomplete: results,
-            placeIds: predictions
+            placeIds: validPredictions
           });
         });
     }
