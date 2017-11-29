@@ -183,7 +183,7 @@ export default class DrawingTools extends Component {
       polygonOptions.fillOpacity = 0.10;
     } else {
       polygonOptions.fillColor = randomColor();
-      polygonOptions.fillOpacity = 0.45;
+      polygonOptions.fillOpacity = 0.20;
     }
   }
 
