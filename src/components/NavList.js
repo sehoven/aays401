@@ -31,7 +31,7 @@ class IconCanvas extends Component {
         context.lineTo(xx, yy);
       }
       context.closePath();
-      context.fillStyle = "rgb(150,150,255)";
+      context.fillStyle = "#9ea7aa";
       context.lineWidth = 2;
       context.strokeStyle = "black";
       context.fill();
