@@ -36,7 +36,7 @@ body
 .header
   font-family: 'Raleway'
   height: $headerHeight
-  background: linear-gradient(to bottom, #232526, #414345)
+  background: linear-gradient(to bottom, #000000, #102027)
   font-size: 36px
   font-weight: normal
   text-align: center
@@ -59,11 +59,13 @@ body
 
 .tabButton
   width: 100%
-  background-color: rgb(150, 150, 150)
+  background-color: #4f5b62
   color: white
   display: table-cell
+  transition: all 0.2s
+  cursor: pointer
   &:hover
-    background-color: rgb(200, 200, 200)
+    background-color: #babdbe
 
 .tabButton p
   text-align: center
@@ -71,9 +73,10 @@ body
 .activeTabButton
   border-style: solid
   border-width: 5px
-  border-color: #4f5b62
+  border-color: #9ea7aa
   background-color: white
   color: black
+  cursor: default
   &:hover
     background-color: white
 
@@ -82,7 +85,7 @@ body
   width: calc(100% - (2 * #{$navPanelPadding})
   display: table
   padding: $navPanelPadding
-  background: linear-gradient(to top, #ada996, #dbdbdb, #eaeaea)
+  background: linear-gradient(to top, #ffffff, #eceff1, #eceff1)
 
 .container
   position: absolute
@@ -250,7 +253,7 @@ button
   margin: 5px
 
 button:hover
-  background-color: #5D5D5D
+  background-color: #babdbe
 
 buttonLarge
   border-radius: 4px
