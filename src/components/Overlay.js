@@ -150,7 +150,7 @@ export class Overlay extends Component {
         </center>
         &nbsp;
       </div>
-      
+
     )
   }
 }
@@ -240,7 +240,7 @@ export default class OverlayContainer extends Component {
         if(polygonPoints.length > 0) {
           HTTPService.countPolyResidences(
             { points: polygonPoints }
-          ).then(function(json){
+          ).then(function(json) {
             that.setState(prevState => ({
               data: [...prevState.data, json]
             }));
@@ -332,28 +332,28 @@ export default class OverlayContainer extends Component {
                         <li>Motor Home: {this.state.dataReady? itemData.Residential["Mobile Home"]:"?"}</li>
                       </ul>
                   </label>
-                  
+
                   <label className="containerButton">Apartments: {this.state.dataReady? itemData.Apartment.total:"?"}
                   <input type="checkbox" defaultChecked={true}></input>
                   <span className="checkmark"></span>
-                    
+
                       <ul className="navbar-count-inner-poly-text">
                           <li>Low Rise Apartment: {this.state.dataReady? itemData.Apartment["Low Rise Apartments"]:"?"}</li>
                           <li>Medium Rise Apartment: {this.state.dataReady? itemData.Apartment["Medium Rise Apartments"]:"?"}</li>
                           <li>High Rise Apartment: {this.state.dataReady? itemData.Apartment["High Rise Apartments"]:"?"}</li>
                       </ul>
                   </label>
-                  
+
                   <label className="containerButton">Industrial: {this.state.dataReady? itemData.Industrial.total:"?"}
                     <input type="checkbox" defaultChecked={true}></input>
                     <span className="checkmark"></span>
-                  </label> 
+                  </label>
 
-                    
+
                   <label className="containerButton">Commercial: {this.state.dataReady? itemData.Commercial.total:"?"}
                     <input type="checkbox" defaultChecked={true}></input>
                     <span className="checkmark"></span>
-                  </label> 
+                  </label>
 
                 </ul>
 

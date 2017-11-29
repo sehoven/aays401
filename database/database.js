@@ -1,5 +1,5 @@
 /*
-This script will create a database 
+This script will create a database
 or restore it depending on whether or not it exists.
 The database config info should be stored in a .env file.
 
@@ -23,7 +23,7 @@ const connectionStringPre = 'postgresql://'+process.env.databaseUser+':'+process
 //Drop and recreate
 
 
-  
+
 const client = new pg.Client({
   connectionString: connectionStringPre,
 })
@@ -33,27 +33,27 @@ const client = new pg.Client({
   .catch(e => console.error('Connection Error', e.stack))
 
   client.query('Create Database "'+dbName+'";',function(err,result) {
-    
+
     if(err){
       client.end();
       restore();
     }
-    
+
     //Wait to see if the process exists.
     //If the process exists the restore was successful
     sleep(60*1000);
 
     console.log('Created Database"'+dbName+'"');
-  
+
     const clientNew = new pg.Client({
       connectionString: connectionStringPost,
     })
     clientNew.connect()
       .then(() => console.log('Connected To PostgreSQL'))
       .catch(e => console.error('Connection Error', e.stack))
-    
+
     clientNew.query(sql,function(err,result) {
-      
+
       if(err){
         client.end()
         clientNew.end()
@@ -73,12 +73,12 @@ function restore(){
   clientNew.connect();
   console.log("Restoring Database: "+process.env.databaseName);
 
-  clientNew.query('DROP SCHEMA "'+dbName+'"CASCADE;',function(err,result){
+  clientNew.query('DROP SCHEMA "'+dbName+'"CASCADE;',function(err,result) {
     if(err){
       console.log('Could not drop database schema',err);
     }
     clientNew.query(sql,function(err,result) {
-          
+
       if(err){
         console.log('SQL error\n');
         console.log(err)

@@ -35,20 +35,27 @@ export function login(info) {
                   "headers": {  'Content-Type': 'application/json',
                   'Content-Length': new Buffer(body).length }})
     .then(function(res) {
-      return res.json();
+      return {
+        statusCode: res.status,
+        body: res.json()
+      };
   });
 
 }
 
 export function signup(info) {
   let body = JSON.stringify({ "username" : info.username,"password":info.password,"email":info.email});
+  console.log(body);
   return fetch( ` http://localhost:3000/signup` ,
                 { "method": 'POST',
                     "body": body,
                     "headers": {  'Content-Type': 'application/json',
                     'Content-Length': new Buffer(body).length }})
     .then(function(res) {
-      return res.json();
+      return {
+        statusCode: res.status,
+        body: res.json()
+      };
   });
 
 }

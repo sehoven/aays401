@@ -32,16 +32,12 @@ app.use(function (req, res, next) {
     next();
 });
 
-
-
-
-
 // Handle requests to "/nearby"
 // Returns all known neighborhoods that are within rad from point (lat, lng)
 /**
  * @api {get} /nearby/{Object[]} Get nearby neighbourhoods
  * @apiGroup Polygon
- * 
+ *
  * @apiSuccessExample Success-Response:
  *    HTTP/1.1 200 OK
  *    {
@@ -118,7 +114,7 @@ app.get('/nearby', function(req, res) {
  */
 app.get('/locations', function(req, res) {
   console.log("Location request handler invoked");
-  
+
   if (!req.query) return res.sendStatus(400);
   if ((typeof req.query.name==undefined) || (req.query.name == '')) {
     res.end(JSON.stringify([]));
@@ -161,13 +157,13 @@ app.get('/locations', function(req, res) {
 
             // Converting to format requested by API
             for(let j = 0; j < result.rows[i].latitude.length; ++j) {
-              
+
               latLngs.push({
                 lat: result.rows[i].latitude[j],
                 lng: result.rows[i].longitude[j]
               });
             }
-            
+
             let centerLatLng = {
                 lat:result.rows[i].centerlat,
                 lng:result.rows[i].centerlng
@@ -181,27 +177,27 @@ app.get('/locations', function(req, res) {
               height:result.rows[i].height,
               center:centerLatLng
             });
-            
-            
+
+
           }
           for (let i=0;i<resultinner.rowCount;i++){
-            
+
             let latLngs = [];
-            
+
             // Converting to format requested by API
             for(let j = 0; j < resultinner.rows[i].latitude.length; ++j) {
-                          
+
             latLngs.push({
               lat: resultinner.rows[i].latitude[j],
               lng: resultinner.rows[i].longitude[j]
               });
             }
-                        
+
             let centerLatLng = {
               lat:resultinner.rows[i].centerlat,
               lng:resultinner.rows[i].centerlng
             };
-            
+
             resBody.push({
               name:resultinner.rows[i].title,
               points:latLngs,
@@ -210,8 +206,8 @@ app.get('/locations', function(req, res) {
               height:resultinner.rows[i].height,
               center:centerLatLng
             });
-                        
-                        
+
+
           }
           var json = JSON.stringify(resBody);
           res.writeHead(200, {"Content-Type": "application/json"});
@@ -279,7 +275,7 @@ app.post('/addressCount', function(req, res) {
                   "Industrial": {"title":"Industrial","total":0},
                   "Commercial": {"title":"Commercial","total":0}
                   };
-  
+
 
 
   //Connect to DB
@@ -289,10 +285,10 @@ app.post('/addressCount', function(req, res) {
   client.connect()
   .catch(e => console.error('Connection Error', e.stack))
 
-  
+
   let polygon = [];
 
-  
+
   var maxLat=0;
   var maxLng=0;
   var minLat=0;
@@ -312,7 +308,7 @@ app.post('/addressCount', function(req, res) {
       minLat = req.body.poly[i].lat
     }
   }
-  
+
 
   var queryText = 'SELECT code.subvalue as subvalue,code.value as type, prop.latitude as lat, prop.longitude as lng from aays.tblProperty prop left join aays.luzoningcodes code on code.zoningcode = prop.zoningcode where prop.latitude BETWEEN $1 AND $2 AND prop.longitude BETWEEN $3 AND $4;';
   var values = [minLat,maxLat,minLng,maxLng];
@@ -325,7 +321,7 @@ app.post('/addressCount', function(req, res) {
 
     for(var item in result.rows){
       let point = [result.rows[item].lat,result.rows[item].lng];
-      
+
       if(inside(point,polygon)){
         switch(result.rows[item].type){
 
@@ -370,11 +366,11 @@ app.post('/addressCount', function(req, res) {
       }
     }
 
-    
+
     res.writeHead(200, {"Content-Type": "application/json"});
     var json = JSON.stringify(resBody);
     res.end(json);
-    
+
   });
 });
 
@@ -415,23 +411,22 @@ app.post('/login', function(req, res) {
   console.log("Login request handler invoked");
   var json;
   var resBody=[];
-  
 
   if (!req.body) return res.sendStatus(400);
   if(req.body.password=='' || req.body.username==''){
     resBody.push({
-      "signup":"failed",
+      "login":"fail",
       "reason":"Null variables",
       "code": 40
-      });
-      json = JSON.stringify(resBody);
-      res.writeHead(400, {"Content-Type": "application/json"});
-      res.end(json);
-      return;
+    });
+    json = JSON.stringify(resBody);
+    res.writeHead(400, {"Content-Type": "application/json"});
+    res.end(json);
+    return;
   }
   if( typeof req.body.password=='undefined' || typeof req.body.username =='undefined'){
     resBody.push({
-      "signup":"failed",
+      "login":"fail",
       "reason":"Null variables",
       "code": 40
       });
@@ -440,7 +435,7 @@ app.post('/login', function(req, res) {
       res.end(json);
       return;
   }
-  
+
   var username = req.body.username;
   var password = req.body.password;
   //Connect to DB
@@ -468,7 +463,7 @@ app.post('/login', function(req, res) {
       if(result.rowCount==0){
         resBody.push({
           "login":"fail",
-          "reason": "Username does not exists",
+          "reason": "Username does not exist",
           "code": 42
         });
         json = JSON.stringify(resBody);
@@ -481,12 +476,10 @@ app.post('/login', function(req, res) {
 
       bcrypt.compare(password, result.rows[0].password, function(err, comp) {
         if(comp==true&&result.rows[0].authenticated==true){
-          
           resBody.push({
-            "login":"sucess",
+            "login":"success",
             "reason": "",
             "code": 20
-
           });
           json = JSON.stringify(resBody);
           res.writeHead(200, {"Content-Type": "application/json"});
@@ -514,11 +507,8 @@ app.post('/login', function(req, res) {
           res.writeHead(400, {"Content-Type": "application/json"});
           res.end(json);
           return;
-
         }
       });
-      
-
   });
 });
 
@@ -560,7 +550,7 @@ app.post('/signup', function(req, res) {
   if (!req.body) return res.sendStatus(400);
   if(req.body.password=='' || req.body.username=='' || req.body.email==''){
     resBody.push({
-      "signup":"failed",
+      "signup":"fail",
       "reason":"Null variables",
       "code": 40
       });
@@ -571,7 +561,7 @@ app.post('/signup', function(req, res) {
   }
   if( typeof req.body.password=='undefined' || typeof req.body.username =='undefined'|| typeof req.body.email=='undefined' ){
     resBody.push({
-      "signup":"failed",
+      "signup":"fail",
       "reason":"Null variables",
       "code": 40
       });
@@ -587,7 +577,7 @@ app.post('/signup', function(req, res) {
   client.connect()
   .catch(e => console.error('Connection Error', e.stack))
 
-  
+
   let username = req.body.username;
   let password = req.body.password;
   let email = req.body.email;
@@ -600,7 +590,7 @@ app.post('/signup', function(req, res) {
   client.query(queryText,value,function(err,result) {
     if(err){
       resBody.push({
-        "signup":"failed",
+        "signup":"fail",
         "reason":"Database error",
         "code": 41
       });
@@ -610,11 +600,11 @@ app.post('/signup', function(req, res) {
       client.end();
       return;
     }
-    
-            
+
+
     if(result.rowCount>0){
       resBody.push({
-      "signup":"failed",
+      "signup":"fail",
       "reason":"Username exists",
       "code": 42
       });
@@ -624,15 +614,15 @@ app.post('/signup', function(req, res) {
       client.end();
       return;
     }
-  
-    
+
+
   //Email check
     queryText = "select * from aays.tbluserauth where email = $1;";
     value = [email];
     client.query(queryText,value,function(err,result) {
       if(err){
         resBody.push({
-          "signup":"failed",
+          "signup":"fail",
           "reason":"Database errorr",
           "code": 41
         });
@@ -642,12 +632,12 @@ app.post('/signup', function(req, res) {
         client.end();
         return;
       }
-              
-      
-              
+
+
+
       if(result.rowCount>0){
         resBody.push({
-        "signup":"failed",
+        "signup":"fail",
         "reason":"Sign up failed. Email is owned by another user",
         "code": 42
         });
@@ -657,19 +647,19 @@ app.post('/signup', function(req, res) {
         client.end();
         return;
       }
-    
-              
+
+
       //Password Encryption
       bcrypt.genSalt(saltRounds, function(err, salt) {
         bcrypt.hash(password, salt, function(err, hash) {
-            
-        
+
+
           queryText = "insert into aays.tbluserauth(username,password,email,authenticated) Values($1,$2,$3,$4);";
           value=[username,hash,email,false]
           client.query(queryText,value,function(err,result) {
               if(err){
                 resBody.push({
-                  "signup":"failed",
+                  "signup":"fail",
                   "reason":"Database error",
                   "code": 41
                 });
@@ -679,15 +669,15 @@ app.post('/signup', function(req, res) {
                 client.end();
                 return;
               }
-              
-              
-              
+
+
+
               resBody.push({
                   "signup":"success",
                   "reason":"",
                   "code": 20
               });
-          
+
               json = JSON.stringify(resBody);
               res.writeHead(200, {"Content-Type": "application/json"});
               res.end(json);
@@ -701,6 +691,6 @@ app.post('/signup', function(req, res) {
   });
 });
 
-app.listen(3000, function() {  
+app.listen(3000, function() {
   console.log('API up and running...');
 });

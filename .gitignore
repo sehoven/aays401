@@ -13,3 +13,5 @@ docs/apidoc/*
 
 #ignore enviroment variables
 .env
+
+database/aaysDB.sql
