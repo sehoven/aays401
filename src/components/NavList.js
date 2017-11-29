@@ -1,4 +1,6 @@
 import React, {Component} from 'react';
+import ReactLoading from 'react-loading';
+
 const HTTPService = require('./HTTPService.js');
 
 /*================================
@@ -6,46 +8,46 @@ Receives a pointer to the index.js object, and two lists:
 autocomplete, data in props
 ================================*/
 class IconCanvas extends Component {
-    componentDidMount() {
-      this.updateCanvas();
-    }
+  componentDidMount() {
+    this.updateCanvas();
+  }
 
-    // If looking for performance bottlenecks, look here
-    updateCanvas() {
-      let size = 100;
-      const context = this.refs.canvas.getContext("2d");
+  // If looking for performance bottlenecks, look here
+  updateCanvas() {
+    let size = 100;
+    const context = this.refs.canvas.getContext("2d");
 
-      if (context != null) {
-        let item = this.props.item;
-        let points = item.points;
-        let scaleFactor = (size*0.9)/Math.max(item.width, item.height);
-        let xx = (size/2) + (points[0].lat - item.center.lat) * scaleFactor;
-        let yy = (size/2) + (points[0].lng - item.center.lng) * scaleFactor;
-        context.moveTo(xx, yy);
-        context.beginPath();
-        for (let i = 1; i < points.length; i += 1){
-          let xx = (size/2) + (points[i].lat - item.center.lat) * scaleFactor;
-          let yy = (size/2) + (points[i].lng - item.center.lng) * scaleFactor;
-          context.lineTo(xx, yy);
-        }
-        context.closePath();
-        context.fillStyle = "rgb(150,150,255)";
-        context.lineWidth = 2;
-        context.strokeStyle = "black";
-        context.fill();
-        context.stroke();
+    if (context != null) {
+      let item = this.props.item;
+      let points = item.points;
+      let scaleFactor = (size*0.9)/Math.max(item.width, item.height);
+      let xx = (size/2) + (points[0].lat - item.center.lat) * scaleFactor;
+      let yy = (size/2) + (points[0].lng - item.center.lng) * scaleFactor;
+      context.moveTo(xx, yy);
+      context.beginPath();
+      for (let i = 1; i < points.length; i += 1){
+        let xx = (size/2) + (points[i].lat - item.center.lat) * scaleFactor;
+        let yy = (size/2) + (points[i].lng - item.center.lng) * scaleFactor;
+        context.lineTo(xx, yy);
       }
+      context.closePath();
+      context.fillStyle = "rgb(150,150,255)";
+      context.lineWidth = 2;
+      context.strokeStyle = "black";
+      context.fill();
+      context.stroke();
     }
+  }
 
-    render() {
-      return (
-        <canvas
-          className="navbar-list-icon"
-          ref="canvas"
-          width="100"
-          height="100" />
-      );
-    }
+  render() {
+    return (
+      <canvas
+      className="navbar-list-icon"
+      ref="canvas"
+      width="100"
+      height="100" />
+    );
+  }
 }
 
 export default class NavList extends React.Component {
@@ -58,16 +60,18 @@ export default class NavList extends React.Component {
   }
 
   componentWillUnmount(){
-    if (this.willInject){
+    if (this.willInject) {
       this.polygon = null;
     } else {
-      if (this.polygon) this.polygon.setMap(null);
+      if (this.polygon) {
+        this.polygon.setMap(null);
+      }
     }
   }
 
   centerMapOnId(placeId){
     if (!this.geocoder){
-       this.geocoder = new this.props.maps.Geocoder();
+      this.geocoder = new this.props.maps.Geocoder();
     }
     let map = this.props.map;
     this.geocoder.geocode({'placeId': placeId}, function(results, status) {
@@ -75,10 +79,11 @@ export default class NavList extends React.Component {
         console.log('Geocoder failed due to: ' + status);
         return;
       }
-      map.setZoom(11);
+      map.setZoom(17);
       map.setCenter(results[0].geometry.location);
     });
   }
+
 
   neighbourhoodClicked(center, itemData){
     let map = this.props.map;
@@ -89,53 +94,53 @@ export default class NavList extends React.Component {
     let zoomFactor = (baseZoom - polygonZoomVariation) * viewportZoomFactor
     map.setZoom(Math.floor(zoomFactor));
     map.setCenter(center);
-    let that = this;
-    // HTTPService.countPolyResidences(itemData).then(function(json){
-    //   let dataList = that.props.overlayRef.state.data == null ? that.props.overlayRef.state.data : [];
-    //   dataList.push(json);
-    //   that.props.overlayRef.setState({dataReady: true, data: dataList});
-    // });
-    if (this.polygon){
+
+    if (this.polygon) {
       this.polygon.setMap(null);
     }
     this.polygon = new this.props.maps.Polygon({
-          paths: itemData.points,
-          strokeWeight: 0,
-          fillOpacity: 0.45,
-          zIndex: 1
+      paths: itemData.points,
+      strokeWeight: 0,
+      fillOpacity: 0.10,
+      zIndex: 1
     });
     this.polygon.setMap(map);
-    that.willInject = true;
-    that.props.tabsRef.injectNeighborhood(this.polygon);
+    this.willInject = true;
+    this.props.tabsRef.injectNeighborhood(this.polygon);
   }
 
   render() {
+    // There is a loading spinner component but it doesn't seem to load fast enough to be seen
+    // <ReactLoading className="center-horizontal" type={"spin"} color={"#888"} height="100px" width="100px"/>
+    // Try replacing "Loading..." with the line above to try it
     if (!this.props.data.ready){
-      return <div id="navbar-list">Loading...</div>
+      return (
+        <div id="navbar-list">
+          Loading...
+        </div>
+      )
     } else {
       return (
         <div id="navbar-list">
           {this.props.autocomplete.map((itemData, i) =>
             <div className="navbar-list-autocomplete-item"
-              key={i}
-              onClick={
-                () => {this.centerMapOnId(this.props.placeIds[i].place_id)}
+            key={i}
+            onClick={
+              () => {this.centerMapOnId(this.props.placeIds[i].place_id)}
             }>
-              <div className="navbar-list-autocomplete-text">
-                {itemData}
-              </div>
+              <div className="navbar-list-autocomplete-text">{itemData}</div>
             </div>
-        )}
-        {this.props.data.data.map((itemData, i) =>
-          <div className="navbar-list-item"
+          )}
+          {this.props.data.data.map((itemData, i) =>
+            <div className="navbar-list-item"
             key={i}
             onClick={
               () => { this.neighbourhoodClicked(itemData.center, itemData) }
-          }>
-            <IconCanvas key={i} item={itemData} />
-            <div className="navbar-list-text"><p>{itemData.name}</p></div>
-          </div>
-        )}
+            }>
+              <IconCanvas key={i} item={itemData} />
+              <div className="navbar-list-text">{itemData.name}</div>
+            </div>
+          )}
         </div>
       );
     }
