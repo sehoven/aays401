@@ -32,7 +32,6 @@ export default class MapContainer extends Component {
   render() {
     return (
       <div>
-        <AppBar />
         <div className="container">
           <div className="left">
             { this.state.mapLoaded &&

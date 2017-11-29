@@ -125,7 +125,7 @@ class AuthPage extends Component {
         </form>
         <ReactModal isOpen={this.state.showModal}
                     contentLabel="Minimal Modal Example"
-                    className="modal">
+                    className="modal modal-auth">
           <h2 id="modal-title">{this.state.modalTitle}</h2>
           <p id="modal-message">{this.state.modalMessage}</p>
           <button onClick={this.handleCloseModal}>OK</button>
