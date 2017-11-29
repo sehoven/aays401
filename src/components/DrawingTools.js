@@ -191,7 +191,6 @@ export default class DrawingTools extends Component {
       polygonOptions.strokeWeight = 0.2;
     }
     polygonOptions.strokeColor = polygonOptions.fillColor;
-    console.log("CONSTRUCT", this.props.polyNum);
   }
 
   componentDidMount() {
@@ -199,7 +198,6 @@ export default class DrawingTools extends Component {
   }
 
   componentWillUpdate() {
-    console.log("UPDATE", this.props.polyNum);
     if(this.props.polyNum == 0){
       polygonOptions.fillColor = '#000000';
       polygonOptions.fillOpacity = 0.20;

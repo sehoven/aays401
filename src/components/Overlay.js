@@ -12,7 +12,7 @@ export class Overlay extends Component {
     super(props);
 
     this.state = {
-      isDrawing: false,
+      isDrawing: false
     }
   }
 
@@ -108,7 +108,6 @@ export class Overlay extends Component {
         </center>
         &nbsp;
       </div>
-
     )
   }
 }
@@ -127,10 +126,46 @@ export default class OverlayContainer extends Component {
       polyNum: 0,
       dataReady: false,
       data: [],
-      url: []
+      url: [],
+      residenceFilter: true,
+      apartmentFilter: true,
+      industrialFilter: true,
+      commercialFilter: true,
+      unspecifiedFilter: true
     }
 
     this.circles = []; // Changing this data shouldn't cause re-render
+  }
+
+  toggleFilter(filter){
+    switch (filter){
+      case "Residences":
+        this.setState((prevState) => (
+          { residenceFilter: !prevState.residenceFilter }
+        ));
+        break;
+      case "Apartments":
+        this.setState((prevState) => (
+          { apartmentFilter: !prevState.apartmentFilter }
+        ));
+        break;
+      case "Industrial":
+        this.setState((prevState) => (
+          { industrialFilter: !prevState.industrialFilter }
+        ));
+        break;
+      case "Commercial":
+        this.setState((prevState) => (
+          { commercialFilter: !prevState.commercialFilter }
+        ));
+        break;
+      case "Unspecified":
+        this.setState((prevState) => (
+          { unspecifiedFilter: !prevState.unspecifiedFilter }
+        ));
+        break;
+    }
+    this.showUnits();
   }
 
   toggleDrawingTools(value, callback) {
@@ -288,18 +323,23 @@ export default class OverlayContainer extends Component {
         var color;
         switch (json[item]["type"]){
           case "Residential":
+            if (!that.state.residenceFilter) continue;
             color = 'rgb(160, 0, 55)';
             break;
           case "Apartment":
+            if (!that.state.apartmentFilter) continue;
             color = '#d3882b';
             break;
           case "Industrial":
+            if (!that.state.industrialFilter) continue;
             color = '#08d312';
             break;
           case "Commercial":
+            if (!that.state.commercialFilter) continue;
             color = '#3e43d3';
             break;
           default:
+            if (!that.state.unspecifiedFilter) continue;
             color = 'black';
             break;
         }
@@ -452,35 +492,35 @@ export default class OverlayContainer extends Component {
             <div className="checkbox-holder">
               <div className="fifth-checkbox">
                 <label id="checkbox-red" className="containerButton">
-                  <input type="checkbox" defaultChecked={true}></input>
+                  <input type="checkbox" onClick={() => this.toggleFilter("Residences")} defaultChecked={true}></input>
                   <span className="checkmark"></span>
                   Residences
                 </label>
               </div>
               <div className="fifth-checkbox">
               <label id="checkbox-orange" className="containerButton">
-                <input type="checkbox" defaultChecked={true}></input>
+                <input type="checkbox" onClick={() => this.toggleFilter("Apartments")} defaultChecked={true} defaultChecked={true}></input>
                 <span className="checkmark"></span>
                 Apartments
               </label>
               </div>
               <div className="fifth-checkbox">
               <label id="checkbox-green" className="containerButton">
-                <input type="checkbox" defaultChecked={true}></input>
+                <input type="checkbox" onClick={() => this.toggleFilter("Industrial")} defaultChecked={true} defaultChecked={true}></input>
                 <span className="checkmark"></span>
                 Industrial
               </label>
               </div>
               <div className="fifth-checkbox">
               <label id="checkbox-blue" className="containerButton">
-                <input type="checkbox" defaultChecked={true}></input>
+                <input type="checkbox" onClick={() => this.toggleFilter("Commercial")} defaultChecked={true} defaultChecked={true}></input>
                 <span className="checkmark"></span>
                 Commercial
               </label>
               </div>
               <div className="fifth-checkbox">
               <label id="checkbox-black" className="containerButton">
-                <input type="checkbox" defaultChecked={true}></input>
+                <input type="checkbox" onClick={() => this.toggleFilter("Unspecified")} defaultChecked={true} defaultChecked={true}></input>
                 <span className="checkmark"></span>
                 Unspecified
               </label>
@@ -491,16 +531,26 @@ export default class OverlayContainer extends Component {
                 <div className="navbar-count-poly-box" key={i}>
                   <div className="navbar-image-box"><a href={this.state.url[i]} download="map">{<img className="image" src= {this.state.url[i]}/>}</a></div>
                   <div className="navbar-count-poly-text">
-                    <label className="containerButton">Residences: {this.state.dataReady? itemData.Residential.total:"?"}
-                    </label>
-                    <label className="containerButton">Apartments: {this.state.dataReady? itemData.Apartment.total:"?"}
-                    </label>
-                    <label className="containerButton">Industrial: {this.state.dataReady? itemData.Industrial.total:"?"}
-                    </label>
-                    <label className="containerButton">Commercial: {this.state.dataReady? itemData.Commercial.total:"?"}
-                    </label>
-                    <label className="containerButton">Unspecified: {this.state.dataReady? itemData.Other:"?"}
-                    </label>
+                    { this.state.residenceFilter &&
+                      <label className="containerButton">Residences: {this.state.dataReady? itemData.Residential.total:"?"}
+                      </label>
+                    }
+                    { this.state.apartmentFilter &&
+                      <label className="containerButton">Apartments: {this.state.dataReady? itemData.Apartment.total:"?"}
+                      </label>
+                    }
+                    { this.state.industrialFilter &&
+                      <label className="containerButton">Industrial: {this.state.dataReady? itemData.Industrial.total:"?"}
+                      </label>
+                    }
+                    { this.state.commercialFilter &&
+                      <label className="containerButton">Commercial: {this.state.dataReady? itemData.Commercial.total:"?"}
+                      </label>
+                    }
+                    { this.state.unspecifiedFilter &&
+                      <label className="containerButton">Unspecified: {this.state.dataReady? itemData.Other:"?"}
+                      </label>
+                    }
                   </div>
                 </div>
               ): null}
