@@ -1,14 +1,9 @@
 const fetch = require('node-fetch');
-
-export function getNearby(lat, lng, rad) {
-  return fetch(` http://localhost:3000/nearby?lat=${lat}&lng=${lng}&rad=${rad}` )
-    .then(function(response) {
-      return response.json();
-    });
-}
+import { LOCATIONS_ADDRESS, COUNT_ADDRESS,
+          LOGIN_ADDRESS, SIGNUP_ADDRESS } from '../settings';
 
 export function searchLists(term) {
-  return fetch(` http://localhost:3000/locations?name=${term}` )
+  return fetch(`${LOCATIONS_ADDRESS}name=${term}` )
     .then(function(response) {
       return response.json();
     });
@@ -17,7 +12,7 @@ export function searchLists(term) {
 
 export function countPolyResidences(polyData) {
   let body = JSON.stringify({ "poly" : polyData.points});
-  return fetch( `http://localhost:3000/addressCount` ,
+  return fetch( `${COUNT_ADDRESS}`,
                 { "method": 'POST',
                   "body": body,
                   "headers": {  'Content-Type': 'application/json',
@@ -29,7 +24,7 @@ export function countPolyResidences(polyData) {
 
 export function login(info) {
   let body = JSON.stringify({ "username" : info.username,"password":info.password});
-  return fetch( ` http://localhost:3000/login` ,
+  return fetch(`${LOGIN_ADDRESS}`,
                 { "method": 'POST',
                   "body": body,
                   "headers": {  'Content-Type': 'application/json',
@@ -42,7 +37,7 @@ export function login(info) {
 
 export function signup(info) {
   let body = JSON.stringify({ "username" : info.username,"password":info.password,"email":info.email});
-  return fetch( ` http://localhost:3000/signup` ,
+  return fetch(`${SIGNUP_ADDRESS}`,
                 { "method": 'POST',
                     "body": body,
                     "headers": {  'Content-Type': 'application/json',
