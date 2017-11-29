@@ -451,24 +451,14 @@ export default class OverlayContainer extends Component {
                 <div className="navbar-image-box"><a href={this.state.url[i]} download="map">{<img className="image" src= {this.state.url[i]}/>}</a></div>
                 <div className="navbar-count-poly-text">
                   <label className="containerButton">Residences: {this.state.dataReady? itemData.Residential.total:"?"}
-                    <input type="checkbox" defaultChecked={true}></input>
-                    <span className="checkmark"></span>
                   </label>
                   <label className="containerButton">Apartments: {this.state.dataReady? itemData.Apartment.total:"?"}
-                  <input type="checkbox" defaultChecked={true}></input>
-                  <span className="checkmark"></span>
                   </label>
                   <label className="containerButton">Industrial: {this.state.dataReady? itemData.Industrial.total:"?"}
-                    <input type="checkbox" defaultChecked={true}></input>
-                    <span className="checkmark"></span>
                   </label>
                   <label className="containerButton">Commercial: {this.state.dataReady? itemData.Commercial.total:"?"}
-                    <input type="checkbox" defaultChecked={true}></input>
-                    <span className="checkmark"></span>
                   </label>
                   <label className="containerButton">Unspecified: {this.state.dataReady? itemData.Other:"?"}
-                    <input type="checkbox" defaultChecked={true}></input>
-                    <span className="checkmark"></span>
                   </label>
                 </div>
               </div>

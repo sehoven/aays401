@@ -201,7 +201,7 @@ body
 
 .navbar-count-poly-text
   display: table-cell
-  margin-right: 10px
+  vertical-align: middle
 
 .navbar-image-box
   display: table-cell
@@ -363,45 +363,5 @@ buttonLarge:hover
 .containerButton
   display: block
   position: relative
-  padding-left: 55px
-  margin-bottom: 12px
-  cursor: pointer
+  padding-left: 30px
   font-size: 18px
-  input
-    position: absolute
-    opacity: 0
-
-.checkmark
-  border: solid black
-  position: absolute
-  margin-left: 20px
-  top: 0
-  left: 0
-  height: 20px
-  width: 20px
-  background-color: #eee
-
-.containerButton
-  &:hover input ~ .checkmark
-    background-color: #ccc
-  input:checked ~ .checkmark
-    background-color: #4f5b62
-
-.checkmark:after
-  content: ""
-  position: absolute
-  display: none
-
-.containerButton
-  input:checked ~ .checkmark:after
-    display: block
-  .checkmark:after
-    left: 7px
-    top: 1px
-    width: 5px
-    height: 12px
-    border: solid white
-    border-width: 0 3px 3px 0
-    -webkit-transform: rotate(45deg)
-    -ms-transform: rotate(45deg)
-    transform: rotate(45deg)
