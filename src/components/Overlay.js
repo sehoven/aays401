@@ -132,20 +132,24 @@ export class Overlay extends Component {
 
     let drawButton = <button id="draw-button" onClick={this.drawClick.bind(this)}>DRAW</button>;
     let clearButton = <button id="clear-button" onClick={this.clearClick.bind(this)}>CLEAR</button>;
-    let cancelButton = <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)}>RETURN</button>;
-    let finishButton = <button id="finish-draw-button" onClick={this.finishClick.bind(this)}>FINISH</button>;
-    let addButton = <button id="add-draw-button" onClick={this.addClick.bind(this)}>ADD</button>;
+    let cancelButton = <button id="cancel-draw-button" style={{width: 120}} onClick={this.cancelClick.bind(this)}>RETURN</button>;
+    let finishButton = <button id="finish-draw-button" style={{width: 120}} onClick={this.finishClick.bind(this)}>FINISH</button>;
+    let addButton = <button id="add-draw-button" style={{width: 120}}  onClick={this.addClick.bind(this)}>ADD</button>;
 
     return (
       <div className="overlayContainer">
         {this.state.banner}
         <NotificationContainer/>
+        <center>
         { this.state.isDrawing ? null : drawButton }
         { this.state.isDrawing || !this.props.canClear ? null : clearButton }
         { this.state.isDrawing ? cancelButton : null }
         { this.state.isDrawing ? finishButton : null }
         { this.state.isDrawing ? addButton : null }
+        </center>
+        &nbsp;
       </div>
+      
     )
   }
 }
@@ -244,7 +248,7 @@ export default class OverlayContainer extends Component {
           fillColor = (this.state.outerPolygon.polygon.fillColor == null)?"0x000000":
                       this.state.outerPolygon.polygon.fillColor.replace("#","0x");
           fillOpacity = this.state.outerPolygon.polygon.fillOpacity;
-          console.log(fillColor, fillOpacity);
+
       }
       else if(this.checkOuterPolygonExists() && (this.state.polyNum < this.getInnerPolygonsCount() + this.checkOuterPolygonExists())){
           let poly = this.state.innerPolygons.getAt(this.getInnerPolygonsCount() - 1);
@@ -252,9 +256,9 @@ export default class OverlayContainer extends Component {
           fillColor = (poly.polygon.fillColor == null)?"0x000000":
                           poly.polygon.fillColor.replace("#","0x");
           fillOpacity = poly.polygon.fillOpacity;
-          console.log(fillColor, fillOpacity);
+
       }
-    //if(this.state.polyNum < this.state.polygons.size()) {
+    
       if(polygon) {
         HTTPService.countPolyResidences(
           { points: polygon }
@@ -294,6 +298,7 @@ export default class OverlayContainer extends Component {
             }));
             let fillColor = (polygon.polygon.fillColor == null)?"0x000000":
                             polygon.polygon.fillColor.replace("#","0x");
+            console.log(polygon.polygon.fillOpacity);
             that.setImgUrl( polygonPoints,
                             fillColor,
                             polygon.polygon.fillOpacity);
@@ -364,7 +369,7 @@ export default class OverlayContainer extends Component {
   }
 
   setImgUrl(polygon, rgb, a){
-    let rgba = rgb + Math.floor((a*256).toString(16));
+    let rgba = rgb + Math.floor(parseFloat((a*256).toString(16)));
     let url="https://maps.googleapis.com/maps/api/staticmap?&size=1000x1000&path=color:"+rgb+"|weight:5|fillcolor:"+rgba;
     if(polygon != null && polygon.length >= 2) {
       polygon.forEach(function(position) {
@@ -373,6 +378,7 @@ export default class OverlayContainer extends Component {
       // Static API doesn't have polygon autocomplete. Close the path manually.
       url += "|" + polygon[0].lat + "," + polygon[0].lng;
     }
+    url += "&key=AIzaSyC2mXFuLvwiASA3mSr2kz79fnXUYRwLKb8";
     this.setState(prevState => ({
       url: [...prevState.url, url]
     }));
@@ -408,20 +414,44 @@ export default class OverlayContainer extends Component {
           <div id="navbar-list">
             {this.state.dataReady ? this.state.data.map((itemData, i)=>
               <div className="navbar-count-poly-box" key={i}>
-                <div className="navbar-count-poly-title">Polygon {i}</div>
-                <div className="navbar-count-poly-text">
-                  <ul>
-                    <li>Residences: {this.state.dataReady ? itemData["Residential"]:"?"}</li>
-                    <li>Apartments: {this.state.dataReady ? itemData["Apartment"]:"?"}</li>
-                    <li>Industrial: {this.state.dataReady ? itemData["Industrial"]:"?"}</li>
-                    <li>Commercial: {this.state.dataReady ? itemData["Commercial"]:"?"}</li>
-                    <li>Development Control Provision: {this.state.dataReady ? itemData["DirectDevelopmentControlProvision"]:"?"}</li>
-                    <li>Urban: {this.state.dataReady ? itemData["UrbanService"]:"?"}</li>
-                    <li>Agriculture: {this.state.dataReady ? itemData["Agriculture"]:"?"}</li>
-                    <li>Other: {this.state.dataReady ? itemData["Other"]:"?"}</li>
-                  </ul>
-                </div>
-                <a href={this.state.url[i]} download="map">{<img className="image" src= {this.state.url[i]}/>}</a>
+                <div className="navbar-count-poly-title"><p style={{padding: 15}}>POLYGON {i+1}</p></div>
+                <ul className="navbar-count-poly-text">
+                  <label className="containerButton">Residences: {this.state.dataReady? itemData.Residential.total:"?"}
+                    <input type="checkbox" defaultChecked={true}></input>
+                    <span className="checkmark"></span>
+                      <ul className="navbar-count-inner-poly-text">
+                        <li>Single House: {this.state.dataReady? itemData.Residential["Single Detached Home"]:"?"}</li>
+                        <li>House / Duplex: {this.state.dataReady? itemData.Residential["Single Detached Home / Duplex"]:"?"}</li>
+                        <li>Townhouse: {this.state.dataReady? itemData.Residential["Townhome"]:"?"}</li>
+                        <li>Motor Home: {this.state.dataReady? itemData.Residential["Mobile Home"]:"?"}</li>
+                      </ul>
+                  </label>
+                  
+                  <label className="containerButton">Apartments: {this.state.dataReady? itemData.Apartment.total:"?"}
+                  <input type="checkbox" defaultChecked={true}></input>
+                  <span className="checkmark"></span>
+                    
+                      <ul className="navbar-count-inner-poly-text">
+                          <li>Low Rise Apartment: {this.state.dataReady? itemData.Apartment["Low Rise Apartments"]:"?"}</li>
+                          <li>Medium Rise Apartment: {this.state.dataReady? itemData.Apartment["Medium Rise Apartments"]:"?"}</li>
+                          <li>High Rise Apartment: {this.state.dataReady? itemData.Apartment["High Rise Apartments"]:"?"}</li>
+                      </ul>
+                  </label>
+                  
+                  <label className="containerButton">Industrial: {this.state.dataReady? itemData.Industrial.total:"?"}
+                    <input type="checkbox" defaultChecked={true}></input>
+                    <span className="checkmark"></span>
+                  </label> 
+
+                    
+                  <label className="containerButton">Commercial: {this.state.dataReady? itemData.Commercial.total:"?"}
+                    <input type="checkbox" defaultChecked={true}></input>
+                    <span className="checkmark"></span>
+                  </label> 
+
+                </ul>
+
+                <center><a href={this.state.url[i]} download="map">{<img className="image" src= {this.state.url[i]}/>}</a></center>
 
               </div>
             ): null}
@@ -513,5 +543,43 @@ class PolygonArray {
 
   size() {
     return this.arr.length;
+  }
+  convertOneToLatLng(polygon) {
+    let latLngs = [];
+    if(polygon != null) {
+      let path = polygon.getPath();
+      for(let i = 0; i < path.getLength(); ++i) {
+        let vertex = path.getAt(i);
+        latLngs.push({
+          lat: vertex.lat(),
+          lng: vertex.lng()
+        });
+      }
+    }
+    return latLngs;
+  }
+
+  convertToLatLng(i) {
+    let latLngs = [];
+    if(i > -1 && i < this.arr.length) {
+      let path = this.arr[i].getPath();
+      for(let j = 0; j < path.getLength(); ++j) {
+        let vertex = path.getAt(j);
+        latLngs.push({
+          lat: vertex.lat(),
+          lng: vertex.lng()
+        });
+      }
+    }
+    return latLngs;
+  }
+  // Converts the whole array of polygons to objects with the lat/lng pairs for each point
+  convertAllToLatLng() {
+    let allPolygons = [];
+    for(let i = 0; i < this.arr.length; ++i) {
+      allPolygons.push(convertToLatLng(this.arr[i]));
+    }
+
+    return allPolygons;
   }
 }

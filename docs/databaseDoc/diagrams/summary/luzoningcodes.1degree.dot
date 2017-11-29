@@ -23,6 +23,7 @@ digraph "luzoningcodes" {
       <TR><TD COLSPAN="3" BGCOLOR="#9bab96" ALIGN="CENTER">luzoningcodes</TD></TR>
       <TR><TD PORT="zoningcode" COLSPAN="3" BGCOLOR="#bed1b8" ALIGN="LEFT">zoningcode</TD></TR>
       <TR><TD PORT="value" COLSPAN="3" ALIGN="LEFT">value</TD></TR>
+      <TR><TD PORT="subvalue" COLSPAN="3" ALIGN="LEFT">subvalue</TD></TR>
       <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">  </TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">72 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
     </TABLE>>
     URL="tables/luzoningcodes.html"
