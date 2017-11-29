@@ -22,7 +22,6 @@ export default class LandingPage extends Component {
   }
 
   render() {
-    const authPage = <div><AppBar />AUTHENTICATE</div>;
     return (
       <div>
         <AppBar />
