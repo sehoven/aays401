@@ -7,12 +7,7 @@ export default class Tabs extends Component {
     super(props);
     this.state = {
       currentPanel: this.props.PanelType.SEARCH,
-      overlay: null
     }
-  }
-
-  componentDidMount(){
-    this.setState({ overlay: this.overlay })
   }
 
   swapState(toggle){
@@ -21,48 +16,43 @@ export default class Tabs extends Component {
 
   injectNeighborhood(polygon){
     this.setState({ currentPanel : this.props.PanelType.DRAW });
-    this.overlay.resetPolygon();
-    let polygonList = this.overlay.state.polygons;
-    polygonList.add(polygon);
-    this.overlay.setState({ polygons: polygonList});
-    this.overlay.updatePolygonData();
+    this.overlay.addFirstPolygon(polygon);
   }
 
   render() {
     const { currentPanel } = this.state;
     return (
-      <div id="leftContainer">
+      <div className="tabContainer">
+        <div className="tabButtons">
+        <div
+          className= {
+            "tabButton " +
+            ((currentPanel == this.props.PanelType.SEARCH) ? "activeTabButton" : "")
+          }
+          id="search-tab"
+          onClick={() => { this.swapState(this.props.PanelType.SEARCH) }} >
+          <div><p>Search</p></div>
+        </div>
+        <div
+          className={
+            "tabButton " +
+            ((currentPanel == this.props.PanelType.DRAW) ? "activeTabButton" : "")
+          }
+          id="draw-tab"
+          onClick={() => { this.swapState(this.props.PanelType.DRAW) }} >
+          <div><p>Draw</p></div>
+        </div>
+        </div>
         <NavPanel
           map={this.props.map}
           maps={this.props.maps}
           active={ currentPanel == this.props.PanelType.SEARCH }
-          overlayRef={this.state.overlay}
           tabsRef={this} />
         <OverlayContainer
           ref={(instance) => {this.overlay = instance}}
           active={ currentPanel == this.props.PanelType.DRAW }
           map={this.props.map}
           maps={this.props.maps} />
-        <div id="tabButtons">
-          <div
-            className= {
-              "tabButton " +
-              ((currentPanel == this.props.PanelType.SEARCH) ? "activeTabButton" : "")
-            }
-            id="search-tab"
-            onClick={() => { this.swapState(this.props.PanelType.SEARCH) }} >
-            <div className="buttonText"><p>Search</p></div>
-          </div>
-          <div
-            className={
-              "tabButton " +
-              ((currentPanel == this.props.PanelType.DRAW) ? "activeTabButton" : "")
-            }
-            id="draw-tab"
-            onClick={() => { this.swapState(this.props.PanelType.DRAW) }} >
-            <div className="buttonText"><p>Draw</p></div>
-          </div>
-        </div>
       </div>
     )
   }

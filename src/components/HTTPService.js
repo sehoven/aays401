@@ -16,10 +16,8 @@ export function searchLists(term) {
 }
 
 export function countPolyResidences(polyData) {
-  let body = JSON.stringify({ "poly" : polyData.points,
-                              "center" : polyData.center,
-                              "radius": polyData.radius});
-  return fetch( ` http://localhost:3000/addressCount` ,
+  let body = JSON.stringify({ "poly" : polyData.points});
+  return fetch( `http://localhost:3000/addressCount` ,
                 { "method": 'POST',
                   "body": body,
                   "headers": {  'Content-Type': 'application/json',
@@ -27,4 +25,30 @@ export function countPolyResidences(polyData) {
     .then(function(res) {
         return res.json();
     });
+}
+
+export function login(info) {
+  let body = JSON.stringify({ "username" : info.username,"password":info.password});
+  return fetch( ` http://localhost:3000/login` ,
+                { "method": 'POST',
+                  "body": body,
+                  "headers": {  'Content-Type': 'application/json',
+                  'Content-Length': new Buffer(body).length }})
+    .then(function(res) {
+      return res.json();
+  });
+
+}
+
+export function signup(info) {
+  let body = JSON.stringify({ "username" : info.username,"password":info.password,"email":info.email});
+  return fetch( ` http://localhost:3000/signup` ,
+                { "method": 'POST',
+                    "body": body,
+                    "headers": {  'Content-Type': 'application/json',
+                    'Content-Length': new Buffer(body).length }})
+    .then(function(res) {
+      return res.json();
+  });
+
 }

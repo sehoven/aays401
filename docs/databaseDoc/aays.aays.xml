@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<database name="aays" schema="aays" type="PostgreSQL - 9.6.5">
+   <tables>
+      <table name="luzoningcodes" numRows="72" remarks="" schema="aays" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="zoningcode" nullable="false" remarks="" size="255" type="varchar">
+            <child column="zoningcode" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" table="tblproperty"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="value" nullable="true" remarks="" size="255" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="subvalue" nullable="true" remarks="" size="255" type="varchar"/>
+         <primaryKey column="zoningcode" sequenceNumberInPK="1"/>
+         <index name="ZoningCode" unique="true">
+            <column ascending="true" name="zoningcode"/>
+            <column ascending="true" name="zoningcode"/>
+         </index>
+      </table>
+      <table name="tblneighbourhood" numRows="388" remarks="" schema="aays" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('aays.&quot;tblNeighbourhood_NeighbourhoodId_seq&quot;'::regclass)" digits="0" id="0" name="neighbourhoodid" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="title" nullable="true" remarks="" size="255" type="varchar"/>
+         <column autoUpdated="false" digits="17" id="2" name="latitude" nullable="true" remarks="" size="17" type="_float8"/>
+         <column autoUpdated="false" digits="17" id="3" name="longitude" nullable="true" remarks="" size="17" type="_float8"/>
+         <column autoUpdated="false" digits="17" id="4" name="centerlat" nullable="true" remarks="" size="17" type="float8"/>
+         <column autoUpdated="false" digits="17" id="5" name="centerlng" nullable="true" remarks="" size="17" type="float8"/>
+         <column autoUpdated="false" digits="17" id="6" name="radius" nullable="true" remarks="" size="17" type="float8"/>
+         <column autoUpdated="false" digits="17" id="7" name="width" nullable="true" remarks="" size="17" type="float8"/>
+         <column autoUpdated="false" digits="17" id="8" name="height" nullable="true" remarks="" size="17" type="float8"/>
+         <primaryKey column="neighbourhoodid" sequenceNumberInPK="1"/>
+         <index name="NeighbourhoodId" unique="true">
+            <column ascending="true" name="neighbourhoodid"/>
+         </index>
+         <index name="TitleIndex" unique="false">
+            <column ascending="true" name="title"/>
+         </index>
+      </table>
+      <table name="tblproperty" numRows="345508" remarks="" schema="aays" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="streetaddress" nullable="true" remarks="" size="255" type="varchar"/>
+         <column autoUpdated="false" digits="17" id="1" name="latitude" nullable="true" remarks="" size="17" type="float8"/>
+         <column autoUpdated="false" digits="17" id="2" name="longitude" nullable="true" remarks="" size="17" type="float8"/>
+         <column autoUpdated="false" digits="0" id="3" name="zoningcode" nullable="true" remarks="" size="255" type="varchar">
+            <parent column="zoningcode" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" table="luzoningcodes"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="4" name="housenumber" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="true" defaultValue="nextval('aays.&quot;tblProperty_PropertyId_seq&quot;'::regclass)" digits="0" id="5" name="propertyid" nullable="false" remarks="" size="10" type="serial"/>
+         <column autoUpdated="false" digits="0" id="6" name="suite" nullable="true" remarks="" size="255" type="varchar"/>
+         <primaryKey column="propertyid" sequenceNumberInPK="1"/>
+         <index name="tblProperty_pkey" unique="true">
+            <column ascending="true" name="propertyid"/>
+         </index>
+         <index name="LatitudeIndex" unique="false">
+            <column ascending="true" name="latitude"/>
+         </index>
+         <index name="LatLongIndex" unique="false">
+            <column ascending="true" name="latitude"/>
+            <column ascending="true" name="longitude"/>
+         </index>
+         <index name="LongitudeIndex" unique="false">
+            <column ascending="true" name="longitude"/>
+         </index>
+      </table>
+      <table name="tblsavedzones" numRows="0" remarks="" schema="aays" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="userid" nullable="true" remarks="" size="19" type="int8"/>
+         <column autoUpdated="false" digits="0" id="1" name="date" nullable="true" remarks="" size="13" type="date"/>
+         <column autoUpdated="false" digits="0" id="2" name="title" nullable="true" remarks="" size="255" type="varchar"/>
+         <column autoUpdated="false" digits="17" id="3" name="outerpolygon" nullable="true" remarks="" size="17" type="_float8"/>
+         <column autoUpdated="false" digits="0" id="4" name="innerpolygon" nullable="true" remarks="" size="2147483647" type="json"/>
+         <column autoUpdated="true" defaultValue="nextval('aays.tblsavedzones_savedid_seq'::regclass)" digits="0" id="5" name="savedid" nullable="false" remarks="" size="19" type="bigserial"/>
+         <primaryKey column="savedid" sequenceNumberInPK="1"/>
+         <index name="tblsavedzones_pkey" unique="true">
+            <column ascending="true" name="savedid"/>
+         </index>
+      </table>
+      <table name="tbluserauth" numRows="1" remarks="" schema="aays" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="username" nullable="false" remarks="" size="255" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="1" name="email" nullable="false" remarks="" size="255" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="password" nullable="false" remarks="" size="1024" type="varchar"/>
+         <column autoUpdated="true" defaultValue="nextval('aays.tbluserauth_userid_seq'::regclass)" digits="0" id="3" name="userid" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="4" name="authenticated" nullable="true" remarks="" size="1" type="bool"/>
+         <primaryKey column="userid" sequenceNumberInPK="1"/>
+         <index name="tbluserauth_pkey" unique="true">
+            <column ascending="true" name="userid"/>
+         </index>
+      </table>
+   </tables>
+</database>
