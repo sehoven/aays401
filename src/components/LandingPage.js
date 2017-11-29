@@ -64,7 +64,11 @@ class AuthPage extends Component {
   }
 
   handleCloseModal () {
-    this.setState({ showModal: false });
+    this.setState({
+      showModal: false,
+      modalTitle: "",
+      modalMessage: ""
+    });
   }
 
   handleSubmit(event) {
@@ -74,6 +78,13 @@ class AuthPage extends Component {
         break;
       case this.props.PanelType.SIGNUP:
         this.signup();
+        this.setState({
+          modalTitle: "One more thing...",
+          modalMessage: "You have been signed up but your account must be " +
+                        "validated by a system administrator before your " +
+                        "account can be used.",
+          showModal: true
+        });
         break;
     }
     event.preventDefault();
@@ -215,7 +226,7 @@ class AuthPage extends Component {
                    required />
           </div>
           <div className="auth-block">
-            <button type="submit">
+            <button>
               {this.state.currentPanel == this.props.PanelType.SIGNUP ? "SIGN UP" : "LOGIN" }
             </button>
           </div>
