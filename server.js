@@ -136,7 +136,8 @@ app.get('/locations', function(req, res) {
         let coords = [];
         // Converting to format requested by API
         for(let j = 0; j < result.rows[i].latitude.length; ++j) {
-          coords.push([result.rows[i].latitude[j], result.rows[i].longitude[j]]);
+          if (result.rows[i].latitude[j] && result.rows[i].longitude[j])
+            coords.push([result.rows[i].latitude[j], result.rows[i].longitude[j]]);
         }
         //200 and 0.0001 are arbitrary thresholds, but I did a lot of testing
         //to get to them
@@ -285,29 +286,3 @@ app.post('/addressCount', function(req, res) {
 app.listen(3000, function() {
   console.log('API up and running...');
 });
-
-function binaryIndexOf(array, searchElement, property) {
-  var minIndex = 0;
-  var maxIndex = array.length - 1;
-  var currentIndex;
-  var currentElement;
-
-  while (minIndex <= maxIndex) {
-    currentIndex = (minIndex + maxIndex) / 2 | 0;
-    currentElement = array[currentIndex].center[property];
-
-    if (currentElement < searchElement) {
-      minIndex = currentIndex + 1;
-    }
-    else if (currentElement > searchElement) {
-      maxIndex = currentIndex - 1;
-    }
-  }
-  return currentIndex;
-}
-
-function filterBinary(arr, min, max, property){
- let leftIndex = binaryIndexOf(arr, min, property);
- let rightIndex = binaryIndexOf(arr, max, property) + 1;
- return arr.slice(leftIndex, rightIndex);
-}
