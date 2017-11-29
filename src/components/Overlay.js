@@ -188,7 +188,7 @@ export default class OverlayContainer extends Component {
   drawClickCallback() { }
 
   clearClickCallback() {
-      let polycount = this.getInnerPolygonsCount()+(this.checkOuterPolygonExits());
+      let polycount = this.getInnerPolygonsCount()+(this.checkOuterPolygonExists());
       let polygon = this.state.outerPolygon;
       let polygonArray = this.state.innerPolygons;
 
@@ -239,10 +239,10 @@ export default class OverlayContainer extends Component {
     let that = this;
     let polygon = null;
 
-    if(this.checkOuterPolygonExits() && this.state.polyNum == 0) {
+    if(this.checkOuterPolygonExists() && this.state.polyNum == 0) {
         polygon = this.state.outerPolygon.convertToLatLng();
     }
-    else if(this.checkOuterPolygonExits() && (this.state.polyNum < this.getInnerPolygonsCount() + this.checkOuterPolygonExits())){
+    else if(this.checkOuterPolygonExists() && (this.state.polyNum < this.getInnerPolygonsCount() + this.checkOuterPolygonExists())){
         polygon = this.state.innerPolygons.getAt(this.getInnerPolygonsCount() - 1).convertToLatLng();
     }
 
@@ -263,7 +263,7 @@ export default class OverlayContainer extends Component {
   updatePolygonData() {
     let that = this;
 
-    this.setState({url: [], data: [], polyNum: this.getInnerPolygonsCount()+this.checkOuterPolygonExits(), dataReady: false}, () => {
+    this.setState({url: [], data: [], polyNum: this.getInnerPolygonsCount()+this.checkOuterPolygonExists(), dataReady: false}, () => {
 
         let updateList=[];
         updateList.push(this.state.outerPolygon);
@@ -291,7 +291,7 @@ export default class OverlayContainer extends Component {
   }
 
   removeAllPolygons() {
-      if(this.checkOuterPolygonExits()) {
+      if(this.checkOuterPolygonExists()) {
           this.state.outerPolygon.remove();
       }
       if(this.state.innerPolygons.size > 0) {
@@ -299,7 +299,15 @@ export default class OverlayContainer extends Component {
               this.state.innerPolygons.getAt(i).remove();
           }
       }
-      this.setState({outerPolygon: null, innerPolygons: new PolygonArray()});
+      this.setState({
+          isDrawing: false,
+          outerPolygon: null,
+          innerPolygons: new PolygonArray(),
+          polyNum: 0,
+          dataReady: false,
+          data: [],
+          url: []
+      });
   }
 
   addFirstPolygon(polygon) {
@@ -361,7 +369,7 @@ export default class OverlayContainer extends Component {
           toggleDrawingTools={this.toggleDrawingTools.bind(this)}
           drawClickCallback={this.drawClickCallback.bind(this)}
           clearClickCallback={this.clearClickCallback.bind(this)}
-          canClear={ (this.getInnerPolygonsCount()+this.checkOuterPolygonExits() != null) }
+          canClear={ (this.getInnerPolygonsCount()+this.checkOuterPolygonExists() != null) }
           finishClickCallback={this.finishClickCallback.bind(this)}
           addClickCallback = {this.addClickCallback.bind(this)}
           cancelClickCallback={this.cancelClickCallback.bind(this)} />
