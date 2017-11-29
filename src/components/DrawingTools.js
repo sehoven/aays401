@@ -184,10 +184,10 @@ export default class DrawingTools extends Component {
 
     if(this.props.polyNum == 0){
       polygonOptions.fillColor = '#000000';
-      polygonOptions.fillOpacity = 0.20;
+      polygonOptions.fillOpacity = 0.10;
     } else {
       polygonOptions.fillColor = randomColor();
-      polygonOptions.fillOpacity = 0.45;
+      polygonOptions.fillOpacity = 0.20;
     }
     polygonOptions.strokeColor = polygonOptions.fillColor;
   }
