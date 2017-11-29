@@ -25,6 +25,7 @@ digraph "oneDegreeRelationshipsDiagram" {
       <TR><TD COLSPAN="3" BGCOLOR="#9bab96" ALIGN="CENTER">luzoningcodes</TD></TR>
       <TR><TD PORT="zoningcode" COLSPAN="2" BGCOLOR="#bed1b8" ALIGN="LEFT">zoningcode</TD><TD PORT="zoningcode.type" ALIGN="LEFT">varchar[255]</TD></TR>
       <TR><TD PORT="value" COLSPAN="2" ALIGN="LEFT">value</TD><TD PORT="value.type" ALIGN="LEFT">varchar[255]</TD></TR>
+      <TR><TD PORT="subvalue" COLSPAN="2" ALIGN="LEFT">subvalue</TD><TD PORT="subvalue.type" ALIGN="LEFT">varchar[255]</TD></TR>
       <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">&lt; 0</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">72 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">0 &gt;</TD></TR>
     </TABLE>>
     URL="luzoningcodes.html"

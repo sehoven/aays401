@@ -3,6 +3,7 @@ in the .env file
 */
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+const simplify = require('simplify-geometry');
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
@@ -12,20 +13,16 @@ const Client = require('pg');
 require('dotenv').load();
 const connectionString = 'postgresql://'+process.env.databaseUser+':'+process.env.databasePassword+'@localhost:'+process.env.databasePort+'/'+process.env.databaseName+''
 
-
-
 // Load local neighbourhood data synchronously
 
-
 console.log("Ready. Listening on port 3000.");
-
 
 app.use(bodyParser.json());
 
 // Prepare Access-Control
 app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080');
-    res.setHeader('Access-Control-Allow-Methods', 'GET');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
     //'GET, POST, OPTIONS, PUT, PATCH, DELETE'); Add as required
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
     res.setHeader('Access-Control-Allow-Credentials', true);
@@ -78,10 +75,6 @@ app.get('/nearby', function(req, res) {
   res.end(json);
 });
 
-
-
-
-
 // Handle requests to "/locations"
 // Returns all known locations that match existing query items
 /**
@@ -121,7 +114,6 @@ app.get('/locations', function(req, res) {
     return;
   }
 
-
   //Connect to DB
   const client = new Client.Client({
     connectionString: connectionString,
@@ -141,6 +133,7 @@ app.get('/locations', function(req, res) {
       }
 
       let resBody = [];
+
       var searchTerm1 = "%"+req.query.name.toLowerCase()+"%";
       queryText = "SELECT * from aays.tblNeighbourhood where lower(Title) like $1 and lower(Title) not like $2;";
       values = [searchTerm1,searchTerm];
@@ -151,45 +144,57 @@ app.get('/locations', function(req, res) {
             return;
           }
           client.end()
+
           for (let i=0;i<result.rowCount;i++){
-
             let latLngs = [];
-
+            let coords = [];
             // Converting to format requested by API
+            if (result.rows[i].latitude.length < 3) continue;
             for(let j = 0; j < result.rows[i].latitude.length; ++j) {
-
+              if (result.rows[i].latitude[j] && result.rows[i].longitude[j])
+                coords.push([result.rows[i].latitude[j], result.rows[i].longitude[j]]);
+            }
+            //200 and 0.0001 are arbitrary thresholds, but I did a lot of testing
+            //to get to them
+            var simplified = (coords.length>200)?simplify(coords, 0.0001):coords;
+            for(let j = 0; j < simplified.length; ++j) {
               latLngs.push({
-                lat: result.rows[i].latitude[j],
-                lng: result.rows[i].longitude[j]
+                lat: simplified[j][0],
+                lng: simplified[j][1]
               });
             }
 
             let centerLatLng = {
-                lat:result.rows[i].centerlat,
-                lng:result.rows[i].centerlng
-              };
+              lat:result.rows[i].centerlat,
+              lng:result.rows[i].centerlng
+            };
 
             resBody.push({
               name:result.rows[i].title,
               points:latLngs,
-              radius: result.rows[i].radius,
+              radius:result.rows[i].radius,
               width:result.rows[i].width,
               height:result.rows[i].height,
               center:centerLatLng
             });
-
-
           }
+
           for (let i=0;i<resultinner.rowCount;i++){
-
             let latLngs = [];
-
+            let coords = [];
             // Converting to format requested by API
+            if (resultinner.rows[i].latitude.length < 3) continue;
             for(let j = 0; j < resultinner.rows[i].latitude.length; ++j) {
-
-            latLngs.push({
-              lat: resultinner.rows[i].latitude[j],
-              lng: resultinner.rows[i].longitude[j]
+              if (resultinner.rows[i].latitude[j] && resultinner.rows[i].longitude[j])
+                coords.push([resultinner.rows[i].latitude[j], resultinner.rows[i].longitude[j]]);
+            }
+            //200 and 0.0001 are arbitrary thresholds, but I did a lot of testing
+            //to get to them
+            var simplified = (coords.length>200)?simplify(coords, 0.0001):coords;
+            for(let j = 0; j < simplified.length; ++j) {
+              latLngs.push({
+                lat: simplified[j][0],
+                lng: simplified[j][1]
               });
             }
 
@@ -201,25 +206,21 @@ app.get('/locations', function(req, res) {
             resBody.push({
               name:resultinner.rows[i].title,
               points:latLngs,
-              radius: resultinner.rows[i].radius,
+              radius:resultinner.rows[i].radius,
               width:resultinner.rows[i].width,
               height:resultinner.rows[i].height,
               center:centerLatLng
             });
-
-
           }
-          var json = JSON.stringify(resBody);
-          res.writeHead(200, {"Content-Type": "application/json"});
-          res.end(json);
-        });
+
+
+      var json = JSON.stringify(resBody);
+      res.writeHead(200, {"Content-Type": "application/json"});
+      res.end(json);
+    });
 
   });
 });
-
-
-
-
 
 /**
  * @api {post} /addressCount/{Object[]} Count addresses in a polygon
@@ -276,8 +277,6 @@ app.post('/addressCount', function(req, res) {
                   "Commercial": {"title":"Commercial","total":0}
                   };
 
-
-
   //Connect to DB
   const client = new Client.Client({
     connectionString: connectionString,
@@ -318,6 +317,12 @@ app.post('/addressCount', function(req, res) {
       return res.status(400).send(err);
     }
     client.end()
+    //inside call required format to be [[[#,#],[#,#]...[#,#]]]
+    let polygon = [];
+
+    for (let i = 0; i < req.body.poly.length; i++){
+      polygon.push([req.body.poly[i].lat, req.body.poly[i].lng]);
+    }
 
     for(var item in result.rows){
       let point = [result.rows[item].lat,result.rows[item].lng];
@@ -366,7 +371,6 @@ app.post('/addressCount', function(req, res) {
       }
     }
 
-
     res.writeHead(200, {"Content-Type": "application/json"});
     var json = JSON.stringify(resBody);
     res.end(json);
@@ -374,37 +378,59 @@ app.post('/addressCount', function(req, res) {
   });
 });
 
-
-
-
-// Handle requests to "/locations"
-// Returns all known locations that match existing query items
 /**
- * @api {get} /locations/{text} List all neighbourhoods in Edmonton that match search string
- * @apiName locations
- * @apiGroup Polygon
- * @apiDescription Handle requests to /locations Returns all known locations that match existing query items
- * @apiParam {String} Any text that is reterived from search bar in the frontend
- * @apiError (Polygon) {get} NullParameters The parameters required are null
- * @apiParamExample {String} SearchString:
- *                        "Rutherford"
+ * @api {post} /login/{body[]} Login / Authentication
+ * @apiGroup User
+ * @apiDescription Receives a username and password and authenticated is with the database, checking if the user indeed exists and also if the user is authenticated to login
+ * @apiParam {Object[]} An array of username, password, email
+ * @apiParamExample {body[]} :
+ *                        "username": "username",
+ *                        "password": "password",
+ *                        "email": "email"
  * @apiSuccessExample Success-Response:
  *    HTTP/1.1 200 OK
  *    {
- *      "neighborhoods"[{
- *          "name":"NiceAvenue",
- *          "points":[{"lat":-113,"lng":53},{"lat":-113,"lng":53}],
- *          "center":{"lat":-113,"lng":53},
- *          "radius":0.111
- *          "width":0.111
- *          "height":0.111
- *      }
+ *      "login":"success",
+        "reason": "",
+        "code": 20
+ *
  *    }
- * @apiError (Polygon) {get} NullParameters The parameters required are null
+ * @apiError (User) {post} NullParameters The parameters required are null
+ * @apiError (User) {post} InvalidParameters The parameters required do not create a shape with area.
  * @apiErrorExample Error-Response:
- *    HTTP/1.1 400 Null parameters
+ *    HTTP/1.1 400 Polygon is not a polygon
  *    {
- *      "error":"Null parameters"
+ *      "login":"fail",
+        "reason":"Null variables",
+        "code": 40
+ *    }
+ *
+ *    HTTP/1.1 400 Polygon is not a polygon
+ *    {
+ *      "login":"fail",
+        "reason": "Database error",
+        "code": 41
+ *    }
+ *
+ *    HTTP/1.1 400 Polygon is not a polygon
+ *    {
+ *      "login":"fail",
+        "reason": "Username does not exists",
+        "code": 42
+ *    }
+ *
+ *    HTTP/1.1 400 Polygon is not a polygon
+ *    {
+ *      "login":"fail",
+        "reason": "This user has not been authenticted by DBA",
+        "code": 42
+ *    }
+ *
+ *    HTTP/1.1 400 Polygon is not a polygon
+ *    {
+ *      "login":"fail",
+        "reason": "Invalid password",
+        "code": 42
  *    }
  */
 app.post('/login', function(req, res) {
@@ -513,34 +539,59 @@ app.post('/login', function(req, res) {
 });
 
 
-// Handle requests to "/locations"
-// Returns all known locations that match existing query items
 /**
- * @api {get} /locations/{text} List all neighbourhoods in Edmonton that match search string
- * @apiName locations
- * @apiGroup Polygon
- * @apiDescription Handle requests to /locations Returns all known locations that match existing query items
- * @apiParam {String} Any text that is reterived from search bar in the frontend
- * @apiError (Polygon) {get} NullParameters The parameters required are null
- * @apiParamExample {String} SearchString:
- *                        "Rutherford"
+ * @api {post} /login/{body[]} Login / Authentication
+ * @apiGroup User
+ * @apiDescription Receives a username and password and authenticated is with the database, checking if the user indeed exists and also if the user is authenticated to login
+ * @apiParam {Object[]} An array of username, password, email
+ * @apiParamExample {body[]} :
+ *                        "username": "username",
+ *                        "password": "password",
+ *                        "email": "email"
  * @apiSuccessExample Success-Response:
  *    HTTP/1.1 200 OK
  *    {
- *      "neighborhoods"[{
- *          "name":"NiceAvenue",
- *          "points":[{"lat":-113,"lng":53},{"lat":-113,"lng":53}],
- *          "center":{"lat":-113,"lng":53},
- *          "radius":0.111
- *          "width":0.111
- *          "height":0.111
- *      }
+ *      "login":"success",
+        "reason": "",
+        "code": 20
+ *
  *    }
- * @apiError (Polygon) {get} NullParameters The parameters required are null
+ * @apiError (User) {post} NullParameters The parameters required are null
+ * @apiError (User) {post} InvalidParameters The parameters required do not create a shape with area.
  * @apiErrorExample Error-Response:
- *    HTTP/1.1 400 Null parameters
+ *    HTTP/1.1 400 Polygon is not a polygon
  *    {
- *      "error":"Null parameters"
+ *      "login":"fail",
+        "reason":"Null variables",
+        "code": 40
+ *    }
+ *
+ *    HTTP/1.1 400 Polygon is not a polygon
+ *    {
+ *      "login":"fail",
+        "reason": "Database error",
+        "code": 41
+ *    }
+ *
+ *    HTTP/1.1 400 Polygon is not a polygon
+ *    {
+ *      "login":"fail",
+        "reason": "Username does not exists",
+        "code": 42
+ *    }
+ *
+ *    HTTP/1.1 400 Polygon is not a polygon
+ *    {
+ *      "login":"fail",
+        "reason": "This user has not been authenticted by DBA",
+        "code": 42
+ *    }
+ *
+ *    HTTP/1.1 400 Polygon is not a polygon
+ *    {
+ *      "login":"fail",
+        "reason": "Invalid password",
+        "code": 42
  *    }
  */
 app.post('/signup', function(req, res) {
