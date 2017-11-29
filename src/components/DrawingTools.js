@@ -185,6 +185,7 @@ export default class DrawingTools extends Component {
       polygonOptions.fillColor = randomColor();
       polygonOptions.fillOpacity = 0.45;
     }
+    polygonOptions.strokeColor = polygonOptions.fillColor;
   }
 
   componentDidMount() {
@@ -199,6 +200,7 @@ export default class DrawingTools extends Component {
       polygonOptions.fillColor = randomColor();
       polygonOptions.fillOpacity = 0.45;
     }
+    polygonOptions.strokeColor = polygonOptions.fillColor;
   }
 
   componentWillUnmount() {
