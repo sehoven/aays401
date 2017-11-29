@@ -288,7 +288,7 @@ export default class OverlayContainer extends Component {
     let url="https://maps.googleapis.com/maps/api/staticmap?&size=1000x1000&path=color:"+rgb+"|weight:5|fillcolor:"+rgba;
     if(polygon != null && polygon.length >= 2) {
       polygon.forEach(function(position) {
-        url += "|" + position.lat + "," + position.lng;
+        url += "|" + position.lat.toFixed(6) + "," + position.lng.toFixed(6);
       });
       // Static API doesn't have polygon autocomplete. Close the path manually.
       url += "|" + polygon[0].lat + "," + polygon[0].lng;
