@@ -144,7 +144,7 @@ app.get('/locations', function(req, res) {
             return;
           }
           client.end()
-          
+
           for (let i=0;i<result.rowCount;i++){
             let latLngs = [];
             let coords = [];
@@ -178,7 +178,7 @@ app.get('/locations', function(req, res) {
               center:centerLatLng
             });
           }
- 
+
           for (let i=0;i<resultinner.rowCount;i++){
             let latLngs = [];
             let coords = [];
@@ -212,8 +212,8 @@ app.get('/locations', function(req, res) {
               center:centerLatLng
             });
           }
-      
-      
+
+
       var json = JSON.stringify(resBody);
       res.writeHead(200, {"Content-Type": "application/json"});
       res.end(json);
@@ -284,10 +284,8 @@ app.post('/addressCount', function(req, res) {
   client.connect()
   .catch(e => console.error('Connection Error', e.stack))
 
-  
   let polygon = [];
 
-  
   var maxLat=0;
   var maxLng=0;
   var minLat=0;
@@ -307,12 +305,13 @@ app.post('/addressCount', function(req, res) {
       minLat = req.body.poly[i].lat
     }
   }
-  
+
 
   var queryText = 'SELECT code.subvalue as subvalue,code.value as type, prop.latitude as lat, prop.longitude as lng from aays.tblProperty prop left join aays.luzoningcodes code on code.zoningcode = prop.zoningcode where prop.latitude BETWEEN $1 AND $2 AND prop.longitude BETWEEN $3 AND $4;';
   var values = [minLat,maxLat,minLng,maxLng];
   client.query(queryText,values,function(err,result) {
     if(err){
+      console.log(err);
       client.end()
       return res.status(400).send(err);
     }
@@ -323,7 +322,7 @@ app.post('/addressCount', function(req, res) {
     for (let i = 0; i < req.body.poly.length; i++){
       polygon.push([req.body.poly[i].lat, req.body.poly[i].lng]);
     }
-    
+
     for(var item in result.rows){
       let point = [result.rows[item].lat,result.rows[item].lng];
 
@@ -393,7 +392,7 @@ app.post('/addressCount', function(req, res) {
  *      "login":"sucess",
         "reason": "",
         "code": 20
- *      
+ *
  *    }
  * @apiError (User) {post} NullParameters The parameters required are null
  * @apiError (User) {post} InvalidParameters The parameters required do not create a shape with area.
@@ -404,28 +403,28 @@ app.post('/addressCount', function(req, res) {
         "reason":"Null variables",
         "code": 40
  *    }
- * 
+ *
  *    HTTP/1.1 400 Polygon is not a polygon
  *    {
  *      "login":"fail",
         "reason": "Database error",
         "code": 41
  *    }
- * 
+ *
  *    HTTP/1.1 400 Polygon is not a polygon
  *    {
  *      "login":"fail",
         "reason": "Username does not exists",
         "code": 42
  *    }
- * 
+ *
  *    HTTP/1.1 400 Polygon is not a polygon
  *    {
  *      "login":"fail",
         "reason": "This user has not been authenticted by DBA",
         "code": 42
  *    }
- * 
+ *
  *    HTTP/1.1 400 Polygon is not a polygon
  *    {
  *      "login":"fail",
@@ -437,7 +436,7 @@ app.post('/login', function(req, res) {
   console.log("Login request handler invoked");
   var json;
   var resBody=[];
-  
+
 
   if (!req.body) return res.sendStatus(400);
   if(req.body.password=='' || req.body.username==''){
@@ -462,7 +461,7 @@ app.post('/login', function(req, res) {
       res.end(json);
       return;
   }
-  
+
   var username = req.body.username;
   var password = req.body.password;
   //Connect to DB
@@ -503,7 +502,7 @@ app.post('/login', function(req, res) {
 
       bcrypt.compare(password, result.rows[0].password, function(err, comp) {
         if(comp==true&&result.rows[0].authenticated==true){
-          
+
           resBody.push({
             "login":"sucess",
             "reason": "",
@@ -539,7 +538,7 @@ app.post('/login', function(req, res) {
 
         }
       });
-      
+
 
   });
 });
@@ -560,7 +559,7 @@ app.post('/login', function(req, res) {
  *      "login":"sucess",
         "reason": "",
         "code": 20
- *      
+ *
  *    }
  * @apiError (User) {post} NullParameters The parameters required are null
  * @apiError (User) {post} InvalidParameters The parameters required do not create a shape with area.
@@ -571,28 +570,28 @@ app.post('/login', function(req, res) {
         "reason":"Null variables",
         "code": 40
  *    }
- * 
+ *
  *    HTTP/1.1 400 Polygon is not a polygon
  *    {
  *      "login":"fail",
         "reason": "Database error",
         "code": 41
  *    }
- * 
+ *
  *    HTTP/1.1 400 Polygon is not a polygon
  *    {
  *      "login":"fail",
         "reason": "Username does not exists",
         "code": 42
  *    }
- * 
+ *
  *    HTTP/1.1 400 Polygon is not a polygon
  *    {
  *      "login":"fail",
         "reason": "This user has not been authenticted by DBA",
         "code": 42
  *    }
- * 
+ *
  *    HTTP/1.1 400 Polygon is not a polygon
  *    {
  *      "login":"fail",
@@ -634,7 +633,7 @@ app.post('/signup', function(req, res) {
   client.connect()
   .catch(e => console.error('Connection Error', e.stack))
 
-  
+
   let username = req.body.username;
   let password = req.body.password;
   let email = req.body.email;
@@ -657,8 +656,8 @@ app.post('/signup', function(req, res) {
       client.end();
       return;
     }
-    
-            
+
+
     if(result.rowCount>0){
       resBody.push({
       "signup":"failed",
@@ -671,8 +670,8 @@ app.post('/signup', function(req, res) {
       client.end();
       return;
     }
-  
-    
+
+
   //Email check
     queryText = "select * from aays.tbluserauth where email = $1;";
     value = [email];
@@ -689,9 +688,9 @@ app.post('/signup', function(req, res) {
         client.end();
         return;
       }
-              
-      
-              
+
+
+
       if(result.rowCount>0){
         resBody.push({
         "signup":"failed",
@@ -704,13 +703,13 @@ app.post('/signup', function(req, res) {
         client.end();
         return;
       }
-    
-              
+
+
       //Password Encryption
       bcrypt.genSalt(saltRounds, function(err, salt) {
         bcrypt.hash(password, salt, function(err, hash) {
-            
-        
+
+
           queryText = "insert into aays.tbluserauth(username,password,email,authenticated) Values($1,$2,$3,$4);";
           value=[username,hash,email,false]
           client.query(queryText,value,function(err,result) {
@@ -726,15 +725,15 @@ app.post('/signup', function(req, res) {
                 client.end();
                 return;
               }
-              
-              
-              
+
+
+
               resBody.push({
                   "signup":"success",
                   "reason":"",
                   "code": 20
               });
-          
+
               json = JSON.stringify(resBody);
               res.writeHead(200, {"Content-Type": "application/json"});
               res.end(json);
@@ -748,6 +747,6 @@ app.post('/signup', function(req, res) {
   });
 });
 
-app.listen(3000, function() {  
+app.listen(3000, function() {
   console.log('API up and running...');
 });

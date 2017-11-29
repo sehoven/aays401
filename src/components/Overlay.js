@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
 import DrawingTools, { PolygonTools } from './DrawingTools.js';
+import { STATIC_STYLE, IMAGE_DIMENSIONS } from '../settings';
 
 const HTTPService = require('./HTTPService.js');
 const notificationTimer = 2000;
@@ -149,7 +150,7 @@ export class Overlay extends Component {
         </center>
         &nbsp;
       </div>
-      
+
     )
   }
 }
@@ -258,7 +259,7 @@ export default class OverlayContainer extends Component {
           fillOpacity = poly.polygon.fillOpacity;
 
       }
-    
+
       if(polygon) {
         HTTPService.countPolyResidences(
           { points: polygon }
@@ -370,7 +371,10 @@ export default class OverlayContainer extends Component {
 
   setImgUrl(polygon, rgb, a){
     let rgba = rgb + Math.floor(parseFloat((a*256).toString(16)));
-    let url="https://maps.googleapis.com/maps/api/staticmap?&size=1000x1000&path=color:"+rgb+"|weight:5|fillcolor:"+rgba;
+    let url = "https://maps.googleapis.com/maps/api/staticmap?"
+            + "key=AIzaSyC2mXFuLvwiASA3mSr2kz79fnXUYRwLKb8"
+            + STATIC_STYLE + "&size=" + IMAGE_DIMENSIONS + "&path=color:" + rgb
+            + "|weight:5|fillcolor:" + rgba;
     if(polygon != null && polygon.length >= 2) {
       polygon.forEach(function(position) {
         url += "|" + position.lat.toFixed(6) + "," + position.lng.toFixed(6);
@@ -378,7 +382,6 @@ export default class OverlayContainer extends Component {
       // Static API doesn't have polygon autocomplete. Close the path manually.
       url += "|" + polygon[0].lat + "," + polygon[0].lng;
     }
-    url += "&key=AIzaSyC2mXFuLvwiASA3mSr2kz79fnXUYRwLKb8";
     this.setState(prevState => ({
       url: [...prevState.url, url]
     }));
@@ -426,28 +429,28 @@ export default class OverlayContainer extends Component {
                         <li>Motor Home: {this.state.dataReady? itemData.Residential["Mobile Home"]:"?"}</li>
                       </ul>
                   </label>
-                  
+
                   <label className="containerButton">Apartments: {this.state.dataReady? itemData.Apartment.total:"?"}
                   <input type="checkbox" defaultChecked={true}></input>
                   <span className="checkmark"></span>
-                    
+
                       <ul className="navbar-count-inner-poly-text">
                           <li>Low Rise Apartment: {this.state.dataReady? itemData.Apartment["Low Rise Apartments"]:"?"}</li>
                           <li>Medium Rise Apartment: {this.state.dataReady? itemData.Apartment["Medium Rise Apartments"]:"?"}</li>
                           <li>High Rise Apartment: {this.state.dataReady? itemData.Apartment["High Rise Apartments"]:"?"}</li>
                       </ul>
                   </label>
-                  
+
                   <label className="containerButton">Industrial: {this.state.dataReady? itemData.Industrial.total:"?"}
                     <input type="checkbox" defaultChecked={true}></input>
                     <span className="checkmark"></span>
-                  </label> 
+                  </label>
 
-                    
+
                   <label className="containerButton">Commercial: {this.state.dataReady? itemData.Commercial.total:"?"}
                     <input type="checkbox" defaultChecked={true}></input>
                     <span className="checkmark"></span>
-                  </label> 
+                  </label>
 
                 </ul>
 
