@@ -9,7 +9,7 @@ export default class LandingPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isAuthenticated: false
+      isAuthenticated: true
     }
 
     this.setAuthenticated = this.setAuthenticated.bind(this);
