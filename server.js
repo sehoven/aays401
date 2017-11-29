@@ -135,6 +135,7 @@ app.get('/locations', function(req, res) {
         let latLngs = [];
         let coords = [];
         // Converting to format requested by API
+        if (result.rows[i].latitude.length < 3) continue;
         for(let j = 0; j < result.rows[i].latitude.length; ++j) {
           if (result.rows[i].latitude[j] && result.rows[i].longitude[j])
             coords.push([result.rows[i].latitude[j], result.rows[i].longitude[j]]);
