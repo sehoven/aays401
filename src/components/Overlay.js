@@ -449,6 +449,43 @@ export default class OverlayContainer extends Component {
         }
         { this.props.active &&
           <div id="navbar-list-draw">
+            <div className="checkbox-holder">
+              <div className="fifth-checkbox">
+                <label id="checkbox-red" className="containerButton">
+                  <input type="checkbox" defaultChecked={true}></input>
+                  <span className="checkmark"></span>
+                  Residences
+                </label>
+              </div>
+              <div className="fifth-checkbox">
+              <label id="checkbox-orange" className="containerButton">
+                <input type="checkbox" defaultChecked={true}></input>
+                <span className="checkmark"></span>
+                Apartments
+              </label>
+              </div>
+              <div className="fifth-checkbox">
+              <label id="checkbox-green" className="containerButton">
+                <input type="checkbox" defaultChecked={true}></input>
+                <span className="checkmark"></span>
+                Industrial
+              </label>
+              </div>
+              <div className="fifth-checkbox">
+              <label id="checkbox-blue" className="containerButton">
+                <input type="checkbox" defaultChecked={true}></input>
+                <span className="checkmark"></span>
+                Commercial
+              </label>
+              </div>
+              <div className="fifth-checkbox">
+              <label id="checkbox-black" className="containerButton">
+                <input type="checkbox" defaultChecked={true}></input>
+                <span className="checkmark"></span>
+                Unspecified
+              </label>
+              </div>
+            </div>
             {this.state.dataReady ? this.state.data.map((itemData, i)=>
               <div className="navbar-count-poly-box" key={i}>
                 <div className="navbar-image-box"><a href={this.state.url[i]} download="map">{<img className="image" src= {this.state.url[i]}/>}</a></div>
