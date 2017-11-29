@@ -186,7 +186,7 @@ export default class DrawingTools extends Component {
       polygonOptions.fillColor = '#000000';
       polygonOptions.strokeWeight = 1;
     } else {
-      polygonOptions.fillColor = randomColor();
+      polygonOptions.fillColor = randomColor({ luminosity: 'bright' });
       polygonOptions.fillOpacity = 0.5;
       polygonOptions.strokeWeight = 0.2;
     }
@@ -204,7 +204,7 @@ export default class DrawingTools extends Component {
       polygonOptions.fillColor = '#000000';
       polygonOptions.fillOpacity = 0.20;
     } else {
-      polygonOptions.fillColor = randomColor();
+      polygonOptions.fillColor = randomColor({ luminosity: 'bright' });
       polygonOptions.fillOpacity = 0.5;
     }
     polygonOptions.strokeColor = polygonOptions.fillColor;

@@ -29,52 +29,6 @@ app.use(function (req, res, next) {
     next();
 });
 
-// Handle requests to "/nearby"
-// Returns all known neighborhoods that are within rad from point (lat, lng)
-/**
- * @api {get} /nearby/{Object[]} Get nearby neighbourhoods
- * @apiGroup Polygon
- *
- * @apiSuccessExample Success-Response:
- *    HTTP/1.1 200 OK
- *    {
- *      "neighborhoods"[{
- *          "name":"NiceAvenue",
- *          "points":[{"lat":-113,"lng":53},{"lat":-113,"lng":53}],
- *          "center":{"lat":-113,"lng":53},
- *          "radius":0.111
- *          "width":0.111
- *          "height":0.111
- *      }
- *    }
- * @apiErrorExample Error-Response:
- *    HTTP/1.1 400 Null parameters
- *    {
- *      "error":"Null parameters"
- *    }
- */
-app.get('/nearby', function(req, res) {
-  console.log("Location request handler invoked");
-  //Should add some kind of type validation here.. and everywhere.
-  if (!req.query.lat || !req.query.lng || !req.query.rad)
-    return res.sendStatus(400);
-
-  let resBody = [];
-  for (var i = 0; i < neighborhoods.length; i++) {
-    var c = parseFloat(req.query.rad) + neighborhoods[i].radius;
-    var a = parseFloat(req.query.lat) - neighborhoods[i].center.lat;
-    var b = parseFloat(req.query.lng) - neighborhoods[i].center.lng;
-
-    if (Math.sqrt( a*a + b*b ) < c){
-        resBody.push(neighborhoods[i]);
-    }
-  }
-
-  res.writeHead(200, {"Content-Type": "application/json"});
-  var json = JSON.stringify(resBody);
-  res.end(json);
-});
-
 // Handle requests to "/locations"
 // Returns all known locations that match existing query items
 /**
@@ -414,10 +368,11 @@ app.post('/getUnits', function(req, res) {
     }
   }
 
-  var queryText =   "SELECT latitude as lat, longitude as lng, zoningcode as zc, count(*) ct "
-                  + "FROM aays.tblProperty "
+  var queryText =   "SELECT latitude as lat, longitude as lng, codes.value as zc, count(*) ct "
+                  + "FROM aays.tblProperty props "
+                  + "LEFT JOIN aays.luzoningcodes codes on codes.zoningcode = props.zoningcode "
                   + "WHERE latitude BETWEEN $1 and $2 AND longitude BETWEEN $3 and $4 "
-                  + "GROUP BY latitude, longitude, zoningcode;";
+                  + "GROUP BY latitude, longitude, zc;";
 
   var values = [minLat, maxLat, minLng, maxLng];
 

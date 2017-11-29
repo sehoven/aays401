@@ -284,18 +284,34 @@ export default class OverlayContainer extends Component {
       for (var item in json){
         // radius = 3 @ 1, 6 @ 10, 9 @ 100, 12 @ 1000
         let radius = (1 + Math.floor(Math.log10(json[item]["count"]))) * 3;
+        var color;
+        switch (json[item]["type"]){
+          case "Residential":
+            color = 'rgb(160, 0, 55)';
+            break;
+          case "Apartment":
+            color = '#d3882b';
+            break;
+          case "Industrial":
+            color = '#08d312';
+            break;
+          case "Commercial":
+            color = '#3e43d3';
+            break;
+          default:
+            color = 'black';
+            break;
+        }
         let newCircle = new that.props.maps.Circle({
           title: json[item]["type"] + ", count: " + json[item]["count"],
           strokeWeight: 0,
-          fillColor: '#FF0000',
+          fillColor: color,
           fillOpacity: (radius == 3)?0.9:0.6,
           map: that.props.map,
           center: { lat: json[item]["lat"], lng: json[item]["lng"] },
           radius: radius
         });
         that.circles.push(newCircle);
-        // It's tempting to make an invisible marker for all points to give them
-        // all tooltips, but that makes the app unusable
         if (json[item]["count"] > 1){
           var newNumber = new google.maps.Marker({
             position: { lat: json[item]["lat"], lng: json[item]["lng"] },
@@ -432,45 +448,25 @@ export default class OverlayContainer extends Component {
           <div id="navbar-list">
             {this.state.dataReady ? this.state.data.map((itemData, i)=>
               <div className="navbar-count-poly-box" key={i}>
-                <div className="navbar-count-poly-title"><p style={{padding: 15}}>POLYGON {i+1}</p></div>
-                <ul className="navbar-count-poly-text">
+                <div className="navbar-image-box"><a href={this.state.url[i]} download="map">{<img className="image" src= {this.state.url[i]}/>}</a></div>
+                <div className="navbar-count-poly-text">
                   <label className="containerButton">Residences: {this.state.dataReady? itemData.Residential.total:"?"}
                     <input type="checkbox" defaultChecked={true}></input>
                     <span className="checkmark"></span>
-                      <ul className="navbar-count-inner-poly-text">
-                        <li>Single House: {this.state.dataReady? itemData.Residential["Single Detached Home"]:"?"}</li>
-                        <li>House / Duplex: {this.state.dataReady? itemData.Residential["Single Detached Home / Duplex"]:"?"}</li>
-                        <li>Townhouse: {this.state.dataReady? itemData.Residential["Townhome"]:"?"}</li>
-                        <li>Motor Home: {this.state.dataReady? itemData.Residential["Mobile Home"]:"?"}</li>
-                      </ul>
                   </label>
-
                   <label className="containerButton">Apartments: {this.state.dataReady? itemData.Apartment.total:"?"}
                   <input type="checkbox" defaultChecked={true}></input>
                   <span className="checkmark"></span>
-
-                      <ul className="navbar-count-inner-poly-text">
-                          <li>Low Rise Apartment: {this.state.dataReady? itemData.Apartment["Low Rise Apartments"]:"?"}</li>
-                          <li>Medium Rise Apartment: {this.state.dataReady? itemData.Apartment["Medium Rise Apartments"]:"?"}</li>
-                          <li>High Rise Apartment: {this.state.dataReady? itemData.Apartment["High Rise Apartments"]:"?"}</li>
-                      </ul>
                   </label>
-
                   <label className="containerButton">Industrial: {this.state.dataReady? itemData.Industrial.total:"?"}
                     <input type="checkbox" defaultChecked={true}></input>
                     <span className="checkmark"></span>
                   </label>
-
-
                   <label className="containerButton">Commercial: {this.state.dataReady? itemData.Commercial.total:"?"}
                     <input type="checkbox" defaultChecked={true}></input>
                     <span className="checkmark"></span>
                   </label>
-
-                </ul>
-
-                <center><a href={this.state.url[i]} download="map">{<img className="image" src= {this.state.url[i]}/>}</a></center>
-
+                </div>
               </div>
             ): null}
           </div>
