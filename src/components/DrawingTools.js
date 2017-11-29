@@ -21,10 +21,13 @@ export class PolygonTools extends Component {
   // Before the component mounts, set the polygon and add the listeners
   componentWillMount() {
     let that = this;
+    let polygon = this.props.outerPolygon;
+    let polygonArray = this.props.innerPolygons;
 
-    for(var i = 0; i < this.props.polygons.size(); ++i) {
+    this.data.push({polygon: this.props.outerPolygon.polygon, polygonListener: null, isSelected: false});
+    for(var i = 0; i < this.props.innerPolygons.size(); ++i) {
       let dataItem = {
-        polygon: this.props.polygons.getAt(i),
+        polygon: this.props.innerPolygons.getAt(i).polygon,
         polygonListener: null,
         isSelected: false
       }
@@ -50,6 +53,7 @@ export class PolygonTools extends Component {
             }
           }
         });
+
         data.polygonListener = polygonListener;
       }
     }
@@ -186,6 +190,7 @@ export default class DrawingTools extends Component {
       polygonOptions.fillOpacity = 0.45;
       polygonOptions.strokeWeight = 0.2;
     }
+    polygonOptions.strokeColor = polygonOptions.fillColor;
   }
 
   componentDidMount() {
@@ -200,6 +205,7 @@ export default class DrawingTools extends Component {
       polygonOptions.fillColor = randomColor();
       polygonOptions.fillOpacity = 0.45;
     }
+    polygonOptions.strokeColor = polygonOptions.fillColor;
   }
 
   componentWillUnmount() {

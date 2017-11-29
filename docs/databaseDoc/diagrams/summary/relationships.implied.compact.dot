@@ -34,6 +34,8 @@ digraph "compactImpliedRelationshipsDiagram" {
     label=<
     <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="#ffffff">
       <TR><TD COLSPAN="3" BGCOLOR="#9bab96" ALIGN="CENTER">tblproperty</TD></TR>
+      <TR><TD PORT="latitude" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">latitude</TD></TR>
+      <TR><TD PORT="longitude" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">longitude</TD></TR>
       <TR><TD PORT="zoningcode" COLSPAN="3" ALIGN="LEFT">zoningcode</TD></TR>
       <TR><TD PORT="propertyid" COLSPAN="3" BGCOLOR="#bed1b8" ALIGN="LEFT">propertyid</TD></TR>
       <TR><TD PORT="elipses" COLSPAN="3" ALIGN="LEFT">...</TD></TR>

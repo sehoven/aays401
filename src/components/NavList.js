@@ -79,7 +79,7 @@ export default class NavList extends React.Component {
         console.log('Geocoder failed due to: ' + status);
         return;
       }
-      map.setZoom(11);
+      map.setZoom(17);
       map.setCenter(results[0].geometry.location);
     });
   }
