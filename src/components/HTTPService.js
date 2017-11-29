@@ -30,7 +30,10 @@ export function login(info) {
                   "headers": {  'Content-Type': 'application/json',
                   'Content-Length': new Buffer(body).length }})
     .then(function(res) {
-      return res.json();
+      return {
+        statusCode: res.status,
+        body: res.json()
+      };
   });
 
 }
@@ -43,7 +46,10 @@ export function signup(info) {
                     "headers": {  'Content-Type': 'application/json',
                     'Content-Length': new Buffer(body).length }})
     .then(function(res) {
-      return res.json();
+      return {
+        statusCode: res.status,
+        body: res.json()
+      };
   });
 
 }

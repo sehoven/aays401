@@ -389,7 +389,7 @@ app.post('/addressCount', function(req, res) {
  * @apiSuccessExample Success-Response:
  *    HTTP/1.1 200 OK
  *    {
- *      "login":"sucess",
+ *      "login":"success",
         "reason": "",
         "code": 20
  *
@@ -399,7 +399,7 @@ app.post('/addressCount', function(req, res) {
  * @apiErrorExample Error-Response:
  *    HTTP/1.1 400 Polygon is not a polygon
  *    {
- *      "login":"failed",
+ *      "login":"fail",
         "reason":"Null variables",
         "code": 40
  *    }
@@ -437,22 +437,21 @@ app.post('/login', function(req, res) {
   var json;
   var resBody=[];
 
-
   if (!req.body) return res.sendStatus(400);
   if(req.body.password=='' || req.body.username==''){
     resBody.push({
-      "login":"failed",
+      "login":"fail",
       "reason":"Null variables",
       "code": 40
-      });
-      json = JSON.stringify(resBody);
-      res.writeHead(400, {"Content-Type": "application/json"});
-      res.end(json);
-      return;
+    });
+    json = JSON.stringify(resBody);
+    res.writeHead(400, {"Content-Type": "application/json"});
+    res.end(json);
+    return;
   }
   if( typeof req.body.password=='undefined' || typeof req.body.username =='undefined'){
     resBody.push({
-      "login":"failed",
+      "login":"fail",
       "reason":"Null variables",
       "code": 40
       });
@@ -489,7 +488,7 @@ app.post('/login', function(req, res) {
       if(result.rowCount==0){
         resBody.push({
           "login":"fail",
-          "reason": "Username does not exists",
+          "reason": "Username does not exist",
           "code": 42
         });
         json = JSON.stringify(resBody);
@@ -502,12 +501,10 @@ app.post('/login', function(req, res) {
 
       bcrypt.compare(password, result.rows[0].password, function(err, comp) {
         if(comp==true&&result.rows[0].authenticated==true){
-
           resBody.push({
-            "login":"sucess",
+            "login":"success",
             "reason": "",
             "code": 20
-
           });
           json = JSON.stringify(resBody);
           res.writeHead(200, {"Content-Type": "application/json"});
@@ -535,11 +532,8 @@ app.post('/login', function(req, res) {
           res.writeHead(400, {"Content-Type": "application/json"});
           res.end(json);
           return;
-
         }
       });
-
-
   });
 });
 
@@ -556,7 +550,7 @@ app.post('/login', function(req, res) {
  * @apiSuccessExample Success-Response:
  *    HTTP/1.1 200 OK
  *    {
- *      "login":"sucess",
+ *      "login":"success",
         "reason": "",
         "code": 20
  *
@@ -566,7 +560,7 @@ app.post('/login', function(req, res) {
  * @apiErrorExample Error-Response:
  *    HTTP/1.1 400 Polygon is not a polygon
  *    {
- *      "login":"failed",
+ *      "login":"fail",
         "reason":"Null variables",
         "code": 40
  *    }
@@ -606,7 +600,7 @@ app.post('/signup', function(req, res) {
   if (!req.body) return res.sendStatus(400);
   if(req.body.password=='' || req.body.username=='' || req.body.email==''){
     resBody.push({
-      "signup":"failed",
+      "signup":"fail",
       "reason":"Null variables",
       "code": 40
       });
@@ -617,7 +611,7 @@ app.post('/signup', function(req, res) {
   }
   if( typeof req.body.password=='undefined' || typeof req.body.username =='undefined'|| typeof req.body.email=='undefined' ){
     resBody.push({
-      "signup":"failed",
+      "signup":"fail",
       "reason":"Null variables",
       "code": 40
       });
@@ -646,7 +640,7 @@ app.post('/signup', function(req, res) {
   client.query(queryText,value,function(err,result) {
     if(err){
       resBody.push({
-        "signup":"failed",
+        "signup":"fail",
         "reason":"Database error",
         "code": 41
       });
@@ -660,7 +654,7 @@ app.post('/signup', function(req, res) {
 
     if(result.rowCount>0){
       resBody.push({
-      "signup":"failed",
+      "signup":"fail",
       "reason":"Username exists",
       "code": 42
       });
@@ -678,7 +672,7 @@ app.post('/signup', function(req, res) {
     client.query(queryText,value,function(err,result) {
       if(err){
         resBody.push({
-          "signup":"failed",
+          "signup":"fail",
           "reason":"Database errorr",
           "code": 41
         });
@@ -689,11 +683,9 @@ app.post('/signup', function(req, res) {
         return;
       }
 
-
-
       if(result.rowCount>0){
         resBody.push({
-        "signup":"failed",
+        "signup":"fail",
         "reason":"Sign up failed. Email is owned by another user",
         "code": 42
         });
@@ -704,18 +696,16 @@ app.post('/signup', function(req, res) {
         return;
       }
 
-
       //Password Encryption
       bcrypt.genSalt(saltRounds, function(err, salt) {
         bcrypt.hash(password, salt, function(err, hash) {
-
 
           queryText = "insert into aays.tbluserauth(username,password,email,authenticated) Values($1,$2,$3,$4);";
           value=[username,hash,email,false]
           client.query(queryText,value,function(err,result) {
               if(err){
                 resBody.push({
-                  "signup":"failed",
+                  "signup":"fail",
                   "reason":"Database error",
                   "code": 41
                 });
@@ -725,8 +715,6 @@ app.post('/signup', function(req, res) {
                 client.end();
                 return;
               }
-
-
 
               resBody.push({
                   "signup":"success",

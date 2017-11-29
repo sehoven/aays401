@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import MapContainer from './components/MapContainer.js';
+import LandingPage from './components/LandingPage.js';
 const ReactDOM = require('react-dom');
 
 require('./styles/_style.sass');
@@ -11,7 +11,7 @@ export class Index extends Component {
 
   render(){
     return (
-      <MapContainer />
+      <LandingPage />
     )
   }
 }
