@@ -65,7 +65,6 @@ export class Overlay extends Component {
   }
 
   finishClick() {
-
     let callback;
     if(this.props.finishClickCallback) {
       callback = () => { this.props.finishClickCallback(); };
@@ -221,7 +220,12 @@ export default class OverlayContainer extends Component {
             polyNum: ++prevState.polyNum,
             dataReady: true
           }));
-          that.setImgUrl(polygon);
+          let poly = that.state.polygons.getAt(that.state.polygons.size() - 1);
+          let fillColor = (poly.fillColor == null)?"0x000000":
+                          poly.fillColor.replace("#","0x");
+          that.setImgUrl( polygon,
+                          fillColor,
+                          poly.fillOpacity);
         });
       }
     }
@@ -240,7 +244,11 @@ export default class OverlayContainer extends Component {
             that.setState(prevState => ({
               data: [...prevState.data, json]
             }));
-            that.setImgUrl(polygonPoints);
+            let fillColor = (polygon.fillColor == null)?"0x000000":
+                            polygon.fillColor.replace("#","0x");
+            that.setImgUrl( polygonPoints,
+                            fillColor,
+                            polygon.fillOpacity);
           });
         }
       })).then(() => {
@@ -275,16 +283,19 @@ export default class OverlayContainer extends Component {
     }
   }
 
-  setImgUrl(polygon){
-    if(polygon != null) {
-      let url="https://maps.googleapis.com/maps/api/staticmap?&size=1000x1000&path=color:0x00000000|weight:5|fillcolor:0x00BDBDBD";
+  setImgUrl(polygon, rgb, a){
+    let rgba = rgb + Math.floor((a*256).toString(16));
+    let url="https://maps.googleapis.com/maps/api/staticmap?&size=1000x1000&path=color:"+rgb+"|weight:5|fillcolor:"+rgba;
+    if(polygon != null && polygon.length >= 2) {
       polygon.forEach(function(position) {
         url += "|" + position.lat + "," + position.lng;
       });
-      this.setState(prevState => ({
-        url: [...prevState.url, url]
-      }));
+      // Static API doesn't have polygon autocomplete. Close the path manually.
+      url += "|" + polygon[0].lat + "," + polygon[0].lng;
     }
+    this.setState(prevState => ({
+      url: [...prevState.url, url]
+    }));
   }
 
   render() {
