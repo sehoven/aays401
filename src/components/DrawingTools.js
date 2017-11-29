@@ -4,7 +4,7 @@ var randomColor = require('randomcolor');
 var polygonOptions = {
   strokeWeight: 0.2,
   strokeColor: '#000000',
-  fillOpacity: 0.20,
+  fillOpacity: 0.50,
   fillColor: '#000000',
   editable: true,
   zIndex: 1
@@ -181,16 +181,17 @@ export default class DrawingTools extends Component {
     this.polygonListener = null;
     this.mapListener = null;
 
-    if(this.props.polyNum == 0){
+    if (this.props.polyNum == 0){
       polygonOptions.fillOpacity = 0.1;
-      polygonOptions.strokeColor = '#000000';
+      polygonOptions.fillColor = '#000000';
       polygonOptions.strokeWeight = 1;
     } else {
       polygonOptions.fillColor = randomColor();
-      polygonOptions.fillOpacity = 0.45;
+      polygonOptions.fillOpacity = 0.5;
       polygonOptions.strokeWeight = 0.2;
     }
     polygonOptions.strokeColor = polygonOptions.fillColor;
+    console.log("CONSTRUCT", this.props.polyNum);
   }
 
   componentDidMount() {
@@ -198,12 +199,13 @@ export default class DrawingTools extends Component {
   }
 
   componentWillUpdate() {
+    console.log("UPDATE", this.props.polyNum);
     if(this.props.polyNum == 0){
       polygonOptions.fillColor = '#000000';
       polygonOptions.fillOpacity = 0.20;
     } else {
       polygonOptions.fillColor = randomColor();
-      polygonOptions.fillOpacity = 0.45;
+      polygonOptions.fillOpacity = 0.5;
     }
     polygonOptions.strokeColor = polygonOptions.fillColor;
   }

@@ -151,7 +151,7 @@ export default class OverlayContainer extends Component {
   drawClickCallback() { }
 
   clearClickCallback() {
-      let polycount = this.getInnerPolygonsCount()+(this.checkOuterPolygonExists());
+      let polycount = this.getInnerPolygonsCount()+this.checkOuterPolygonExists();
       let polygon = this.state.outerPolygon;
       let polygonArray = this.state.innerPolygons;
 
@@ -237,7 +237,7 @@ export default class OverlayContainer extends Component {
   updatePolygonData() {
     let that = this;
 
-    this.setState({url: [], data: [], polyNum: this.getInnerPolygonsCount()+this.checkOuterPolygonExists(), dataReady: false}, () => {
+    this.setState({url: [], data: [], polyNum: this.getInnerPolygonsCount() + this.checkOuterPolygonExists(), dataReady: false}, () => {
 
         let updateList=[];
         updateList.push(this.state.outerPolygon);
@@ -257,7 +257,6 @@ export default class OverlayContainer extends Component {
             }));
             let fillColor = (polygon.polygon.fillColor == null)?"0x000000":
                             polygon.polygon.fillColor.replace("#","0x");
-            console.log(polygon.polygon.fillOpacity);
             that.setImgUrl( polygonPoints,
                             fillColor,
                             polygon.polygon.fillOpacity);
@@ -275,10 +274,10 @@ export default class OverlayContainer extends Component {
     // Circles are much faster than Markers, so markers are used sparingly
     // for numbers. It's slower to render squares with Markers despite
     // squares having far fewer edges.
-    let polygon = this.state.polygons.getAt(0);
+    let polygon = this.state.outerPolygon;
     if (!polygon) return null;
     let that = this;
-    let points = this.state.polygons.convertOneToLatLng(polygon);
+    let points = polygon.convertToLatLng();
     HTTPService.getUnits(points)
     .then(function(json){
       that.clearCircles();
@@ -299,17 +298,16 @@ export default class OverlayContainer extends Component {
         // all tooltips, but that makes the app unusable
         if (json[item]["count"] > 1){
           var newNumber = new google.maps.Marker({
-            title: json[item]["type"] + ", count: " + json[item]["count"],
             position: { lat: json[item]["lat"], lng: json[item]["lng"] },
             icon: {
-              path: 'M 1,1 -1,1 -1,-1 1,-1 z', // This is hacky, but alternatives are >100 lines
+              path: 'M 0,0 z',
               strokeWeight: 0,
               scale: radius
             },
             label: (json[item]["count"]==1)?null:{
               text: "" + json[item]["count"],
               color: 'white',
-              fontSize: "8px"
+              fontSize: "10px"
             },
             map: that.props.map
           });
@@ -329,6 +327,27 @@ export default class OverlayContainer extends Component {
     }
     this.circles = []; // Delete old circles by removing references
   }
+
+  removeAllPolygons() {
+    if(this.checkOuterPolygonExists()) {
+      this.state.outerPolygon.remove();
+    }
+    if(this.state.innerPolygons.size > 0) {
+      for(let i = 0; i < this.state.innerPolygons.size; i++) {
+        this.state.innerPolygons.getAt(i).remove();
+      }
+    }
+    this.setState({
+      isDrawing: false,
+      outerPolygon: null,
+      innerPolygons: new PolygonArray(),
+      polyNum: 0,
+      dataReady: false,
+      data: [],
+      url: []
+    });
+  }
+
   addFirstPolygon(polygon) {
       if(polygon != null) {
           //need to clear all previous polygons first
