@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+checkOuterPolygonExitsimport React, { Component } from 'react';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
 import DrawingTools, { PolygonTools } from './DrawingTools.js';
 
@@ -173,17 +173,22 @@ export default class OverlayContainer extends Component {
     this.setState({isDrawing: value}, callback);
   }
 
-  checkOuterPolygonState() {
+  checkOuterPolygonExists() {
       if(this.state.outerPolygon == null){
           return 0;
       } else {
           return 1;
       }
   }
+
+  getInnerPolygonsCount() {
+      return this.state.innerPolygons.size();
+  }
+
   drawClickCallback() { }
 
   clearClickCallback() {
-      let polycount = this.state.innerPolygons.size()+(this.checkOuterPolygonState());
+      let polycount = this.getInnerPolygonsCount()+(this.checkOuterPolygonExits());
       let polygon = this.state.outerPolygon;
       let polygonArray = this.state.innerPolygons;
 
@@ -234,11 +239,11 @@ export default class OverlayContainer extends Component {
     let that = this;
     let polygon = null;
 
-    if(this.checkOuterPolygonState() && this.state.polyNum == 0) {
+    if(this.checkOuterPolygonExits() && this.state.polyNum == 0) {
         polygon = this.state.outerPolygon.convertToLatLng();
     }
-    else if(this.checkOuterPolygonState() && (this.state.polyNum < this.state.innerPolygons.size() + this.checkOuterPolygonState())){
-        polygon = this.state.innerPolygons.getAt(this.state.innerPolygons.size() - 1).convertToLatLng();
+    else if(this.checkOuterPolygonExits() && (this.state.polyNum < this.getInnerPolygonsCount() + this.checkOuterPolygonExits())){
+        polygon = this.state.innerPolygons.getAt(this.getInnerPolygonsCount() - 1).convertToLatLng();
     }
 
     if(polygon) {
@@ -258,11 +263,11 @@ export default class OverlayContainer extends Component {
   updatePolygonData() {
     let that = this;
 
-    this.setState({url: [], data: [], polyNum: this.state.innerPolygons.size()+this.checkOuterPolygonState(), dataReady: false}, () => {
+    this.setState({url: [], data: [], polyNum: this.getInnerPolygonsCount()+this.checkOuterPolygonExits(), dataReady: false}, () => {
 
         let updateList=[];
         updateList.push(this.state.outerPolygon);
-        for(let i = 0; i < this.state.innerPolygons.size(); i++){
+        for(let i = 0; i < this.getInnerPolygonsCount(); i++){
             updateList.push(this.state.innerPolygons.getAt(i));
         }
 
@@ -286,7 +291,7 @@ export default class OverlayContainer extends Component {
   }
 
   removeAllPolygons() {
-      if(this.checkOuterPolygonState()) {
+      if(this.checkOuterPolygonExits()) {
           this.state.outerPolygon.remove();
       }
       if(this.state.innerPolygons.size > 0) {
@@ -356,7 +361,7 @@ export default class OverlayContainer extends Component {
           toggleDrawingTools={this.toggleDrawingTools.bind(this)}
           drawClickCallback={this.drawClickCallback.bind(this)}
           clearClickCallback={this.clearClickCallback.bind(this)}
-          canClear={ (this.state.innerPolygons.size()+this.checkOuterPolygonState() != null) }
+          canClear={ (this.getInnerPolygonsCount()+this.checkOuterPolygonExits() != null) }
           finishClickCallback={this.finishClickCallback.bind(this)}
           addClickCallback = {this.addClickCallback.bind(this)}
           cancelClickCallback={this.cancelClickCallback.bind(this)} />
@@ -401,7 +406,7 @@ export default class OverlayContainer extends Component {
   }
 }
 
-export class Polygon {
+class Polygon {
     constructor(x){
         this.polygon = x;
     }
@@ -428,7 +433,7 @@ export class Polygon {
 }
 
 // Class to handle the polygon objects visible on the map.
-export class PolygonArray {
+class PolygonArray {
   constructor(...x) {
     this.arr = [...x];
   }
