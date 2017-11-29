@@ -45,7 +45,6 @@ export function login(info) {
 
 export function signup(info) {
   let body = JSON.stringify({ "username" : info.username,"password":info.password,"email":info.email});
-  console.log(body);
   return fetch( ` http://localhost:3000/signup` ,
                 { "method": 'POST',
                     "body": body,

@@ -684,8 +684,6 @@ app.post('/signup', function(req, res) {
         return;
       }
 
-
-
       if(result.rowCount>0){
         resBody.push({
         "signup":"fail",
@@ -699,11 +697,9 @@ app.post('/signup', function(req, res) {
         return;
       }
 
-
       //Password Encryption
       bcrypt.genSalt(saltRounds, function(err, salt) {
         bcrypt.hash(password, salt, function(err, hash) {
-
 
           queryText = "insert into aays.tbluserauth(username,password,email,authenticated) Values($1,$2,$3,$4);";
           value=[username,hash,email,false]
@@ -720,8 +716,6 @@ app.post('/signup', function(req, res) {
                 client.end();
                 return;
               }
-
-
 
               resBody.push({
                   "signup":"success",
