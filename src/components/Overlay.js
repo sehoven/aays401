@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
 import DrawingTools, { PolygonTools } from './DrawingTools.js';
+<<<<<<< HEAD
 import 'react-notifications/lib/notifications.css';
+=======
+import { STATIC_STYLE, IMAGE_DIMENSIONS } from '../settings';
+>>>>>>> 0bc3f2313e54cf5a19d6a094e1a9e69b41498e8e
 
 const HTTPService = require('./HTTPService.js');
 const notificationTimer = 2000;
@@ -404,7 +408,10 @@ export default class OverlayContainer extends Component {
 
   setImgUrl(polygon, rgb, a){
     let rgba = rgb + Math.floor(parseFloat((a*256).toString(16)));
-    let url="https://maps.googleapis.com/maps/api/staticmap?&size=1000x1000&path=color:"+rgb+"|weight:5|fillcolor:"+rgba;
+    let url = "https://maps.googleapis.com/maps/api/staticmap?"
+            + "key=AIzaSyC2mXFuLvwiASA3mSr2kz79fnXUYRwLKb8"
+            + STATIC_STYLE + "&size=" + IMAGE_DIMENSIONS + "&path=color:" + rgb
+            + "|weight:5|fillcolor:" + rgba;
     if(polygon != null && polygon.length >= 2) {
       polygon.forEach(function(position) {
         url += "|" + position.lat.toFixed(6) + "," + position.lng.toFixed(6);
@@ -412,7 +419,6 @@ export default class OverlayContainer extends Component {
       // Static API doesn't have polygon autocomplete. Close the path manually.
       url += "|" + polygon[0].lat + "," + polygon[0].lng;
     }
-    url += "&key=AIzaSyC2mXFuLvwiASA3mSr2kz79fnXUYRwLKb8";
     this.setState(prevState => ({
       url: [...prevState.url, url]
     }));
