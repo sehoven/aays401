@@ -65,7 +65,6 @@ export class Overlay extends Component {
   }
 
   finishClick() {
-
     let callback;
     if(this.props.finishClickCallback) {
       callback = () => { this.props.finishClickCallback(); };
@@ -236,28 +235,40 @@ export default class OverlayContainer extends Component {
   }
 
   appendPolygonData() {
-    let that = this;
-    let polygon = null;
+      let that = this;
+      let polygon = null;
+      var fillColor, fillOpacity;
 
-    if(this.checkOuterPolygonExists() && this.state.polyNum == 0) {
-        polygon = this.state.outerPolygon.convertToLatLng();
-    }
-    else if(this.checkOuterPolygonExists() && (this.state.polyNum < this.getInnerPolygonsCount() + this.checkOuterPolygonExists())){
-        polygon = this.state.innerPolygons.getAt(this.getInnerPolygonsCount() - 1).convertToLatLng();
-    }
-
-    if(polygon) {
-      HTTPService.countPolyResidences(
-        { points: polygon }
-      ).then(function(json){
-        that.setState(prevState => ({
-          data: [...prevState.data, json],
-          polyNum: ++prevState.polyNum,
-          dataReady: true
-        }));
-        that.setImgUrl(polygon);
-      });
-    }
+      if(this.checkOuterPolygonExists() && this.state.polyNum == 0) {
+          polygon = this.state.outerPolygon.convertToLatLng();
+          fillColor = (this.state.outerPolygon.polygon.fillColor == null)?"0x000000":
+                      this.state.outerPolygon.polygon.fillColor.replace("#","0x");
+          fillOpacity = this.state.outerPolygon.polygon.fillOpacity;
+          console.log(fillColor, fillOpacity);
+      }
+      else if(this.checkOuterPolygonExists() && (this.state.polyNum < this.getInnerPolygonsCount() + this.checkOuterPolygonExists())){
+          let poly = this.state.innerPolygons.getAt(this.getInnerPolygonsCount() - 1);
+          polygon = poly.convertToLatLng();
+          fillColor = (poly.polygon.fillColor == null)?"0x000000":
+                          poly.polygon.fillColor.replace("#","0x");
+          fillOpacity = poly.polygon.fillOpacity;
+          console.log(fillColor, fillOpacity);
+      }
+    //if(this.state.polyNum < this.state.polygons.size()) {
+      if(polygon) {
+        HTTPService.countPolyResidences(
+          { points: polygon }
+        ).then(function(json){
+          that.setState(prevState => ({
+            data: [...prevState.data, json],
+            polyNum: ++prevState.polyNum,
+            dataReady: true
+          }));
+          that.setImgUrl( polygon,
+                          fillColor,
+                          fillOpacity);
+        });
+      }
   }
 
   updatePolygonData() {
@@ -281,7 +292,11 @@ export default class OverlayContainer extends Component {
             that.setState(prevState => ({
               data: [...prevState.data, json]
             }));
-            that.setImgUrl(polygonPoints);
+            let fillColor = (polygon.polygon.fillColor == null)?"0x000000":
+                            polygon.polygon.fillColor.replace("#","0x");
+            that.setImgUrl( polygonPoints,
+                            fillColor,
+                            polygon.polygon.fillOpacity);
           });
         }
       })).then(() => {
@@ -348,16 +363,19 @@ export default class OverlayContainer extends Component {
     }
   }
 
-  setImgUrl(polygon){
-    if(polygon != null) {
-      let url="https://maps.googleapis.com/maps/api/staticmap?&size=1000x1000&path=color:0x00000000|weight:5|fillcolor:0x00BDBDBD";
+  setImgUrl(polygon, rgb, a){
+    let rgba = rgb + Math.floor((a*256).toString(16));
+    let url="https://maps.googleapis.com/maps/api/staticmap?&size=1000x1000&path=color:"+rgb+"|weight:5|fillcolor:"+rgba;
+    if(polygon != null && polygon.length >= 2) {
       polygon.forEach(function(position) {
-        url += "|" + position.lat + "," + position.lng;
+        url += "|" + position.lat.toFixed(6) + "," + position.lng.toFixed(6);
       });
-      this.setState(prevState => ({
-        url: [...prevState.url, url]
-      }));
+      // Static API doesn't have polygon autocomplete. Close the path manually.
+      url += "|" + polygon[0].lat + "," + polygon[0].lng;
     }
+    this.setState(prevState => ({
+      url: [...prevState.url, url]
+    }));
   }
 
   render() {
