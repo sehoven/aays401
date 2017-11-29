@@ -448,7 +448,7 @@ export default class OverlayContainer extends Component {
                         polyNum={this.state.polyNum} /> : null
         }
         { this.props.active &&
-          <div id="navbar-list-draw">
+          <div className="parent-height">
             <div className="checkbox-holder">
               <div className="fifth-checkbox">
                 <label id="checkbox-red" className="containerButton">
@@ -486,23 +486,25 @@ export default class OverlayContainer extends Component {
               </label>
               </div>
             </div>
-            {this.state.dataReady ? this.state.data.map((itemData, i)=>
-              <div className="navbar-count-poly-box" key={i}>
-                <div className="navbar-image-box"><a href={this.state.url[i]} download="map">{<img className="image" src= {this.state.url[i]}/>}</a></div>
-                <div className="navbar-count-poly-text">
-                  <label className="containerButton">Residences: {this.state.dataReady? itemData.Residential.total:"?"}
-                  </label>
-                  <label className="containerButton">Apartments: {this.state.dataReady? itemData.Apartment.total:"?"}
-                  </label>
-                  <label className="containerButton">Industrial: {this.state.dataReady? itemData.Industrial.total:"?"}
-                  </label>
-                  <label className="containerButton">Commercial: {this.state.dataReady? itemData.Commercial.total:"?"}
-                  </label>
-                  <label className="containerButton">Unspecified: {this.state.dataReady? itemData.Other:"?"}
-                  </label>
+            <div id="navbar-list-draw">
+              {this.state.dataReady ? this.state.data.map((itemData, i)=>
+                <div className="navbar-count-poly-box" key={i}>
+                  <div className="navbar-image-box"><a href={this.state.url[i]} download="map">{<img className="image" src= {this.state.url[i]}/>}</a></div>
+                  <div className="navbar-count-poly-text">
+                    <label className="containerButton">Residences: {this.state.dataReady? itemData.Residential.total:"?"}
+                    </label>
+                    <label className="containerButton">Apartments: {this.state.dataReady? itemData.Apartment.total:"?"}
+                    </label>
+                    <label className="containerButton">Industrial: {this.state.dataReady? itemData.Industrial.total:"?"}
+                    </label>
+                    <label className="containerButton">Commercial: {this.state.dataReady? itemData.Commercial.total:"?"}
+                    </label>
+                    <label className="containerButton">Unspecified: {this.state.dataReady? itemData.Other:"?"}
+                    </label>
+                  </div>
                 </div>
-              </div>
-            ): null}
+              ): null}
+            </div>
           </div>
         }
       </div>
