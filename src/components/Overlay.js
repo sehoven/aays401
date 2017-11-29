@@ -1,11 +1,8 @@
 import React, { Component } from 'react';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
 import DrawingTools, { PolygonTools } from './DrawingTools.js';
-<<<<<<< HEAD
 import 'react-notifications/lib/notifications.css';
-=======
 import { STATIC_STYLE, IMAGE_DIMENSIONS } from '../settings';
->>>>>>> 0bc3f2313e54cf5a19d6a094e1a9e69b41498e8e
 
 const HTTPService = require('./HTTPService.js');
 const notificationTimer = 2000;
@@ -451,7 +448,7 @@ export default class OverlayContainer extends Component {
                         polyNum={this.state.polyNum} /> : null
         }
         { this.props.active &&
-          <div id="navbar-list">
+          <div id="navbar-list-draw">
             {this.state.dataReady ? this.state.data.map((itemData, i)=>
               <div className="navbar-count-poly-box" key={i}>
                 <div className="navbar-image-box"><a href={this.state.url[i]} download="map">{<img className="image" src= {this.state.url[i]}/>}</a></div>

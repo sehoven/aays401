@@ -122,7 +122,7 @@ export default class NavList extends React.Component {
       )
     } else {
       return (
-        <div id="navbar-list">
+        <div id="navbar-list-search">
           {this.props.autocomplete.map((itemData, i) =>
             <div className="navbar-list-autocomplete-item"
             key={i}
