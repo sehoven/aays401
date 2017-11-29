@@ -1,4 +1,4 @@
-checkOuterPolygonExitsimport React, { Component } from 'react';
+import React, { Component } from 'react';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
 import DrawingTools, { PolygonTools } from './DrawingTools.js';
 
