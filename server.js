@@ -381,34 +381,59 @@ app.post('/addressCount', function(req, res) {
 
 
 
-// Handle requests to "/locations"
-// Returns all known locations that match existing query items
 /**
- * @api {get} /locations/{text} List all neighbourhoods in Edmonton that match search string
- * @apiName locations
- * @apiGroup Polygon
- * @apiDescription Handle requests to /locations Returns all known locations that match existing query items
- * @apiParam {String} Any text that is reterived from search bar in the frontend
- * @apiError (Polygon) {get} NullParameters The parameters required are null
- * @apiParamExample {String} SearchString:
- *                        "Rutherford"
+ * @api {post} /login/{body[]} Login / Authentication
+ * @apiGroup User
+ * @apiDescription Receives a username and password and authenticated is with the database, checking if the user indeed exists and also if the user is authenticated to login
+ * @apiParam {Object[]} An array of username, password, email
+ * @apiParamExample {body[]} :
+ *                        "username": "username",
+ *                        "password": "password",
+ *                        "email": "email"
  * @apiSuccessExample Success-Response:
  *    HTTP/1.1 200 OK
  *    {
- *      "neighborhoods"[{
- *          "name":"NiceAvenue",
- *          "points":[{"lat":-113,"lng":53},{"lat":-113,"lng":53}],
- *          "center":{"lat":-113,"lng":53},
- *          "radius":0.111
- *          "width":0.111
- *          "height":0.111
- *      }
+ *      "login":"sucess",
+        "reason": "",
+        "code": 20
+ *      
  *    }
- * @apiError (Polygon) {get} NullParameters The parameters required are null
+ * @apiError (User) {post} NullParameters The parameters required are null
+ * @apiError (User) {post} InvalidParameters The parameters required do not create a shape with area.
  * @apiErrorExample Error-Response:
- *    HTTP/1.1 400 Null parameters
+ *    HTTP/1.1 400 Polygon is not a polygon
  *    {
- *      "error":"Null parameters"
+ *      "login":"failed",
+        "reason":"Null variables",
+        "code": 40
+ *    }
+ * 
+ *    HTTP/1.1 400 Polygon is not a polygon
+ *    {
+ *      "login":"fail",
+        "reason": "Database error",
+        "code": 41
+ *    }
+ * 
+ *    HTTP/1.1 400 Polygon is not a polygon
+ *    {
+ *      "login":"fail",
+        "reason": "Username does not exists",
+        "code": 42
+ *    }
+ * 
+ *    HTTP/1.1 400 Polygon is not a polygon
+ *    {
+ *      "login":"fail",
+        "reason": "This user has not been authenticted by DBA",
+        "code": 42
+ *    }
+ * 
+ *    HTTP/1.1 400 Polygon is not a polygon
+ *    {
+ *      "login":"fail",
+        "reason": "Invalid password",
+        "code": 42
  *    }
  */
 app.post('/login', function(req, res) {
@@ -420,7 +445,7 @@ app.post('/login', function(req, res) {
   if (!req.body) return res.sendStatus(400);
   if(req.body.password=='' || req.body.username==''){
     resBody.push({
-      "signup":"failed",
+      "login":"failed",
       "reason":"Null variables",
       "code": 40
       });
@@ -431,7 +456,7 @@ app.post('/login', function(req, res) {
   }
   if( typeof req.body.password=='undefined' || typeof req.body.username =='undefined'){
     resBody.push({
-      "signup":"failed",
+      "login":"failed",
       "reason":"Null variables",
       "code": 40
       });
@@ -523,34 +548,59 @@ app.post('/login', function(req, res) {
 });
 
 
-// Handle requests to "/locations"
-// Returns all known locations that match existing query items
 /**
- * @api {get} /locations/{text} List all neighbourhoods in Edmonton that match search string
- * @apiName locations
- * @apiGroup Polygon
- * @apiDescription Handle requests to /locations Returns all known locations that match existing query items
- * @apiParam {String} Any text that is reterived from search bar in the frontend
- * @apiError (Polygon) {get} NullParameters The parameters required are null
- * @apiParamExample {String} SearchString:
- *                        "Rutherford"
+ * @api {post} /login/{body[]} Login / Authentication
+ * @apiGroup User
+ * @apiDescription Receives a username and password and authenticated is with the database, checking if the user indeed exists and also if the user is authenticated to login
+ * @apiParam {Object[]} An array of username, password, email
+ * @apiParamExample {body[]} :
+ *                        "username": "username",
+ *                        "password": "password",
+ *                        "email": "email"
  * @apiSuccessExample Success-Response:
  *    HTTP/1.1 200 OK
  *    {
- *      "neighborhoods"[{
- *          "name":"NiceAvenue",
- *          "points":[{"lat":-113,"lng":53},{"lat":-113,"lng":53}],
- *          "center":{"lat":-113,"lng":53},
- *          "radius":0.111
- *          "width":0.111
- *          "height":0.111
- *      }
+ *      "login":"sucess",
+        "reason": "",
+        "code": 20
+ *      
  *    }
- * @apiError (Polygon) {get} NullParameters The parameters required are null
+ * @apiError (User) {post} NullParameters The parameters required are null
+ * @apiError (User) {post} InvalidParameters The parameters required do not create a shape with area.
  * @apiErrorExample Error-Response:
- *    HTTP/1.1 400 Null parameters
+ *    HTTP/1.1 400 Polygon is not a polygon
  *    {
- *      "error":"Null parameters"
+ *      "login":"failed",
+        "reason":"Null variables",
+        "code": 40
+ *    }
+ * 
+ *    HTTP/1.1 400 Polygon is not a polygon
+ *    {
+ *      "login":"fail",
+        "reason": "Database error",
+        "code": 41
+ *    }
+ * 
+ *    HTTP/1.1 400 Polygon is not a polygon
+ *    {
+ *      "login":"fail",
+        "reason": "Username does not exists",
+        "code": 42
+ *    }
+ * 
+ *    HTTP/1.1 400 Polygon is not a polygon
+ *    {
+ *      "login":"fail",
+        "reason": "This user has not been authenticted by DBA",
+        "code": 42
+ *    }
+ * 
+ *    HTTP/1.1 400 Polygon is not a polygon
+ *    {
+ *      "login":"fail",
+        "reason": "Invalid password",
+        "code": 42
  *    }
  */
 app.post('/signup', function(req, res) {
