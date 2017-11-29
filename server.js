@@ -224,7 +224,8 @@ app.post('/addressCount', function(req, res) {
                               "High Rise Apartments":0
                   },
                   "Industrial": {"title":"Industrial","total":0},
-                  "Commercial": {"title":"Commercial","total":0}
+                  "Commercial": {"title":"Commercial","total":0},
+                  "Other": 0
                   };
 
   //Connect to DB
@@ -278,7 +279,6 @@ app.post('/addressCount', function(req, res) {
 
       if(inside(point,polygon)){
         switch(result.rows[item].type){
-
           case 'Residential':
             resBody.Residential.total++;
             switch(result.rows[item].subvalue){
@@ -315,6 +315,9 @@ app.post('/addressCount', function(req, res) {
             break;
           case 'Commercial':
             resBody.Commercial.total++;
+            break;
+          default:
+            resBody.Other++;
             break;
         }
       }

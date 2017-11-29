@@ -466,6 +466,10 @@ export default class OverlayContainer extends Component {
                     <input type="checkbox" defaultChecked={true}></input>
                     <span className="checkmark"></span>
                   </label>
+                  <label className="containerButton">Unspecified: {this.state.dataReady? itemData.Other:"?"}
+                    <input type="checkbox" defaultChecked={true}></input>
+                    <span className="checkmark"></span>
+                  </label>
                 </div>
               </div>
             ): null}
