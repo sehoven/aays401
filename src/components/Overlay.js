@@ -90,21 +90,23 @@ export class Overlay extends Component {
 
     if (!this.props.active) return null;
 
-    let drawButton = <button id="draw-button" onClick={this.drawClick.bind(this)}>DRAW</button>;
-    let clearButton = <button id="clear-button" onClick={this.clearClick.bind(this)}>CLEAR</button>;
-    let cancelButton = <button id="cancel-draw-button" style={{width: 120}} onClick={this.cancelClick.bind(this)}>RETURN</button>;
-    let finishButton = <button id="finish-draw-button" style={{width: 120}} onClick={this.finishClick.bind(this)}>FINISH</button>;
-    let addButton = <button id="add-draw-button" style={{width: 120}}  onClick={this.addClick.bind(this)}>ADD</button>;
+    let buttonGroup = [
+      <button id="draw-button" onClick={this.drawClick.bind(this)} style={{width: "45%"}} key="0">DRAW</button>,
+      <button id="clear-button" onClick={this.clearClick.bind(this)} style={{width: "45%"}} key="1">CLEAR</button>
+    ];
+    let drawButtonGroup = [
+      <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)} style={{width: "28%"}} key="0">RETURN</button>,
+      <button id="finish-draw-button" onClick={this.finishClick.bind(this)} style={{width: "28%"}} key="1">FINISH</button>,
+      <button id="add-draw-button" onClick={this.addClick.bind(this)} style={{width: "28%"}} key="2">ADD</button>
+    ]
 
     return (
       <div className="overlayContainer">
+        { this.state.banner }
         <NotificationContainer/>
         <center>
-        { this.state.isDrawing ? null : drawButton }
-        { this.state.isDrawing || !this.props.canClear ? null : clearButton }
-        { this.state.isDrawing ? cancelButton : null }
-        { this.state.isDrawing ? finishButton : null }
-        { this.state.isDrawing ? addButton : null }
+        { this.state.isDrawing ? null : buttonGroup }
+        { !this.state.isDrawing ? null : drawButtonGroup }
         </center>
         &nbsp;
       </div>
@@ -287,7 +289,7 @@ export default class OverlayContainer extends Component {
         if(polygonPoints.length > 0) {
           HTTPService.countPolyResidences(
             { points: polygonPoints }
-          ).then(function(json){
+          ).then(function(json) {
             that.setState(prevState => ({
               data: [...prevState.data, json]
             }));
@@ -470,7 +472,6 @@ export default class OverlayContainer extends Component {
           toggleDrawingTools={this.toggleDrawingTools.bind(this)}
           drawClickCallback={this.drawClickCallback.bind(this)}
           clearClickCallback={this.clearClickCallback.bind(this)}
-          canClear={ (this.getInnerPolygonsCount()+this.checkOuterPolygonExists() != null) }
           finishClickCallback={this.finishClickCallback.bind(this)}
           addClickCallback = {this.addClickCallback.bind(this)}
           cancelClickCallback={this.cancelClickCallback.bind(this)} />

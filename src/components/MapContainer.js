@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { AppBar } from './UIComponents.js';
 import Map from './Map.js'
 import Tabs from './Tabs';
 import {Enum} from 'enumify';
@@ -31,9 +32,6 @@ export default class MapContainer extends Component {
   render() {
     return (
       <div>
-        <div className="header">
-          ANTHONY AT YOUR SERVICE
-        </div>
         <div className="container">
           <div className="left">
             { this.state.mapLoaded &&

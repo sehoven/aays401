@@ -22,7 +22,7 @@ $overlayContainerHeight: 70px
 h1
   color: blue
 
-body
+body, input
   margin: 0
   font-family: 'Raleway', sans-serif
   -webkit-user-select: none
@@ -42,6 +42,40 @@ body
   text-align: center
   padding: 13px 10px 10px 10px
   color: white
+
+.modal
+  position: absolute
+  top: 40px
+  left: 40px
+  right: 40px
+  bottom: 40px
+  background-color: white
+  padding: 10px
+  border: solid 1px black
+  margin: 0 auto
+
+.modal-auth
+  width: 30vw
+  height: 180px
+
+.modal h2, p
+  text-align: center
+
+.modal button
+  float: right
+
+.auth-form
+  margin-top: 20vh
+
+.auth-block
+  margin-top: 10px
+  text-align: center
+
+.auth-block input
+  padding: 5px
+  margin: 10px
+  width: 30vw
+  font-size: 24px
 
 .tabContainer
   height: 100%
@@ -250,7 +284,8 @@ button
   color: #FFFFFF
   text-align: center
   font-size: 14px
-  padding: 20px
+  padding-top: 20px
+  padding-bottom: 20px
   width: 185px
   transition: all 0.2s
   cursor: pointer
