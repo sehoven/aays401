@@ -26,6 +26,9 @@ body, input
   margin: 0
   font-family: 'Raleway', sans-serif
 
+*:focus
+  outline: 5px auto #babdbe
+
 .center-horizontal
   margin: 0 auto
 
@@ -44,7 +47,6 @@ body, input
   top: 40px
   left: 40px
   right: 40px
-  bottom: 40px
   background-color: white
   padding: 10px
   border: solid 1px black
@@ -52,7 +54,7 @@ body, input
 
 .modal-auth
   width: 30vw
-  height: 180px
+  overflow: auto
 
 .modal h2, p
   text-align: center
@@ -61,17 +63,33 @@ body, input
   float: right
 
 .auth-form
-  margin-top: 20vh
+  margin-top: 40px
+  margin-bottom: 40px
 
 .auth-block
-  margin-top: 10px
+  margin-top: 5px
   text-align: center
 
 .auth-block input
   padding: 5px
-  margin: 10px
+  margin: 5px
   width: 30vw
   font-size: 24px
+
+.auth-block .mismatch
+  border: solid red 1px
+  background: rgba(255, 0, 0, 0.05)
+
+.auth-container
+  width: 40vw
+  height: 100%
+  margin: 0 auto
+  margin-top: 10vh
+  margin-bottom: 10vh
+  border: solid 1px black
+
+.warning
+  color: rgb(255, 0, 0)
 
 .tabContainer
   height: 100%
@@ -105,15 +123,12 @@ body, input
   background-color: white
   color: black
 
-
 .navPanel
   height: calc(100% - #{$totalHeaderHeight} - #{$tabButtonsHeight} - 10px)
   width: calc(100% - (2 * #{$navPanelPadding})
   display: table
   padding: $navPanelPadding
   background: linear-gradient(to bottom, #ada996, #f2f2f2, #dbdbdb, #eaeaea)
-
-
 
 .container
   position: absolute

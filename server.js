@@ -421,7 +421,7 @@ app.post('/addressCount', function(req, res) {
  *    HTTP/1.1 400 Polygon is not a polygon
  *    {
  *      "login":"fail",
-        "reason": "This user has not been authenticted by DBA",
+        "reason": "This user has not been authenticated by DBA",
         "code": 42
  *    }
  *
@@ -514,7 +514,7 @@ app.post('/login', function(req, res) {
         else if (comp==true &&(result.rows[0].authenticated==false||result.rows[0].authenticated==null)){
           resBody.push({
             "login":"fail",
-            "reason": "This user has not been authenticted by DBA",
+            "reason": "This user has not been authenticated by DBA",
             "code": 42
           });
           json = JSON.stringify(resBody);
@@ -582,7 +582,7 @@ app.post('/login', function(req, res) {
  *    HTTP/1.1 400 Polygon is not a polygon
  *    {
  *      "login":"fail",
-        "reason": "This user has not been authenticted by DBA",
+        "reason": "This user has not been authenticated by DBA",
         "code": 42
  *    }
  *
