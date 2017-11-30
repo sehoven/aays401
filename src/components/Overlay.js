@@ -171,10 +171,13 @@ export default class OverlayContainer extends Component {
       dataReady: false,
       data: [],
       url: [],
-      showModal: false
+      showModal: false,
+      currentImage:null
     }
     this.handleOpenModal = this.handleOpenModal.bind(this);
     this.handleCloseModal = this.handleCloseModal.bind(this);
+    this.PreviousImage = this.PreviousImage.bind(this);
+    this.NextImage = this.NextImage.bind(this);
   }
 
   toggleDrawingTools(value, callback) {
@@ -391,14 +394,22 @@ export default class OverlayContainer extends Component {
     }));
   }
   handleOpenModal () {
-    this.setState({ showModal: true });
+    this.setState({ showModal: true,currentImage:0});
+
     console.log("open modal");
   }
 
   handleCloseModal () {
     this.setState({ showModal: false });
   }
-
+  PreviousImage(){
+    let previous = this.state.currentImage-1
+    {previous>=0&& this.setState({currentImage:previous})}
+  }
+  NextImage(){
+    let next = this.state.currentImage+1
+    {next<this.state.polyNum&&this.setState({currentImage:next})}
+  }
   render() {
     if (!this.props.active) return null;
     return (
@@ -424,7 +435,7 @@ export default class OverlayContainer extends Component {
                         addPolygon={(polygon) => this.addPolygon(polygon)}
                         polyNum={this.state.polyNum} /> : null
         }
-        {this.state.isDrawing?null:
+        {!this.state.isDrawing && this.state.polyNum>0?
           <div>
             <button onClick={this.handleOpenModal} className="output-button">Output Map</button>
             <Modal
@@ -432,11 +443,21 @@ export default class OverlayContainer extends Component {
                   contentLabel="Output Map"
                   onRequestClose={this.handleCloseModal}
                   className="Modal"
-                  overlayClassName="ModalOverlay"
+                  overlayClassName="modal-overlay"
                 >
-                <div>waaaaaaaaaaaaaaaaaaaaaa</div>
+                <div className="modal-text">Click the image to download!</div>
+                <center className="modal-image">
+                  <a href={this.state.url[this.state.currentImage]} download="map">{<img className="image" src= {this.state.url[this.state.currentImage]}/>}</a>
+                </center>
+                <div>
+                  <button className="modal-previous" onClick = {this.PreviousImage}>Previous</button>
+                  <button className="modal-next" onClick = {this.NextImage}>Next</button>
+                </div>
+
+                <button className="modal-back" onClick ={this.handleCloseModal} >Back</button>
               </Modal>
           </div>
+          :null
         }
         { this.props.active &&
           <div id="navbar-list">
