@@ -25,6 +25,7 @@ digraph "largeImpliedRelationshipsDiagram" {
       <TR><TD COLSPAN="3" BGCOLOR="#9bab96" ALIGN="CENTER">luzoningcodes</TD></TR>
       <TR><TD PORT="zoningcode" COLSPAN="3" BGCOLOR="#bed1b8" ALIGN="LEFT">zoningcode</TD></TR>
       <TR><TD PORT="value" COLSPAN="3" ALIGN="LEFT">value</TD></TR>
+      <TR><TD PORT="subvalue" COLSPAN="3" ALIGN="LEFT">subvalue</TD></TR>
       <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">  </TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">72 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
     </TABLE>>
     URL="tables/luzoningcodes.html"
@@ -35,8 +36,8 @@ digraph "largeImpliedRelationshipsDiagram" {
     <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="#ffffff">
       <TR><TD COLSPAN="3" BGCOLOR="#9bab96" ALIGN="CENTER">tblproperty</TD></TR>
       <TR><TD PORT="streetaddress" COLSPAN="3" ALIGN="LEFT">streetaddress</TD></TR>
-      <TR><TD PORT="latitude" COLSPAN="3" ALIGN="LEFT">latitude</TD></TR>
-      <TR><TD PORT="longitude" COLSPAN="3" ALIGN="LEFT">longitude</TD></TR>
+      <TR><TD PORT="latitude" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">latitude</TD></TR>
+      <TR><TD PORT="longitude" COLSPAN="3" BGCOLOR="#f4f7da" ALIGN="LEFT">longitude</TD></TR>
       <TR><TD PORT="zoningcode" COLSPAN="3" ALIGN="LEFT">zoningcode</TD></TR>
       <TR><TD PORT="housenumber" COLSPAN="3" ALIGN="LEFT">housenumber</TD></TR>
       <TR><TD PORT="propertyid" COLSPAN="3" BGCOLOR="#bed1b8" ALIGN="LEFT">propertyid</TD></TR>

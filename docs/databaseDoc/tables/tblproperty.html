@@ -102,7 +102,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 </tr>
 </thead>
 <tbody valign='top'>
-<tr class='odd'>
+<tr class='even'>
  <td class='detail'>streetaddress</td>
  <td class='detail'>varchar</td>
  <td class='detail' align='right'>255</td>
@@ -113,8 +113,19 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
  <td class='detail'> </td>
  <td class='comment detail'></td>
 </tr>
+<tr class='odd'>
+ <td class='indexedColumn' title='Indexed'>latitude</td>
+ <td class='detail'>float8</td>
+ <td class='detail' align='right'>17,17</td>
+ <td class='detail' align='center' title='nullable'>&nbsp;&radic;&nbsp;</td>
+ <td class='detail' align='center'></td>
+ <td class='detail' align='right'>null</td>
+ <td class='detail'></td>
+ <td class='detail'> </td>
+ <td class='comment detail'></td>
+</tr>
 <tr class='even'>
- <td class='detail'>latitude</td>
+ <td class='indexedColumn' title='Indexed'>longitude</td>
  <td class='detail'>float8</td>
  <td class='detail' align='right'>17,17</td>
  <td class='detail' align='center' title='nullable'>&nbsp;&radic;&nbsp;</td>
@@ -125,17 +136,6 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
  <td class='comment detail'></td>
 </tr>
 <tr class='odd'>
- <td class='detail'>longitude</td>
- <td class='detail'>float8</td>
- <td class='detail' align='right'>17,17</td>
- <td class='detail' align='center' title='nullable'>&nbsp;&radic;&nbsp;</td>
- <td class='detail' align='center'></td>
- <td class='detail' align='right'>null</td>
- <td class='detail'></td>
- <td class='detail'> </td>
- <td class='comment detail'></td>
-</tr>
-<tr class='even'>
  <td class='detail'>zoningcode</td>
  <td class='detail'>varchar</td>
  <td class='detail' align='right'>255</td>
@@ -145,7 +145,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
  <td class='detail'></td>
  <td class='detail'>
   <table border='0' width='100%' cellspacing='0' cellpadding='0'>
-   <tr class='impliedRelationship relative even' valign='top'>
+   <tr class='impliedRelationship relative odd' valign='top'>
     <td class='relatedTable detail' title="tblproperty.zoningcode's name implies that it's a child of luzoningcodes.zoningcode, but it doesn't reference that column."><a href='luzoningcodes.html'>luzoningcodes</a><span class='relatedKey'>.zoningcode</span>
     </td>
     <td class='constraint detail'>Implied Constraint<span title='Restrict delete:
@@ -155,7 +155,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
  </td>
  <td class='comment detail'></td>
 </tr>
-<tr class='odd'>
+<tr class='even'>
  <td class='detail'>housenumber</td>
  <td class='detail'>int4</td>
  <td class='detail' align='right'>10</td>
@@ -166,7 +166,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
  <td class='detail'> </td>
  <td class='comment detail'></td>
 </tr>
-<tr class='even'>
+<tr class='odd'>
  <td class='primaryKey' title='Primary Key'>propertyid</td>
  <td class='detail'>serial</td>
  <td class='detail' align='right'>10</td>
@@ -177,7 +177,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
  <td class='detail'> </td>
  <td class='comment detail'></td>
 </tr>
-<tr class='odd'>
+<tr class='even'>
  <td class='detail'>suite</td>
  <td class='detail'>varchar</td>
  <td class='detail' align='right'>255</td>
@@ -189,7 +189,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
  <td class='comment detail'></td>
 </tr>
 </table>
-<p title='7 columns'>Table contained 345,508 rows at Tue Nov 07 14:01 MST 2017<p/>
+<p title='7 columns'>Table contained 345,508 rows at Tue Nov 28 11:08 MST 2017<p/>
 </td></tr></table>
 <div class='indent'>
 <b>Indexes:</b>
@@ -208,6 +208,24 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
   <td class='detail'>Primary key</td>
   <td class='detail' style='text-align:left;'><span title='Ascending'>Asc</span></td>
   <td class='constraint' style='text-align:left;'>tblProperty_pkey</td>
+ </tr>
+ <tr>
+  <td class='indexedColumn'>latitude</td>
+  <td class='detail'>Performance</td>
+  <td class='detail' style='text-align:left;'><span title='Ascending'>Asc</span></td>
+  <td class='constraint' style='text-align:left;'>LatitudeIndex</td>
+ </tr>
+ <tr>
+  <td class='indexedColumn'>latitude + longitude</td>
+  <td class='detail'>Performance</td>
+  <td class='detail' style='text-align:left;'><span title='Ascending'>Asc</span>/<span title='Ascending'>Asc</span></td>
+  <td class='constraint' style='text-align:left;'>LatLongIndex</td>
+ </tr>
+ <tr>
+  <td class='indexedColumn'>longitude</td>
+  <td class='detail'>Performance</td>
+  <td class='detail' style='text-align:left;'><span title='Ascending'>Asc</span></td>
+  <td class='constraint' style='text-align:left;'>LongitudeIndex</td>
  </tr>
 </table>
 </div>

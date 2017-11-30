@@ -1,3 +1,5 @@
+tbluserauth
+tblsavedzones
 tblneighbourhood
 tblproperty
 luzoningcodes
