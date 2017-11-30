@@ -451,7 +451,7 @@ export default class OverlayContainer extends Component {
                 </center>
                 <div>
                   <button className="modal-previous" onClick = {this.PreviousImage}>Previous</button>
-                  <button className="modal-next" onClick = {this.NextImage}>Next</button>
+                  <button  onClick = {this.NextImage}>Next</button>
                 </div>
 
                 <button className="modal-back" onClick ={this.handleCloseModal} >Back</button>
