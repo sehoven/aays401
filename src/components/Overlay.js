@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
 import DrawingTools, { PolygonTools } from './DrawingTools.js';
 import { STATIC_STYLE, IMAGE_DIMENSIONS } from '../settings';
-
+import Modal from 'react-modal';
 const HTTPService = require('./HTTPService.js');
 const notificationTimer = 2000;
 
@@ -170,8 +170,11 @@ export default class OverlayContainer extends Component {
       polyNum: 0,
       dataReady: false,
       data: [],
-      url: []
+      url: [],
+      showModal: false
     }
+    this.handleOpenModal = this.handleOpenModal.bind(this);
+    this.handleCloseModal = this.handleCloseModal.bind(this);
   }
 
   toggleDrawingTools(value, callback) {
@@ -387,6 +390,14 @@ export default class OverlayContainer extends Component {
       url: [...prevState.url, url]
     }));
   }
+  handleOpenModal () {
+    this.setState({ showModal: true });
+    console.log("open modal");
+  }
+
+  handleCloseModal () {
+    this.setState({ showModal: false });
+  }
 
   render() {
     if (!this.props.active) return null;
@@ -412,6 +423,20 @@ export default class OverlayContainer extends Component {
                         maps={this.props.maps}
                         addPolygon={(polygon) => this.addPolygon(polygon)}
                         polyNum={this.state.polyNum} /> : null
+        }
+        {this.state.isDrawing?null:
+          <div>
+            <button onClick={this.handleOpenModal} className="output-button">Output Map</button>
+            <Modal
+                  isOpen={this.state.showModal}
+                  contentLabel="Output Map"
+                  onRequestClose={this.handleCloseModal}
+                  className="Modal"
+                  overlayClassName="ModalOverlay"
+                >
+                <div>waaaaaaaaaaaaaaaaaaaaaa</div>
+              </Modal>
+          </div>
         }
         { this.props.active &&
           <div id="navbar-list">
@@ -460,6 +485,7 @@ export default class OverlayContainer extends Component {
             ): null}
           </div>
         }
+
       </div>
     )
   }
