@@ -82,7 +82,7 @@ class AuthPage extends Component {
       case this.props.PanelType.SIGNUP:
         this.signup(() => {
           this.setState({
-            modalTitle: "One more thing...",
+            modalTitle: "Validation Required",
             modalMessage: "You have been signed up but your account must be " +
                           "validated by a system administrator before your " +
                           "account can be used.",
@@ -133,6 +133,7 @@ class AuthPage extends Component {
   }
 
   swapState(toggle){
+    this.clearAllInput();
     this.setState({ currentPanel : toggle });
   }
 
