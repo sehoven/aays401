@@ -29,52 +29,6 @@ app.use(function (req, res, next) {
     next();
 });
 
-// Handle requests to "/nearby"
-// Returns all known neighborhoods that are within rad from point (lat, lng)
-/**
- * @api {get} /nearby/{Object[]} Get nearby neighbourhoods
- * @apiGroup Polygon
- *
- * @apiSuccessExample Success-Response:
- *    HTTP/1.1 200 OK
- *    {
- *      "neighborhoods"[{
- *          "name":"NiceAvenue",
- *          "points":[{"lat":-113,"lng":53},{"lat":-113,"lng":53}],
- *          "center":{"lat":-113,"lng":53},
- *          "radius":0.111
- *          "width":0.111
- *          "height":0.111
- *      }
- *    }
- * @apiErrorExample Error-Response:
- *    HTTP/1.1 400 Null parameters
- *    {
- *      "error":"Null parameters"
- *    }
- */
-app.get('/nearby', function(req, res) {
-  console.log("Location request handler invoked");
-  //Should add some kind of type validation here.. and everywhere.
-  if (!req.query.lat || !req.query.lng || !req.query.rad)
-    return res.sendStatus(400);
-
-  let resBody = [];
-  for (var i = 0; i < neighborhoods.length; i++) {
-    var c = parseFloat(req.query.rad) + neighborhoods[i].radius;
-    var a = parseFloat(req.query.lat) - neighborhoods[i].center.lat;
-    var b = parseFloat(req.query.lng) - neighborhoods[i].center.lng;
-
-    if (Math.sqrt( a*a + b*b ) < c){
-        resBody.push(neighborhoods[i]);
-    }
-  }
-
-  res.writeHead(200, {"Content-Type": "application/json"});
-  var json = JSON.stringify(resBody);
-  res.end(json);
-});
-
 // Handle requests to "/locations"
 // Returns all known locations that match existing query items
 /**
@@ -117,10 +71,8 @@ app.get('/locations', function(req, res) {
   //Connect to DB
   const client = new Client.Client({
     connectionString: connectionString,
-  })
-  client.connect()
-  .catch(e => console.error('Connection Error', e.stack))
-
+  });
+  client.connect().catch(e => console.error('Connection Error', e.stack));
 
   var searchTerm = req.query.name.toLowerCase()+"%";
   var queryText = "SELECT * from aays.tblNeighbourhood where lower(Title) like $1;";
@@ -213,12 +165,10 @@ app.get('/locations', function(req, res) {
             });
           }
 
-
       var json = JSON.stringify(resBody);
       res.writeHead(200, {"Content-Type": "application/json"});
       res.end(json);
     });
-
   });
 });
 
@@ -274,7 +224,8 @@ app.post('/addressCount', function(req, res) {
                               "High Rise Apartments":0
                   },
                   "Industrial": {"title":"Industrial","total":0},
-                  "Commercial": {"title":"Commercial","total":0}
+                  "Commercial": {"title":"Commercial","total":0},
+                  "Other": 0
                   };
 
   //Connect to DB
@@ -306,7 +257,6 @@ app.post('/addressCount', function(req, res) {
     }
   }
 
-
   var queryText = 'SELECT code.subvalue as subvalue,code.value as type, prop.latitude as lat, prop.longitude as lng from aays.tblProperty prop left join aays.luzoningcodes code on code.zoningcode = prop.zoningcode where prop.latitude BETWEEN $1 AND $2 AND prop.longitude BETWEEN $3 AND $4;';
   var values = [minLat,maxLat,minLng,maxLng];
   client.query(queryText,values,function(err,result) {
@@ -328,7 +278,6 @@ app.post('/addressCount', function(req, res) {
 
       if(inside(point,polygon)){
         switch(result.rows[item].type){
-
           case 'Residential':
             resBody.Residential.total++;
             switch(result.rows[item].subvalue){
@@ -366,6 +315,9 @@ app.post('/addressCount', function(req, res) {
           case 'Commercial':
             resBody.Commercial.total++;
             break;
+          default:
+            resBody.Other++;
+            break;
         }
       }
     }
@@ -377,6 +329,78 @@ app.post('/addressCount', function(req, res) {
   });
 });
 
+app.post('/getUnits', function(req, res) {
+  console.log("Unit request handler invoked");
+  if (!req.body) return res.sendStatus(400);
+  if (!req.body.poly) {
+    return res.sendStatus(400);
+  }
+  if (req.body.poly.length < 2) {
+    res.sendStatus(400);
+    return;
+  }
+
+  //Connect to DB
+  const client = new Client.Client({
+    connectionString: connectionString,
+  })
+  client.connect()
+  .catch(e => console.error('Connection Error', e.stack));
+
+  let polygon = [];
+
+  var maxLat=0;
+  var maxLng=0;
+  var minLat=0;
+  var minLng=0;
+
+  for (let i = 0; i < req.body.poly.length; i++){
+    polygon.push([req.body.poly[i].lat, req.body.poly[i].lng]);
+    if(maxLat<req.body.poly[i].lat){
+      maxLat = req.body.poly[i].lat
+    }
+    if(maxLng<req.body.poly[i].lng){
+      maxLng = req.body.poly[i].lng
+    }
+    if(minLng>req.body.poly[i].lng){
+      minLng = req.body.poly[i].lng
+    }
+    if(minLat>req.body.poly[i].lat){
+      minLat = req.body.poly[i].lat
+    }
+  }
+
+  var queryText =   "SELECT latitude as lat, longitude as lng, codes.value as zc, count(*) ct "
+                  + "FROM aays.tblProperty props "
+                  + "LEFT JOIN aays.luzoningcodes codes on codes.zoningcode = props.zoningcode "
+                  + "WHERE latitude BETWEEN $1 and $2 AND longitude BETWEEN $3 and $4 "
+                  + "GROUP BY latitude, longitude, zc;";
+
+  var values = [minLat, maxLat, minLng, maxLng];
+
+  let resBody = [];
+  client.query(queryText, values, function(err, result) {
+    if(err){
+      client.end();
+      return res.status(400).send(err);
+    }
+    client.end();
+
+    for (var item in result.rows){
+      let point = [result.rows[item].lat, result.rows[item].lng];
+      if(inside(point, polygon)){
+        resBody.push({lat: result.rows[item].lat,
+                      lng: result.rows[item].lng,
+                      type: result.rows[item].zc,
+                      count: result.rows[item].ct });
+      }
+    }
+
+    res.writeHead(200, {"Content-Type": "application/json"});
+    var json = JSON.stringify(resBody);
+    res.end(json);
+  });
+});
 /**
  * @api {post} /login/{body[]} Login / Authentication
  * @apiGroup User
@@ -537,7 +561,6 @@ app.post('/login', function(req, res) {
   });
 });
 
-
 /**
  * @api {post} /login/{body[]} Login / Authentication
  * @apiGroup User
@@ -627,7 +650,6 @@ app.post('/signup', function(req, res) {
   client.connect()
   .catch(e => console.error('Connection Error', e.stack))
 
-
   let username = req.body.username;
   let password = req.body.password;
   let email = req.body.email;
@@ -651,7 +673,6 @@ app.post('/signup', function(req, res) {
       return;
     }
 
-
     if(result.rowCount>0){
       resBody.push({
       "signup":"fail",
@@ -664,7 +685,6 @@ app.post('/signup', function(req, res) {
       client.end();
       return;
     }
-
 
   //Email check
     queryText = "select * from aays.tbluserauth where email = $1;";

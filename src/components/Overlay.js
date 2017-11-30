@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
 import DrawingTools, { PolygonTools } from './DrawingTools.js';
+import 'react-notifications/lib/notifications.css';
 import { STATIC_STYLE, IMAGE_DIMENSIONS } from '../settings';
 
 const HTTPService = require('./HTTPService.js');
@@ -11,9 +12,7 @@ export class Overlay extends Component {
     super(props);
 
     this.state = {
-      isDrawing: false,
-      notification: null,
-      banner: null
+      isDrawing: false
     }
   }
 
@@ -44,12 +43,8 @@ export class Overlay extends Component {
       callback = () => { this.props.drawClickCallback(); };
     }
     this.toggleIsDrawing(callback);
-    if(this.state.notification==null){
-      this.state.notification = 'draw';
-    }
 
-    this.createNotification(this.state.notification);
-    this.state.notification = 'nothing';
+    createNotification('draw');
   }
 
   clearClick() {
@@ -58,11 +53,7 @@ export class Overlay extends Component {
     if(this.props.clearClickCallback) {
       polycount = this.props.clearClickCallback();
     }
-    if(polycount > 0) {
-      this.state.notification = 'clear';
-    }
-    this.createNotification(this.state.notification);
-    this.state.notification = 'nothing';
+    createNotification('clear');
   }
 
   finishClick() {
@@ -72,9 +63,7 @@ export class Overlay extends Component {
     }
     this.toggleIsDrawing(callback);
 
-    this.state.notification = 'finish';
-    this.createNotification(this.state.notification);
-    this.state.notification = 'nothing';
+    createNotification('finish');
   }
 
   cancelClick() {
@@ -84,9 +73,7 @@ export class Overlay extends Component {
     }
     this.toggleIsDrawing(callback);
 
-    this.state.notification = 'cancel';
-    this.createNotification(this.state.notification);
-    this.state.notification = 'nothing';
+    createNotification('cancel');
   }
 
   addClick(){
@@ -96,36 +83,8 @@ export class Overlay extends Component {
     }
     this.setIsDrawing(true, callback);
 
-    this.state.notification = 'inner';
-    this.createNotification(this.state.notification);
-    this.state.notification = 'nothing';
+    createNotification('inner');
   }
-
-  createNotification (type){
-
-    switch (type) {
-        case 'draw':
-          this.state.banner = NotificationManager.info('Draw Outer Delivery Zone','',notificationTimer);
-          break;
-        case 'inner':
-          this.state.banner = NotificationManager.info('Draw Individual Zones Routes','',notificationTimer);
-          break;
-        case 'finish':
-          this.state.banner = NotificationManager.success('Delivery Route Map Generated','',notificationTimer);
-          break;
-        //case 'cancel':
-        // this.state.banner = NotificationManager.warning('Removed Last Drawn Polygon','' ,notificationTimer);
-        //  break;
-        case 'clear':
-          this.state.banner = NotificationManager.warning('Cleared Polygon','', notificationTimer);
-          break;
-        case 'error':
-          this.state.banner = NotificationManager.error('Error message', 'Click me!', notificationTimer, () => {
-            alert('callback');
-          })
-          break;
-      };
-  };
 
   render() {
 
@@ -151,7 +110,6 @@ export class Overlay extends Component {
         </center>
         &nbsp;
       </div>
-
     )
   }
 }
@@ -170,8 +128,46 @@ export default class OverlayContainer extends Component {
       polyNum: 0,
       dataReady: false,
       data: [],
-      url: []
+      url: [],
+      residenceFilter: true,
+      apartmentFilter: true,
+      industrialFilter: true,
+      commercialFilter: true,
+      unspecifiedFilter: true
     }
+
+    this.circles = []; // Changing this data shouldn't cause re-render
+  }
+
+  toggleFilter(filter){
+    switch (filter){
+      case "Residences":
+        this.setState((prevState) => (
+          { residenceFilter: !prevState.residenceFilter }
+        ));
+        break;
+      case "Apartments":
+        this.setState((prevState) => (
+          { apartmentFilter: !prevState.apartmentFilter }
+        ));
+        break;
+      case "Industrial":
+        this.setState((prevState) => (
+          { industrialFilter: !prevState.industrialFilter }
+        ));
+        break;
+      case "Commercial":
+        this.setState((prevState) => (
+          { commercialFilter: !prevState.commercialFilter }
+        ));
+        break;
+      case "Unspecified":
+        this.setState((prevState) => (
+          { unspecifiedFilter: !prevState.unspecifiedFilter }
+        ));
+        break;
+    }
+    this.showUnits();
   }
 
   toggleDrawingTools(value, callback) {
@@ -193,7 +189,7 @@ export default class OverlayContainer extends Component {
   drawClickCallback() { }
 
   clearClickCallback() {
-      let polycount = this.getInnerPolygonsCount()+(this.checkOuterPolygonExists());
+      let polycount = this.getInnerPolygonsCount()+this.checkOuterPolygonExists();
       let polygon = this.state.outerPolygon;
       let polygonArray = this.state.innerPolygons;
 
@@ -206,6 +202,7 @@ export default class OverlayContainer extends Component {
           polygon.remove();
           polygon=null;
           polycount--;
+          this.clearCircles();
       } else {
           return polycount;
       }
@@ -217,8 +214,6 @@ export default class OverlayContainer extends Component {
           data: [...prevState.data.slice(0, this.state.data.length - 1)],
           polyNum: --prevState.polyNum
       }));
-
-      return polycount;
   }
 
   finishClickCallback() {
@@ -280,7 +275,7 @@ export default class OverlayContainer extends Component {
   updatePolygonData() {
     let that = this;
 
-    this.setState({url: [], data: [], polyNum: this.getInnerPolygonsCount()+this.checkOuterPolygonExists(), dataReady: false}, () => {
+    this.setState({url: [], data: [], polyNum: this.getInnerPolygonsCount() + this.checkOuterPolygonExists(), dataReady: false}, () => {
 
         let updateList=[];
         updateList.push(this.state.outerPolygon);
@@ -300,36 +295,116 @@ export default class OverlayContainer extends Component {
             }));
             let fillColor = (polygon.polygon.fillColor == null)?"0x000000":
                             polygon.polygon.fillColor.replace("#","0x");
-            console.log(polygon.polygon.fillOpacity);
             that.setImgUrl( polygonPoints,
                             fillColor,
                             polygon.polygon.fillOpacity);
           });
         }
       })).then(() => {
-        this.setState({dataReady: true});
+        this.setState({dataReady: true}, this.showUnits());
       });
     });
   }
 
+  showUnits(){
+    createNotification('loading-units');
+    // Creates a circle for each point, and a marker for the number
+    // Circles are much faster than Markers, so markers are used sparingly
+    // for numbers. It's slower to render squares with Markers despite
+    // squares having far fewer edges.
+    let polygon = this.state.outerPolygon;
+    if (!polygon) return null;
+    let that = this;
+    let points = polygon.convertToLatLng();
+    HTTPService.getUnits(points)
+    .then(function(json){
+      that.clearCircles();
+      for (var item in json){
+        // radius = 3 @ 1, 6 @ 10, 9 @ 100, 12 @ 1000
+        let radius = (1 + Math.floor(Math.log10(json[item]["count"]))) * 3;
+        var color;
+        switch (json[item]["type"]){
+          case "Residential":
+            if (!that.state.residenceFilter) continue;
+            color = 'rgb(160, 0, 55)';
+            break;
+          case "Apartment":
+            if (!that.state.apartmentFilter) continue;
+            color = '#d3882b';
+            break;
+          case "Industrial":
+            if (!that.state.industrialFilter) continue;
+            color = '#08d312';
+            break;
+          case "Commercial":
+            if (!that.state.commercialFilter) continue;
+            color = '#3e43d3';
+            break;
+          default:
+            if (!that.state.unspecifiedFilter) continue;
+            color = 'black';
+            break;
+        }
+        let newCircle = new that.props.maps.Circle({
+          title: json[item]["type"] + ", count: " + json[item]["count"],
+          strokeWeight: 0,
+          fillColor: color,
+          fillOpacity: (radius == 3)?0.9:0.6,
+          map: that.props.map,
+          center: { lat: json[item]["lat"], lng: json[item]["lng"] },
+          radius: radius
+        });
+        that.circles.push(newCircle);
+        if (json[item]["count"] > 1){
+          var newNumber = new google.maps.Marker({
+            position: { lat: json[item]["lat"], lng: json[item]["lng"] },
+            icon: {
+              path: 'M 0,0 z',
+              strokeWeight: 0,
+              scale: radius
+            },
+            label: (json[item]["count"]==1)?null:{
+              text: "" + json[item]["count"],
+              color: 'white',
+              fontSize: "10px"
+            },
+            map: that.props.map
+          });
+          that.circles.push(newNumber);
+        }
+      }
+    });
+  }
+
+  clearCircles(){
+    if (this.circles.length > 0){
+      for (var circle in this.circles){
+        if (this.circles[circle]){
+          this.circles[circle].setMap(null);
+        }
+      }
+    }
+    this.circles = []; // Delete old circles by removing references
+  }
+
   removeAllPolygons() {
-      if(this.checkOuterPolygonExists()) {
-          this.state.outerPolygon.remove();
+    if(this.checkOuterPolygonExists()) {
+      this.state.outerPolygon.remove();
+    }
+    if(this.state.innerPolygons.size > 0) {
+      for(let i = 0; i < this.state.innerPolygons.size; i++) {
+        this.state.innerPolygons.getAt(i).remove();
       }
-      if(this.state.innerPolygons.size > 0) {
-          for(let i = 0; i < this.state.innerPolygons.size; i++) {
-              this.state.innerPolygons.getAt(i).remove();
-          }
-      }
-      this.setState({
-          isDrawing: false,
-          outerPolygon: null,
-          innerPolygons: new PolygonArray(),
-          polyNum: 0,
-          dataReady: false,
-          data: [],
-          url: []
-      });
+    }
+    this.setState({
+      isDrawing: false,
+      outerPolygon: null,
+      innerPolygons: new PolygonArray(),
+      polyNum: 0,
+      dataReady: false,
+      data: [],
+      url: []
+    });
   }
 
   addFirstPolygon(polygon) {
@@ -414,50 +489,73 @@ export default class OverlayContainer extends Component {
                         polyNum={this.state.polyNum} /> : null
         }
         { this.props.active &&
-          <div id="navbar-list">
-            {this.state.dataReady ? this.state.data.map((itemData, i)=>
-              <div className="navbar-count-poly-box" key={i}>
-                <div className="navbar-count-poly-title"><p style={{padding: 15}}>POLYGON {i+1}</p></div>
-                <ul className="navbar-count-poly-text">
-                  <label className="containerButton">Residences: {this.state.dataReady? itemData.Residential.total:"?"}
-                    <input type="checkbox" defaultChecked={true}></input>
-                    <span className="checkmark"></span>
-                      <ul className="navbar-count-inner-poly-text">
-                        <li>Single House: {this.state.dataReady? itemData.Residential["Single Detached Home"]:"?"}</li>
-                        <li>House / Duplex: {this.state.dataReady? itemData.Residential["Single Detached Home / Duplex"]:"?"}</li>
-                        <li>Townhouse: {this.state.dataReady? itemData.Residential["Townhome"]:"?"}</li>
-                        <li>Motor Home: {this.state.dataReady? itemData.Residential["Mobile Home"]:"?"}</li>
-                      </ul>
-                  </label>
-
-                  <label className="containerButton">Apartments: {this.state.dataReady? itemData.Apartment.total:"?"}
-                  <input type="checkbox" defaultChecked={true}></input>
+          <div className="parent-height">
+            <div className="checkbox-holder">
+              <div className="fifth-checkbox">
+                <label id="checkbox-red" className="containerButton">
+                  <input type="checkbox" onClick={() => this.toggleFilter("Residences")} defaultChecked={true}></input>
                   <span className="checkmark"></span>
-
-                      <ul className="navbar-count-inner-poly-text">
-                          <li>Low Rise Apartment: {this.state.dataReady? itemData.Apartment["Low Rise Apartments"]:"?"}</li>
-                          <li>Medium Rise Apartment: {this.state.dataReady? itemData.Apartment["Medium Rise Apartments"]:"?"}</li>
-                          <li>High Rise Apartment: {this.state.dataReady? itemData.Apartment["High Rise Apartments"]:"?"}</li>
-                      </ul>
-                  </label>
-
-                  <label className="containerButton">Industrial: {this.state.dataReady? itemData.Industrial.total:"?"}
-                    <input type="checkbox" defaultChecked={true}></input>
-                    <span className="checkmark"></span>
-                  </label>
-
-
-                  <label className="containerButton">Commercial: {this.state.dataReady? itemData.Commercial.total:"?"}
-                    <input type="checkbox" defaultChecked={true}></input>
-                    <span className="checkmark"></span>
-                  </label>
-
-                </ul>
-
-                <center><a href={this.state.url[i]} download="map">{<img className="image" src= {this.state.url[i]}/>}</a></center>
-
+                  Residences
+                </label>
               </div>
-            ): null}
+              <div className="fifth-checkbox">
+              <label id="checkbox-orange" className="containerButton">
+                <input type="checkbox" onClick={() => this.toggleFilter("Apartments")} defaultChecked={true} defaultChecked={true}></input>
+                <span className="checkmark"></span>
+                Apartments
+              </label>
+              </div>
+              <div className="fifth-checkbox">
+              <label id="checkbox-green" className="containerButton">
+                <input type="checkbox" onClick={() => this.toggleFilter("Industrial")} defaultChecked={true} defaultChecked={true}></input>
+                <span className="checkmark"></span>
+                Industrial
+              </label>
+              </div>
+              <div className="fifth-checkbox">
+              <label id="checkbox-blue" className="containerButton">
+                <input type="checkbox" onClick={() => this.toggleFilter("Commercial")} defaultChecked={true} defaultChecked={true}></input>
+                <span className="checkmark"></span>
+                Commercial
+              </label>
+              </div>
+              <div className="fifth-checkbox">
+              <label id="checkbox-black" className="containerButton">
+                <input type="checkbox" onClick={() => this.toggleFilter("Unspecified")} defaultChecked={true} defaultChecked={true}></input>
+                <span className="checkmark"></span>
+                Unspecified
+              </label>
+              </div>
+            </div>
+            <div id="navbar-list-draw">
+              {this.state.dataReady ? this.state.data.map((itemData, i)=>
+                <div className="navbar-count-poly-box" key={i}>
+                  <div className="navbar-image-box"><a href={this.state.url[i]} download="map">{<img className="image" src= {this.state.url[i]}/>}</a></div>
+                  <div className="navbar-count-poly-text">
+                    { this.state.residenceFilter &&
+                      <label className="containerButton">Residences: {this.state.dataReady? itemData.Residential.total:"?"}
+                      </label>
+                    }
+                    { this.state.apartmentFilter &&
+                      <label className="containerButton">Apartments: {this.state.dataReady? itemData.Apartment.total:"?"}
+                      </label>
+                    }
+                    { this.state.industrialFilter &&
+                      <label className="containerButton">Industrial: {this.state.dataReady? itemData.Industrial.total:"?"}
+                      </label>
+                    }
+                    { this.state.commercialFilter &&
+                      <label className="containerButton">Commercial: {this.state.dataReady? itemData.Commercial.total:"?"}
+                      </label>
+                    }
+                    { this.state.unspecifiedFilter &&
+                      <label className="containerButton">Unspecified: {this.state.dataReady? itemData.Other:"?"}
+                      </label>
+                    }
+                  </div>
+                </div>
+              ): null}
+            </div>
           </div>
         }
       </div>
@@ -547,6 +645,7 @@ class PolygonArray {
   size() {
     return this.arr.length;
   }
+
   convertOneToLatLng(polygon) {
     let latLngs = [];
     if(polygon != null) {
@@ -576,6 +675,7 @@ class PolygonArray {
     }
     return latLngs;
   }
+
   // Converts the whole array of polygons to objects with the lat/lng pairs for each point
   convertAllToLatLng() {
     let allPolygons = [];
@@ -586,3 +686,28 @@ class PolygonArray {
     return allPolygons;
   }
 }
+
+function createNotification(type, ){
+  switch (type) {
+      case 'draw':
+        NotificationManager.info('Draw Outer Delivery Zone','',notificationTimer);
+        break;
+      case 'inner':
+        NotificationManager.info('Draw Individual Zones Routes','',notificationTimer);
+        break;
+      case 'finish':
+        NotificationManager.success('Delivery Route Map Generated','',notificationTimer);
+        break;
+      case 'clear':
+        NotificationManager.warning('Cleared Polygon','', notificationTimer);
+        break;
+      case 'error':
+        NotificationManager.error('Error message', 'Click me!', notificationTimer, () => {
+          alert('callback');
+        });
+        break;
+      case 'loading-units':
+        NotificationManager.info('Loading Units','', notificationTimer);
+        break;
+    };
+};
