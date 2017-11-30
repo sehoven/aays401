@@ -45,7 +45,9 @@ class AuthPage extends Component {
     this.state = {
       username: "",
       password: "",
+      confirmPassword: "",
       email: "",
+      passMismatch: false,
       currentPanel: this.props.PanelType.LOGIN,
       showModal: false,
       modalTitle: "",
@@ -55,7 +57,8 @@ class AuthPage extends Component {
     this.keys = {
       email: "email",
       username: "username",
-      password: "password"
+      password: "password",
+      confirmPassword: "confirmPassword"
     }
 
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -96,12 +99,34 @@ class AuthPage extends Component {
         [event.target.name]: event.target.value
       });
     }
+    if(event.target.name == this.keys.confirmPassword) {
+      if(this.state.password != event.target.value) {
+        this.setState({
+          passMismatch: true
+        });
+      } else {
+        this.setState({
+          passMismatch: false
+        });
+      }
+    } else if(event.target.name == this.keys.password) {
+      if(this.state.confirmPassword != "" && this.state.confirmPassword != event.target.value) {
+        this.setState({
+          passMismatch: true
+        });
+      } else {
+        this.setState({
+          passMismatch: false
+        });
+      }
+    }
   }
 
   clearAllInput() {
     this.setState({
       username: "",
       password: "",
+      confirmPassword: "",
       email: ""
     });
   }
@@ -225,6 +250,18 @@ class AuthPage extends Component {
                    onChange={this.handleInputChange}
                    required />
           </div>
+          { this.state.currentPanel == this.props.PanelType.SIGNUP ?
+          <div className="auth-block">
+            <input className={this.state.passMismatch ? "mismatch" : ""}
+                   value={this.state.confirmPassword}
+                   type="password"
+                   placeholder=" Confirm Password"
+                   name={this.keys.confirmPassword}
+                   onChange={this.handleInputChange}
+                   required />
+            { this.state.passMismatch ?
+              <p className="warning">Passwords do not match.</p> : null}
+          </div> : null }
           <div className="auth-block">
             <button>
               {this.state.currentPanel == this.props.PanelType.SIGNUP ? "SIGN UP" : "LOGIN" }
