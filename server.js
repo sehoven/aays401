@@ -284,9 +284,7 @@ app.post('/addressCount', function(req, res) {
   client.connect()
   .catch(e => console.error('Connection Error', e.stack))
 
-
   let polygon = [];
-
 
   var maxLat=0;
   var maxLng=0;
@@ -313,6 +311,7 @@ app.post('/addressCount', function(req, res) {
   var values = [minLat,maxLat,minLng,maxLng];
   client.query(queryText,values,function(err,result) {
     if(err){
+      console.log(err);
       client.end()
       return res.status(400).send(err);
     }
