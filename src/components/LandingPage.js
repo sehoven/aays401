@@ -80,13 +80,14 @@ class AuthPage extends Component {
         this.login();
         break;
       case this.props.PanelType.SIGNUP:
-        this.signup();
-        this.setState({
-          modalTitle: "One more thing...",
-          modalMessage: "You have been signed up but your account must be " +
-                        "validated by a system administrator before your " +
-                        "account can be used.",
-          showModal: true
+        this.signup(() => {
+          this.setState({
+            modalTitle: "One more thing...",
+            modalMessage: "You have been signed up but your account must be " +
+                          "validated by a system administrator before your " +
+                          "account can be used.",
+            showModal: true
+          });
         });
         break;
     }
@@ -166,7 +167,7 @@ class AuthPage extends Component {
     });
   }
 
-  signup() {
+  signup(successCallback) {
     let that = this;
     const signupJson = {
       email: this.state.email,
@@ -187,6 +188,7 @@ class AuthPage extends Component {
             //modal window
             that.clearAllInput();
             that.swapState(that.props.PanelType.LOGIN);
+            successCallback();
             break;
           default:
             that.setState({
