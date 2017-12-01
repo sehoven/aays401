@@ -138,7 +138,9 @@ export default class OverlayContainer extends Component {
       unspecifiedFilter: true,
       showModal: false,
       currentImage: 0,
-      currentTotal:0
+      currentTotal:0,
+      filename: null,
+      input:null
     }
     this.circles = []; // Changing this data shouldn't cause re-render
 
@@ -147,6 +149,8 @@ export default class OverlayContainer extends Component {
     this.PreviousImage = this.PreviousImage.bind(this);
     this.NextImage = this.NextImage.bind(this);
     this.getTotal = this.getTotal.bind(this);
+    this.setFilename = this.setFilename.bind(this);
+    this.getInput = this.getInput.bind(this);
   }
 
   toggleFilter(filter){
@@ -474,7 +478,7 @@ export default class OverlayContainer extends Component {
     }));
   }
   handleOpenModal () {
-    this.setState({ showModal: true,currentImage:0});
+    this.setState({ showModal: true,currentImage:0,filename:null});
     this.getTotal();
 
   }
@@ -489,6 +493,13 @@ export default class OverlayContainer extends Component {
   NextImage(){
     let next = this.state.currentImage+1
     {next<this.state.polyNum&&this.setState({currentImage:next})}
+  }
+  setFilename(){
+    var filename = this.state.input
+    this.setState({filename:filename})
+  }
+  getInput(event){
+    this.setState({input:event.target.value})
   }
   getTotal(){
     var total = 0
@@ -534,7 +545,7 @@ export default class OverlayContainer extends Component {
     var FileSaver = require('file-saver');
     var zip = new JSZip();
     var count = 0;
-    var zipFilename = "zipFilename.zip";
+    var zipFilename = this.state.filename+".zip";
     urls.forEach(function(url){
       var filename = "map"+urls.indexOf(url)+".png";
       jszipUtils.getBinaryContent(url, function (err, data) {
@@ -587,6 +598,12 @@ export default class OverlayContainer extends Component {
                   className = "modal-window"
                   overlayClassName="modal-overlay"
                 >
+                {this.state.filename==null
+                ?<div>
+                  <input type="text" onChange={this.getInput} defaultValue="Enter the filename:" />
+                  <button onClick={this.setFilename}>confirm</button>
+                  </div>
+                :
                 <div id="modal-box">
                   <div id="export-modal-left">
                     <div className={"buttonVertical " + ((this.state.currentImage == 0) ? "hide" : "" )} onClick = {this.PreviousImage}>
@@ -631,6 +648,7 @@ export default class OverlayContainer extends Component {
                       onClick = {() => {this.saveImages("bw")}}>Save In Black And White</button>
                     </div>
                   </div>
+                }
               </Modal>
           </div>
           :null
