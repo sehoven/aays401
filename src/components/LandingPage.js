@@ -43,10 +43,12 @@ class PostAuthPage extends Component {
     super(props);
 
     this.state = {
-      newPartition: false
+      newPartition: false,
+      showSaved: false
     }
 
     this.newPartition = this.newPartition.bind(this);
+    this.toggleLoadPartition = this.toggleLoadPartition.bind(this);
   }
 
   newPartition() {
@@ -55,8 +57,10 @@ class PostAuthPage extends Component {
     });
   }
 
-  loadPartition() {
-
+  toggleLoadPartition() {
+    this.setState((prevState) => (
+      { showSaved: !prevState.showSaved }
+    ));
   }
 
   render() {
@@ -66,23 +70,37 @@ class PostAuthPage extends Component {
           <MapContainer /> :
           <div className="post-auth">
             <div className="post-auth-group">
-              <button className="post-auth-button center-horizontal" onClick={this.newPartition}>
+              <button className="post-auth-button center-horizontal"
+                      onClick={this.newPartition}>
                 NEW PARTITION
               </button>
             </div>
             <div className="post-auth-group">
-              <button className="post-auth-button center-horizontal" onClick={this.loadPartition}>
+              <button className="post-auth-button center-horizontal"
+                      onClick={this.toggleLoadPartition}>
                 LOAD PARTITION
               </button>
-              <table>
-                <tr>
-                  <td>Time Stamp</td>
-                  <td>Name</td>
-                </tr>
-                <tr>
-                  <td>
-                </tr>
-              </table>
+              { this.state.showSaved ?
+                <table id="saved-partitions">
+                  <tbody>
+                    <tr>
+                      <th>Time Stamp</th>
+                      <th>Name</th>
+                    </tr>
+                    <tr>
+                      <td>1</td>
+                      <td>TEST</td>
+                    </tr>
+                    <tr>
+                      <td>2</td>
+                      <td>TEST</td>
+                    </tr>
+                    <tr>
+                      <td>3</td>
+                      <td>TEST</td>
+                    </tr>
+                  </tbody>
+                </table> : null }
             </div>
           </div>
         }
