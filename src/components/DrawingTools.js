@@ -21,13 +21,10 @@ export class PolygonTools extends Component {
   // Before the component mounts, set the polygon and add the listeners
   componentWillMount() {
     let that = this;
-    let polygon = this.props.outerPolygon;
-    let polygonArray = this.props.innerPolygons;
 
-    this.data.push({polygon: this.props.outerPolygon.polygon, polygonListener: null, isSelected: false});
-    for(var i = 0; i < this.props.innerPolygons.size(); ++i) {
+    for(var i = 0; i < this.props.polygons.size(); ++i) {
       let dataItem = {
-        polygon: this.props.innerPolygons.getAt(i).polygon,
+        polygon: this.props.polygons.getAt(i).polygon,
         polygonListener: null,
         isSelected: false
       }

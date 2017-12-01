@@ -221,12 +221,9 @@ export default class OverlayContainer extends Component {
       isEditing: false,
       notification: null,
       tempPolygon: null,
-      outerPolygon: null,
-      innerPolygons: new PolygonArray(),
+      polygons: new PolygonArray(),
       polyNum: 0,
       dataReady: false,
-      data: [],
-      url: [],
       residenceFilter: true,
       apartmentFilter: true,
       industrialFilter: true,
@@ -270,14 +267,6 @@ export default class OverlayContainer extends Component {
 
   toggleDrawingTools(value, callback) {
     this.setState({isDrawing: value}, callback);
-  }
-
-  checkOuterPolygonExists() {
-      if(this.state.outerPolygon == null){
-          return 0;
-      } else {
-          return 1;
-      }
   }
 
   getInnerPolygonsCount() {
@@ -430,29 +419,21 @@ export default class OverlayContainer extends Component {
   updatePolygonData() {
     let that = this;
 
-    this.setState({url: [], data: [], polyNum: this.getInnerPolygonsCount() + this.checkOuterPolygonExists(), dataReady: false}, () => {
-
-        let updateList=[];
-        updateList.push(this.state.outerPolygon);
-        for(let i = 0; i < this.getInnerPolygonsCount(); i++){
-            updateList.push(this.state.innerPolygons.getAt(i));
-        }
-
-        Promise.all(updateList.map((polygon, i) => {
+    this.setState({dataReady: false}, () => {
+      Promise.all(this.state.polygons.map((polygon, i) => {
         let polygonPoints = polygon.convertToLatLng();
 
         if(polygonPoints.length > 0) {
           HTTPService.countPolyResidences(
             { points: polygonPoints }
           ).then(function(json) {
-            that.setState(prevState => ({
-              data: [...prevState.data, json]
-            }));
-            let fillColor = (polygon.polygon.fillColor == null)?"0x000000":
-                            polygon.polygon.fillColor.replace("#","0x");
+            polygon.setData(json);
+            let fillColor = (polygon.getFillColor()) ?
+                              polygon.getFillColor().replace("#", "0x") :
+                              "0x000000";
             that.setImgUrl( polygonPoints,
                             fillColor,
-                            polygon.polygon.fillOpacity);
+                            polygon.getFillOpacity());
           });
         }
       })).then(() => {
@@ -461,13 +442,17 @@ export default class OverlayContainer extends Component {
     });
   }
 
+  checkOuterPolygonExists() {
+    return this.state.polygons.size() >= 1;
+  }
+
   showUnits(){
     createNotification('loading-units');
     // Creates a circle for each point, and a marker for the number
     // Circles are much faster than Markers, so markers are used sparingly
     // for numbers. It's slower to render squares with Markers despite
     // squares having far fewer edges.
-    let polygon = this.state.outerPolygon;
+    let polygon = this.state.polygons.getOuterPolygon();
     if (!polygon) return null;
     let that = this;
     let points = polygon.convertToLatLng();
@@ -543,22 +528,12 @@ export default class OverlayContainer extends Component {
   }
 
   removeAllPolygons() {
-    // if(this.checkOuterPolygonExists()) {
-    //   this.state.outerPolygon.remove();
-    // }
-    if(this.state.innerPolygons.size > 0) {
-      for(let i = 0; i < this.state.innerPolygons.size; i++) {
-        this.state.innerPolygons.getAt(i).remove();
-      }
-    }
+    this.state.polygons.removeAll();
     this.setState({
       isDrawing: false,
-      outerPolygon: null,
-      innerPolygons: new PolygonArray(),
+      polygons: new PolygonArray(),
       polyNum: 0,
-      dataReady: false,
-      data: [],
-      url: []
+      dataReady: false
     });
   }
 
@@ -663,8 +638,7 @@ export default class OverlayContainer extends Component {
         { (this.state.isDrawing || this.state.isEditing) && this.checkOuterPolygonExists() > 0 ?
           <PolygonTools map={this.props.map}
                         maps={this.props.maps}
-                        outerPolygon={this.state.outerPolygon}
-                        innerPolygons={this.state.innerPolygons}
+                        polygons={this.state.polygons}
                         setPolygonArray={(polygons) => this.setPolygonArray(polygons)} /> : null
         }
         { this.state.isDrawing ?
@@ -749,43 +723,59 @@ export default class OverlayContainer extends Component {
 }
 
 class Polygon {
-    constructor(x){
-        this.polygon = x;
-        this.prevPath;
-    }
+  constructor(x){
+    this.polygon = x;
+    this.data;
+    this.url;
+    this.prevPath;
+  }
 
-    convertToLatLng(){
-        let latLngs = [];
-        let path = this.polygon.getPath();
-        for(let i = 0; i < path.getLength(); ++i) {
-          let vertex = path.getAt(i);
-          latLngs.push({
-            lat: vertex.lat(),
-            lng: vertex.lng()
-          });
-        }
-        return latLngs;
-    }
+  setData(data) {
+    this.data = data;
+  }
 
-    savePath() {
-      this.prevPath=this.convertToLatLng();
-    }
+  setUrl(url) {
+    this.url = url;
+  }
 
-    restore() {
-      console.log(this.polygon);
-      console.log("ffff "+this.prevPath);
-      if(this.prevPath!=null){
-        this.polygon.setPath(this.prevPath);
-      }
-    }
+  getFillColor() {
+    return this.polygon.fillColor
+  }
 
-    remove(){
-        let removed = this.polygon;
-        if(removed != null) {
-          removed.setMap(null);
-        }
-        return null;
+  getFillOpacity() {
+    return this.polygon.fillOpacity
+  }
+
+  savePath() {
+    this.prevPath = this.convertToLatLng();
+  }
+
+  restore() {
+    if(this.prevPath != null) {
+      this.polygon.setPath(this.prevPath);
     }
+  }
+
+  remove() {
+    let removed = this.polygon;
+    if(removed != null) {
+      removed.setMap(null);
+    }
+    return null;
+  }
+
+  convertToLatLng(){
+    let latLngs = [];
+    let path = this.polygon.getPath();
+    for(let i = 0; i < path.getLength(); ++i) {
+      let vertex = path.getAt(i);
+      latLngs.push({
+        lat: vertex.lat(),
+        lng: vertex.lng()
+      });
+    }
+    return latLngs;
+  }
 }
 
 // Class to handle the polygon objects visible on the map.
@@ -798,6 +788,14 @@ class PolygonArray {
     return this.arr;
   }
 
+  getOuter() {
+    return this.arr.splice(0, 1);
+  }
+
+  getAllInner() {
+    return this.arr.slice(1);
+  }
+
   push(polygon) {
     if(polygon != null) {
       this.arr.push(polygon);
@@ -808,6 +806,13 @@ class PolygonArray {
     let popped = this.arr.pop();
 
     return popped;
+  }
+
+  removeAll() {
+    for(let i = this.arr.length - 1; i >= 0; --i) {
+      let removed = this.arr.splice(i, 1);
+      removed[0].setMap(null);
+    }
   }
 
   remove(i) {
@@ -843,36 +848,6 @@ class PolygonArray {
 
   size() {
     return this.arr.length;
-  }
-
-  convertOneToLatLng(polygon) {
-    let latLngs = [];
-    if(polygon != null) {
-      let path = polygon.getPath();
-      for(let i = 0; i < path.getLength(); ++i) {
-        let vertex = path.getAt(i);
-        latLngs.push({
-          lat: vertex.lat(),
-          lng: vertex.lng()
-        });
-      }
-    }
-    return latLngs;
-  }
-
-  convertToLatLng(i) {
-    let latLngs = [];
-    if(i > -1 && i < this.arr.length) {
-      let path = this.arr[i].getPath();
-      for(let j = 0; j < path.getLength(); ++j) {
-        let vertex = path.getAt(j);
-        latLngs.push({
-          lat: vertex.lat(),
-          lng: vertex.lng()
-        });
-      }
-    }
-    return latLngs;
   }
 
   // Converts the whole array of polygons to objects with the lat/lng pairs for each point
