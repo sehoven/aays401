@@ -136,7 +136,7 @@ export default class OverlayContainer extends Component {
       commercialFilter: true,
       unspecifiedFilter: true,
       showModal: false,
-      currentImage:null
+      currentImage: 0
     }
     this.circles = []; // Changing this data shouldn't cause re-render
 
@@ -408,6 +408,7 @@ export default class OverlayContainer extends Component {
       outerPolygon: null,
       innerPolygons: new PolygonArray(),
       polyNum: 0,
+      currentImage: 0,
       dataReady: false,
       data: [],
       url: []
@@ -486,16 +487,41 @@ export default class OverlayContainer extends Component {
     let next = this.state.currentImage+1
     {next<this.state.polyNum&&this.setState({currentImage:next})}
   }
-  saveImages(){
-    var urls = this.state.url;
-    console.log(urls);
+  saveImages(type){
+    var urls;
+    switch (type) {
+      case "color":
+        urls = this.state.url;
+        break;
+      case "bw":
+        console.log(this.state.innerPolygons);
+        urls = this.state.innerPolygons.getAll().map(function(poly){
+          let polygon = poly.convertToLatLng();
+          let url = "https://maps.googleapis.com/maps/api/staticmap?"
+                  + "key=AIzaSyC2mXFuLvwiASA3mSr2kz79fnXUYRwLKb8"
+                  + STATIC_STYLE + "&size=" + IMAGE_DIMENSIONS + "&path=color:" + "0x000000"
+                  + "|weight:5|fillcolor:" + "0x00000000";
+          if(polygon != null && polygon.length >= 2) {
+            polygon.forEach(function(position) {
+              url += "|" + position.lat.toFixed(6) + "," + position.lng.toFixed(6);
+            });
+            // Static API doesn't have polygon autocomplete. Close the path manually.
+            url += "|" + polygon[0].lat + "," + polygon[0].lng;
+          }
+          return url;
+        });
+        break;
+      default:
+        urls = [];
+        break;
+    }
     var JSZip = require("jszip");
     var FileSaver = require('file-saver');
     var zip = new JSZip();
     var count = 0;
     var zipFilename = "zipFilename.zip";
     urls.forEach(function(url){
-      var filename = "map"+urls.indexOf(url);
+      var filename = "map"+urls.indexOf(url)+".png";
       jszipUtils.getBinaryContent(url, function (err, data) {
         if(err) {
           console.log(err);
@@ -506,12 +532,12 @@ export default class OverlayContainer extends Component {
         if (count == urls.length) {
           var zipFile = zip.generate({type: "blob"});
           FileSaver.saveAs(zipFile, zipFilename);
-
         }
       })
     })
   }
   render() {
+    console.log(this.state.data, this.state.currentImage)
     if (!this.props.active) return null;
     return (
       <div className={this.props.active && "navPanel"}>
@@ -546,18 +572,50 @@ export default class OverlayContainer extends Component {
                   className = "modal-window"
                   overlayClassName="modal-overlay"
                 >
-                <center>
-                  <a href={this.state.url[this.state.currentImage]} download="map">{<img className="modal-image" src= {this.state.url[this.state.currentImage]}/>}</a>
-                </center>
-
-                <div className="modal-wrapper">
-                  <button onClick = {this.PreviousImage}>Previous</button>
-                  {this.state.currentImage==this.state.polyNum-1
-                    ?<button onClick = {() => {this.saveImages()}}>Save</button>
-                    :<button onClick = {this.NextImage}>Next</button>
-                  }
-
-                </div>
+                <div id="modal-box">
+                  <div id="export-modal-left">
+                    <div className={"buttonVertical " + ((this.state.currentImage == 0) ? "hide" : "" )} onClick = {this.PreviousImage}>
+                      <div className="vertical-button-text">◀</div>
+                    </div>
+                  </div>
+                  <a id="export-modal-center"><img className="modal-image"src= {this.state.url[this.state.currentImage]}/></a>
+                  <div id="export-modal-right">
+                  <div className={"buttonVertical " + ((this.state.currentImage == this.state.polyNum-1) ? "hide" : "" )} onClick = {this.NextImage}>
+                    <div className="vertical-button-text">▶</div>
+                  </div>
+                  </div>
+                    <div>
+                      { (this.state.showModal && this.state.dataReady) &&
+                        <div className="modal-text" style={{color: "black",
+                                                            marginLeft: "-55px"}}>
+                          { this.state.residenceFilter &&
+                            <div style={{ fontSize: "20px", paddingTop: "40px"}}>Residences: {this.state.data[this.state.currentImage].Residential.total}
+                            </div>
+                          }
+                          { this.state.apartmentFilter &&
+                            <div style={{ fontSize: "20px"}}>Apartments: {this.state.data[this.state.currentImage].Apartment.total}
+                            </div>
+                          }
+                          { this.state.industrialFilter &&
+                            <div style={{ fontSize: "20px"}}>Industrial: {this.state.data[this.state.currentImage].Industrial.total}
+                            </div>
+                          }
+                          { this.state.commercialFilter &&
+                            <div style={{ fontSize: "20px"}}>Commercial: {this.state.data[this.state.currentImage].Commercial.total}
+                            </div>
+                          }
+                          { this.state.unspecifiedFilter &&
+                            <div style={{ fontSize: "20px"}}>Unspecified: {this.state.data[this.state.currentImage].Other}
+                            </div>
+                          }
+                        </div>
+                      }
+                      <button className={(this.state.currentImage == this.state.polyNum-1) ? "" : "hide" }
+                      onClick = {() => {this.saveImages("color")}}>Save In Color</button>
+                      <button  className={(this.state.currentImage == this.state.polyNum-1) ? "" : "hide" }
+                      onClick = {() => {this.saveImages("bw")}}>Save In Black And White</button>
+                    </div>
+                  </div>
               </Modal>
           </div>
           :null
