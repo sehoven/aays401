@@ -36,6 +36,9 @@ body, input
 .center-horizontal
   margin: 0 auto
 
+.default-margin
+  margin: 20px
+
 .header
   font-family: 'Raleway'
   height: $headerHeight
@@ -43,8 +46,11 @@ body, input
   font-size: 36px
   font-weight: normal
   text-align: center
-  padding: 13px 10px 10px 10px
+  padding: $headerPadding
   color: white
+
+.under-header
+  height: calc(100vh - #{$totalHeaderHeight})
 
 .modal
   position: absolute
@@ -95,18 +101,33 @@ body, input
 .warning
   color: rgb(255, 0, 0)
 
-.post-auth
-  margin-top: 25vh
-
-.post-auth-group
-  margin: 20px
-
 .post-auth-button
   display: block
 
+.fade-enter
+  opacity: 0.01
+
+.fade-enter.fade-enter-active
+  opacity: 1
+  transition: opacity 300ms ease-in
+
+.fade-leave
+  opacity: 1
+
+.fade-leave.fade-leave-active
+  opacity: 0.01
+  transition: opacity 500ms ease-in
+
+.fade-appear
+  opacity: 0.01
+
+.fade-appear.fade-appear-active
+  opacity: 1
+  transition: opacity 300ms ease-in
+
 #saved-partitions
   border-collapse: collapse
-  width: 100%
+  width: calc(100% - 40vw)
   margin-top: 20px
 
 #saved-partitions td, #saved-partitions th

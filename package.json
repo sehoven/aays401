@@ -52,6 +52,7 @@
     "prop-types": "^15.6.0",
     "randomcolor": "^0.5.3",
     "react": "^15.6.2",
+    "react-addons-css-transition-group": "^15.6.2",
     "react-dom": "^15.6.2",
     "react-google-maps": "^8.3.0",
     "react-loading": "^1.0.2",

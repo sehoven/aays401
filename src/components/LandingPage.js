@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ReactModal from 'react-modal';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import { Enum } from 'enumify';
 
 import { AppBar } from './UIComponents.js';
@@ -13,7 +14,7 @@ export default class LandingPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isAuthenticated: true
+      isAuthenticated: false
     }
 
     this.setAuthenticated = this.setAuthenticated.bind(this);
@@ -44,11 +45,13 @@ class PostAuthPage extends Component {
 
     this.state = {
       newPartition: false,
-      showSaved: false
+      showSaved: false,
+      savedRows: []
     }
 
     this.newPartition = this.newPartition.bind(this);
     this.toggleLoadPartition = this.toggleLoadPartition.bind(this);
+    this.generateRows = this.generateRows.bind(this);
   }
 
   newPartition() {
@@ -58,49 +61,84 @@ class PostAuthPage extends Component {
   }
 
   toggleLoadPartition() {
+    if(!this.state.showSaved) {
+      this.setState({savedRows: this.generateRows(0, 10)});
+    }
     this.setState((prevState) => (
       { showSaved: !prevState.showSaved }
     ));
   }
 
+  handleClick(i) {
+    console.log("Row " + i + " clicked");
+  }
+
+  generateRows(start, end) {
+    let tableRows = [];
+
+    for(let i = start; i < end; ++i) {
+      tableRows.push(
+        <tr key={i} onClick={() => this.handleClick(i)}>
+          <td>{i}</td>
+          <td>TEST</td>
+        </tr>
+      );
+    }
+
+    return tableRows;
+  }
+
   render() {
+    let rowComponents = this.generateRows(0, 10);
     return (
-      <div>
+      <div className="under-header">
         { this.state.newPartition ?
           <MapContainer /> :
           <div className="post-auth">
-            <div className="post-auth-group">
+            <div className="default-margin">
               <button className="post-auth-button center-horizontal"
                       onClick={this.newPartition}>
-                NEW PARTITION
+                New Partition
               </button>
             </div>
-            <div className="post-auth-group">
+            <div className="default-margin">
               <button className="post-auth-button center-horizontal"
                       onClick={this.toggleLoadPartition}>
-                LOAD PARTITION
+                Load Partition
               </button>
               { this.state.showSaved ?
-                <table id="saved-partitions">
-                  <tbody>
+                <div>
+                <ReactCSSTransitionGroup
+                 transitionName="fade"
+                 transitionAppear={true}
+                 transitionAppearTimeout={500}
+                 transitionEnterTimeout={500}
+                 transitionLeaveTimeout={500}>
+                <table id="saved-partitions" className="center-horizontal">
+                  <thead>
                     <tr>
                       <th>Time Stamp</th>
                       <th>Name</th>
                     </tr>
-                    <tr>
-                      <td>1</td>
-                      <td>TEST</td>
-                    </tr>
-                    <tr>
-                      <td>2</td>
-                      <td>TEST</td>
-                    </tr>
-                    <tr>
-                      <td>3</td>
-                      <td>TEST</td>
-                    </tr>
-                  </tbody>
-                </table> : null }
+                  </thead>
+                  <ReactCSSTransitionGroup
+                    transitionName="fade"
+                    transitionEnterTimeout={500}
+                    transitionLeaveTimeout={300}
+                    transitionAppearTimeout={500}
+                    transitionAppear={true}
+                    component="tbody">
+                    { rowComponents }
+                  </ReactCSSTransitionGroup>
+                </table>
+                </ReactCSSTransitionGroup>
+                <div className="default-margin">
+                  <button className="post-auth-button center-horizontal"
+                          onClick={() => {console.log("should add rows")}}>
+                    Load More
+                  </button>
+                </div>
+                </div> : null }
             </div>
           </div>
         }
