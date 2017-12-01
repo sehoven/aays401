@@ -8,7 +8,7 @@ class Canvas extends React.Component {
     img.onload = () => {
       ctx.drawImage(img, 0, 0)
       ctx.font = "40px Courier"
-      ctx.fillText(this.props.text, 0,500 )
+      ctx.fillText(this.props.text, 50,500 )
     }
   }
   render() {

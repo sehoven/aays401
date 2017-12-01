@@ -137,7 +137,8 @@ export default class OverlayContainer extends Component {
       commercialFilter: true,
       unspecifiedFilter: true,
       showModal: false,
-      currentImage: 0
+      currentImage: 0,
+      currentTotal:0
     }
     this.circles = []; // Changing this data shouldn't cause re-render
 
@@ -145,7 +146,7 @@ export default class OverlayContainer extends Component {
     this.handleCloseModal = this.handleCloseModal.bind(this);
     this.PreviousImage = this.PreviousImage.bind(this);
     this.NextImage = this.NextImage.bind(this);
-    //this.getTotal = this.getTotal.bind(this);
+    this.getTotal = this.getTotal.bind(this);
   }
 
   toggleFilter(filter){
@@ -474,8 +475,8 @@ export default class OverlayContainer extends Component {
   }
   handleOpenModal () {
     this.setState({ showModal: true,currentImage:0});
+    this.getTotal();
 
-    console.log("open modal");
   }
 
   handleCloseModal () {
@@ -489,7 +490,17 @@ export default class OverlayContainer extends Component {
     let next = this.state.currentImage+1
     {next<this.state.polyNum&&this.setState({currentImage:next})}
   }
+  getTotal(){
+    var total = 0
+    var text = "Number of units: "
 
+    total += this.state.data[this.state.currentImage].Residential.total
+    total += this.state.data[this.state.currentImage].Commercial.total
+    total += this.state.data[this.state.currentImage].Industrial.total
+    total += this.state.data[this.state.currentImage].Apartment.total
+    total += this.state.data[this.state.currentImage].Other
+    this.setState({currentTotal:text+total});
+  }
   saveImages(type){
     var urls;
     switch (type) {
@@ -497,7 +508,7 @@ export default class OverlayContainer extends Component {
         urls = this.state.url;
         break;
       case "bw":
-        console.log(this.state.innerPolygons);
+
         urls = this.state.innerPolygons.getAll().map(function(poly){
           let polygon = poly.convertToLatLng();
           let url = "https://maps.googleapis.com/maps/api/staticmap?"
@@ -541,7 +552,7 @@ export default class OverlayContainer extends Component {
     })
   }
   render() {
-    console.log(this.state.data, this.state.currentImage)
+
     if (!this.props.active) return null;
     return (
       <div className={this.props.active && "navPanel"}>
@@ -582,7 +593,7 @@ export default class OverlayContainer extends Component {
                       <div className="vertical-button-text">◀</div>
                     </div>
                   </div>
-                  <a id="export-modal-center"><img className="modal-image"src= {this.state.url[this.state.currentImage]}/></a>
+                  <Canvas id="export-modal-center" imgsrc= {this.state.url[this.state.currentImage]} text={this.state.currentTotal} />
                   <div id="export-modal-right">
                   <div className={"buttonVertical " + ((this.state.currentImage == this.state.polyNum-1) ? "hide" : "" )} onClick = {this.NextImage}>
                     <div className="vertical-button-text">▶</div>
