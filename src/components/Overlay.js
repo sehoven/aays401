@@ -557,6 +557,7 @@ export default class OverlayContainer extends Component {
                 <center>
                   <Canvas text = {"hah"} imgsrc = {this.state.url[this.state.currentImage]}/>
                 </center>
+                //<a id="export-modal-center"><img className="modal-image"src= {this.state.url[this.state.currentImage]}/></a>
                 <div className="modal-wrapper">
                   <button onClick = {this.PreviousImage}>Previous</button>
                   {this.state.currentImage==this.state.polyNum-1
