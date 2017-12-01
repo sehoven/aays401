@@ -58,7 +58,7 @@ export class Overlay extends Component {
     if(this.props.clearClickCallback) {
       polycount = this.props.clearClickCallback();
     }
-    if(polycount > 0) {
+    if(this.props.hasDeliveryZone()) {
       this.state.notification = 'clear';
     }
     this.createNotification(this.state.notification);
@@ -153,10 +153,11 @@ export class Overlay extends Component {
   };
 
   renderButtonGroup (){
-      if(this.props.hasDeliveryZone) {
+    //console.log(this.props.hasDeliveryZone());
+      if(this.props.hasDeliveryZone()) {
           let buttonGroup = [
             <button id="draw-button" onClick={this.drawClick.bind(this)} style={{width: "28%"}} key="0">ADD</button>,
-            <button id="clear-button" onClick={this.clearClick.bind(this)} style={{width: "28%"}} key="1">CLEAR</button>,
+            <button id="clear-button" onClick={this.clearClick.bind(this)} style={{width: "28%"}} key="1">UNDO</button>,
             <button id="edit-button" onClick={this.editClick.bind(this)} style={{width: "28%"}} key="9">EDIT</button>
           ];
           return buttonGroup;
@@ -169,28 +170,34 @@ export class Overlay extends Component {
   }
 
   renderDrawButtonGroup (){
-      if(!this.props.hasDeliveryZone){
-          let drawButtonGroup = [
-            <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)} style={{width: "45%"}} key="0">CANCEL</button>,
-            <button id="finish-draw-button" onClick={this.finishClick.bind(this)} style={{width: "45%"}} key="1">CONFIRM</button>,
-        ];
-        return drawButtonGroup;
-    }
-    else if(this.props.isEditing){
-        let drawButtonGroup = [
-          <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)} style={{width: "45%"}} key="0">CANCEL</button>,
-          <button id="finish-draw-button" onClick={this.editUpdateClick.bind(this)} style={{width: "45%"}} key="1">CONFIRM EDIT</button>,
-      ];
-      return drawButtonGroup;
+    let drawButtonGroup = [
+      <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)} style={{width: "45%"}} key="0">CANCEL</button>,
+      <button id="finish-draw-button" onClick={this.finishClick.bind(this)} style={{width: "45%"}} key="1">ADD</button>,
+    ];
+    return drawButtonGroup;
+  //     if(!this.props.hasDeliveryZone){
+  //         let drawButtonGroup = [
+  //           <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)} style={{width: "45%"}} key="0">CANCEL</button>,
+  //           <button id="finish-draw-button" onClick={this.finishClick.bind(this)} style={{width: "45%"}} key="1">CONFIRM</button>,
+  //       ];
+  //       return drawButtonGroup;
+  //   }
+  //   else if(this.props.isEditing){
+  //       let drawButtonGroup = [
+  //         <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)} style={{width: "45%"}} key="0">CANCEL</button>,
+  //         <button id="finish-draw-button" onClick={this.editUpdateClick.bind(this)} style={{width: "45%"}} key="1">CONFIRM EDIT</button>,
+  //     ];
+  //     return drawButtonGroup;
+  // }
+  //     else {
+  //         let drawButtonGroup = [
+  //           <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)} style={{width: "45%"}} key="0">CANCEL</button>,
+  //           <button id="finish-draw-button" onClick={this.finishClick.bind(this)} style={{width: "45%"}} key="1">ADD</button>,
+  //       ];
+  //       return drawButtonGroup;
+  //     }
   }
-      else {
-          let drawButtonGroup = [
-            <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)} style={{width: "45%"}} key="0">CANCEL</button>,
-            <button id="finish-draw-button" onClick={this.finishClick.bind(this)} style={{width: "45%"}} key="1">ADD</button>,
-        ];
-        return drawButtonGroup;
-      }
-  }
+
   render() {
 
     if (!this.props.active) return null;
@@ -250,10 +257,14 @@ export default class OverlayContainer extends Component {
   drawClickCallback() { }
 
   clearClickCallback() {
+    console.log("clear click");
       let polycount = this.getInnerPolygonsCount()+(this.checkOuterPolygonExists());
       let polygon = this.state.outerPolygon;
       let polygonArray = this.state.innerPolygons;
 
+      if(polycount == 2){
+          this.state.outerPolygon.polygon.setOptions({clickable: true});
+        }
       if(polycount > 1){
           polygonArray.getAt(polygonArray.size() - 1).remove();
           polygonArray.pop();
@@ -284,7 +295,7 @@ export default class OverlayContainer extends Component {
   }
 
   cancelClickCallback(buttonState) {
-
+    console.log("cancel click");
     let that = this;
     let appendPromise = new Promise(function(resolve, reject) {
       resolve();
@@ -296,17 +307,42 @@ export default class OverlayContainer extends Component {
       });
     });
     let polygon = this.state.tempPolygon;
-    polygon.setMap(null);
-    this.setState({tempPolygon: null});
+    if(polygon){
+      polygon.setMap(null);
+    }
+
+    //this.removeAllPolygons();
+    //console.log("ddddd "+this.state.innerPolygons.getAt(0).convertToLatLng());
+    if(this.checkOuterPolygonExists()){
+      this.state.outerPolygon.restore();
+    }
+    for(var i=0;i<this.getInnerPolygonsCount();i++){
+      this.state.innerPolygons.getAt(i).restore();
+    }
+    //console.log("ddddd "+this.state.innerPolygons.getAt(0).convertToLatLng());
+    if(this.checkOuterPolygonExists()){
+      this.updatePolygonData();
+    }
+
+    this.setState({isDrawing: false, isEditing: false});
   }
 
   editClickCallback() {
+      //console.log("qqqq "+this.state.innerPolygons.getAt(0).convertToLatLng());
+      this.state.outerPolygon.savePath();
+      for(var i=0;i<this.getInnerPolygonsCount();i++){
+        this.state.innerPolygons.getAt(i).savePath();
+        //console.log(this.state.innerPolygons.getAt(i))
+      }
       this.setState({isDrawing: false, isEditing: true});
+      //console.log("ddddd "+this.state.innerPolygons.getAt(0).convertToLatLng());
+      //console.log("edit click");
   }
 
   editUpdateClickCallback() {
-      this.updatePolygonData();
-      this.setState({isDrawing: false, isEditing: false});
+    console.log("edit update");
+    this.updatePolygonData();
+    this.setState({isDrawing: false, isEditing: false});
   }
 
   addClickCallback() {
@@ -395,9 +431,9 @@ export default class OverlayContainer extends Component {
   }
 
   removeAllPolygons() {
-      if(this.checkOuterPolygonExists()) {
-          this.state.outerPolygon.remove();
-      }
+      // if(this.checkOuterPolygonExists()) {
+      //     this.state.outerPolygon.remove();
+      // }
       if(this.state.innerPolygons.size > 0) {
           for(let i = 0; i < this.state.innerPolygons.size; i++) {
               this.state.innerPolygons.getAt(i).remove();
@@ -440,6 +476,7 @@ export default class OverlayContainer extends Component {
         let polygonArray = this.state.innerPolygons;
         polygonArray.push(new Polygon(polygon));
         this.setState({innerPolygons: polygonArray});
+        this.state.outerPolygon.polygon.setOptions({clickable: false});
       }
     }
     this.setState({tempPolygon: null});
@@ -495,7 +532,7 @@ export default class OverlayContainer extends Component {
           toggleDrawingTools={this.toggleDrawingTools.bind(this)}
           drawClickCallback={this.drawClickCallback.bind(this)}
           clearClickCallback={this.clearClickCallback.bind(this)}
-          hasDeliveryZone={this.checkOuterPolygonExists()}
+          hasDeliveryZone={this.checkOuterPolygonExists.bind(this)}
           isEditing={this.state.isEditing}
           finishClickCallback={this.finishClickCallback.bind(this)}
           addClickCallback = {this.addClickCallback.bind(this)}
@@ -570,6 +607,7 @@ export default class OverlayContainer extends Component {
 class Polygon {
     constructor(x){
         this.polygon = x;
+        this.prevPath;
     }
 
     convertToLatLng(){
@@ -584,6 +622,16 @@ class Polygon {
         }
         return latLngs;
     }
+
+    savePath() {
+      this.prevPath=this.convertToLatLng();
+    }
+
+    restore() {
+      console.log(this.polygon, this.prevPath);
+      this.polygon.setPath(this.prevPath);
+    }
+
     remove(){
         let removed = this.polygon;
         if(removed != null) {
