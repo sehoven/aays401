@@ -472,8 +472,6 @@ export default class OverlayContainer extends Component {
   }
   handleOpenModal () {
     this.setState({ showModal: true,currentImage:0});
-
-    console.log("open modal");
   }
 
   handleCloseModal () {
@@ -494,7 +492,6 @@ export default class OverlayContainer extends Component {
         urls = this.state.url;
         break;
       case "bw":
-        console.log(this.state.innerPolygons);
         urls = this.state.innerPolygons.getAll().map(function(poly){
           let polygon = poly.convertToLatLng();
           let url = "https://maps.googleapis.com/maps/api/staticmap?"
@@ -524,7 +521,6 @@ export default class OverlayContainer extends Component {
       var filename = "map"+urls.indexOf(url)+".png";
       jszipUtils.getBinaryContent(url, function (err, data) {
         if(err) {
-          console.log(err);
           throw err; // or handle the error
         }
         zip.file(filename, data, {binary:true});
@@ -537,7 +533,6 @@ export default class OverlayContainer extends Component {
     })
   }
   render() {
-    console.log(this.state.data, this.state.currentImage)
     if (!this.props.active) return null;
     return (
       <div className={this.props.active && "navPanel"}>
@@ -584,38 +579,39 @@ export default class OverlayContainer extends Component {
                     <div className="vertical-button-text">▶</div>
                   </div>
                   </div>
-                    <div>
-                      { (this.state.showModal && this.state.dataReady) &&
-                        <div className="modal-text" style={{color: "black",
-                                                            marginLeft: "-55px"}}>
-                          { this.state.residenceFilter &&
-                            <div style={{ fontSize: "20px", paddingTop: "40px"}}>Residences: {this.state.data[this.state.currentImage].Residential.total}
-                            </div>
-                          }
-                          { this.state.apartmentFilter &&
-                            <div style={{ fontSize: "20px"}}>Apartments: {this.state.data[this.state.currentImage].Apartment.total}
-                            </div>
-                          }
-                          { this.state.industrialFilter &&
-                            <div style={{ fontSize: "20px"}}>Industrial: {this.state.data[this.state.currentImage].Industrial.total}
-                            </div>
-                          }
-                          { this.state.commercialFilter &&
-                            <div style={{ fontSize: "20px"}}>Commercial: {this.state.data[this.state.currentImage].Commercial.total}
-                            </div>
-                          }
-                          { this.state.unspecifiedFilter &&
-                            <div style={{ fontSize: "20px"}}>Unspecified: {this.state.data[this.state.currentImage].Other}
-                            </div>
-                          }
-                        </div>
-                      }
+                  <div className="export-modal-details">
+                    { (this.state.showModal && this.state.dataReady) &&
+                      <div id="modal-data-box" className="modal-text">
+                        { this.state.residenceFilter &&
+                          <div style={{ fontSize: "20px"}}>Residences: {this.state.data[this.state.currentImage].Residential.total}
+                          </div>
+                        }
+                        { this.state.apartmentFilter &&
+                          <div style={{ fontSize: "20px"}}>Apartments: {this.state.data[this.state.currentImage].Apartment.total}
+                          </div>
+                        }
+                        { this.state.industrialFilter &&
+                          <div style={{ fontSize: "20px"}}>Industrial: {this.state.data[this.state.currentImage].Industrial.total}
+                          </div>
+                        }
+                        { this.state.commercialFilter &&
+                          <div style={{ fontSize: "20px"}}>Commercial: {this.state.data[this.state.currentImage].Commercial.total}
+                          </div>
+                        }
+                        { this.state.unspecifiedFilter &&
+                          <div style={{ fontSize: "20px"}}>Unspecified: {this.state.data[this.state.currentImage].Other}
+                          </div>
+                        }
+                      </div>
+                    }
+                    <div id="save-button-group">
                       <button className={(this.state.currentImage == this.state.polyNum-1) ? "" : "hide" }
                       onClick = {() => {this.saveImages("color")}}>Save In Color</button>
                       <button  className={(this.state.currentImage == this.state.polyNum-1) ? "" : "hide" }
                       onClick = {() => {this.saveImages("bw")}}>Save In Black And White</button>
                     </div>
                   </div>
+                </div>
               </Modal>
           </div>
           :null
@@ -696,34 +692,35 @@ export default class OverlayContainer extends Component {
   }
 }
 
-class Polygon {
-    constructor(x){
-        this.polygon = x;
+export class Polygon {
+    constructor(x) {
+      this.polygon = x;
     }
 
-    convertToLatLng(){
-        let latLngs = [];
-        let path = this.polygon.getPath();
-        for(let i = 0; i < path.getLength(); ++i) {
-          let vertex = path.getAt(i);
-          latLngs.push({
-            lat: vertex.lat(),
-            lng: vertex.lng()
-          });
-        }
-        return latLngs;
+    convertToLatLng() {
+      let latLngs = [];
+      let path = this.polygon.getPath();
+      for(let i = 0; i < path.getLength(); ++i) {
+        let vertex = path.getAt(i);
+        latLngs.push({
+          lat: vertex.lat(),
+          lng: vertex.lng()
+        });
+      }
+      return latLngs;
     }
-    remove(){
-        let removed = this.polygon;
-        if(removed != null) {
-          removed.setMap(null);
-        }
-        return null;
+
+    remove() {
+      let removed = this.polygon;
+      if(removed != null) {
+        removed.setMap(null);
+      }
+      return null;
     }
 }
 
 // Class to handle the polygon objects visible on the map.
-class PolygonArray {
+export class PolygonArray {
   constructor(...x) {
     this.arr = [...x];
   }
@@ -779,41 +776,11 @@ class PolygonArray {
     return this.arr.length;
   }
 
-  convertOneToLatLng(polygon) {
-    let latLngs = [];
-    if(polygon != null) {
-      let path = polygon.getPath();
-      for(let i = 0; i < path.getLength(); ++i) {
-        let vertex = path.getAt(i);
-        latLngs.push({
-          lat: vertex.lat(),
-          lng: vertex.lng()
-        });
-      }
-    }
-    return latLngs;
-  }
-
-  convertToLatLng(i) {
-    let latLngs = [];
-    if(i > -1 && i < this.arr.length) {
-      let path = this.arr[i].getPath();
-      for(let j = 0; j < path.getLength(); ++j) {
-        let vertex = path.getAt(j);
-        latLngs.push({
-          lat: vertex.lat(),
-          lng: vertex.lng()
-        });
-      }
-    }
-    return latLngs;
-  }
-
   // Converts the whole array of polygons to objects with the lat/lng pairs for each point
   convertAllToLatLng() {
     let allPolygons = [];
     for(let i = 0; i < this.arr.length; ++i) {
-      allPolygons.push(convertToLatLng(this.arr[i]));
+      allPolygons.push(this.arr[i].convertToLatLng());
     }
 
     return allPolygons;

@@ -8,7 +8,7 @@ export class AppBar extends Component {
   render() {
     return (
       <div className="header">
-        <div className="left">AaYS</div>
+        <div className="left title">GeoFlyer</div>
         <div>
           {this.props.children}
         </div>

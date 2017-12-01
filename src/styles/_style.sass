@@ -1,5 +1,4 @@
 @import url('https://fonts.googleapis.com/css?family=Raleway:300')
-@import "node_modules/patchkit-stepped-progress-bar/styles.less"
 
 $uiWidth: 400px
 $mapControlHeight: 5vh
@@ -51,11 +50,13 @@ input, textarea
   font-family: 'Raleway'
   height: $headerHeight
   background: linear-gradient(to bottom, #000000, #102027)
-  font-size: 36px
   font-weight: normal
-  text-align: center
-  padding: 13px 10px 10px 10px
+  padding: 10px
   color: white
+
+.title
+  font-size: 48px
+  font-weight: bold
 
 .modal
   position: absolute
@@ -81,7 +82,7 @@ input, textarea
 
 #modal-title, #modal-message
   color: black
-  
+
 .modal-window
   width: 800px
   height: 500px
@@ -102,6 +103,15 @@ input, textarea
   background-color: rgba(0,0,0,0.7)
   border: solid 1px black
   z-index: 15
+
+#modal-data-box
+  text-align: left
+  margin-top: 40px
+  margin-right: 40px
+  margin-left: 10px
+  padding: 10px
+  border: solid 2px #9ea7aa
+  color: black
 
 .modal-text
   text-align: center
@@ -159,6 +169,13 @@ input, textarea
   vertical-align: middle
   line-height: 100px
   width: 50px
+
+#export-modal-details
+  display: table-cell
+
+#save-button-group
+  display: inline-grid
+  margin-left: 15px
 
 .auth-form
   margin-top: 40px
@@ -261,8 +278,20 @@ input, textarea
   right: 0
   width: 50%
   position: absolute
-  margin-left: 30%
-  margin-top: -35px
+  margin-left: 32%
+
+// Overriding some styles from the progress bar
+.rc-steps-label-vertical .rc-steps-item-content
+  text-align: left
+  width: inherit
+  margin-left: -12px
+  margin-top: 0
+
+.rc-steps-item-process .rc-steps-item-title
+  color: white
+
+.rc-steps-item-title
+  color: white
 
 #search-box
   font-family: 'Raleway'
@@ -578,9 +607,11 @@ buttonLarge:hover
     opacity: 0
 
 #logout
+  font-size: 24px
   right: 0
   position: absolute
-  padding-right: 10px
+  padding-top: 10px
+  padding-right: 15px
   cursor: pointer
   &:hover
     color: #babdbe

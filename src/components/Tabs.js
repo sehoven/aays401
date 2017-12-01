@@ -24,24 +24,24 @@ export default class Tabs extends Component {
     return (
       <div className="tabContainer">
         <div className="tabButtons">
-        <div
-          className= {
-            "tabButton " +
-            ((currentPanel == this.props.PanelType.SEARCH) ? "activeTabButton" : "")
-          }
-          id="search-tab"
-          onClick={() => { this.swapState(this.props.PanelType.SEARCH) }} >
-          <div><p>Search</p></div>
-        </div>
-        <div
-          className={
-            "tabButton " +
-            ((currentPanel == this.props.PanelType.DRAW) ? "activeTabButton" : "")
-          }
-          id="draw-tab"
-          onClick={() => { this.swapState(this.props.PanelType.DRAW) }} >
-          <div><p>Draw</p></div>
-        </div>
+          <div
+            className= {
+              "tabButton " +
+              ((currentPanel == this.props.PanelType.SEARCH) ? "activeTabButton" : "")
+            }
+            id="search-tab"
+            onClick={() => { this.swapState(this.props.PanelType.SEARCH) }} >
+            <div><p>Search</p></div>
+          </div>
+          <div
+            className={
+              "tabButton " +
+              ((currentPanel == this.props.PanelType.DRAW) ? "activeTabButton" : "")
+            }
+            id="draw-tab"
+            onClick={() => { this.swapState(this.props.PanelType.DRAW) }} >
+            <div><p>Draw</p></div>
+          </div>
         </div>
         <NavPanel
           map={this.props.map}

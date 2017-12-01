@@ -5,7 +5,6 @@ import { AppBar } from './UIComponents.js';
 import MapContainer from './MapContainer.js';
 const HTTPService = require('./HTTPService.js');
 import ProgressBarView from './ProgressBar.js';
-import SteppedProgressBar from 'patchkit-stepped-progress-bar';
 
 class PanelType extends Enum {}
 PanelType.initEnum(['LOGIN', 'SIGNUP']);
@@ -21,7 +20,7 @@ export default class LandingPage extends Component {
     this.logout = this.logout.bind(this);
   }
 
-  logout(){
+  logout() {
     document.cookie = 'authToken=;';
     this.setState({ isAuthenticated: false });
   }
@@ -253,24 +252,24 @@ export class AuthPage extends Component {
     return (
       <div className="auth-container">
         <div className="tabButtons">
-        <div
-          className= {
-            "tabButton " +
-            ((currentPanel == this.props.PanelType.LOGIN) ? "activeTabButton" : "")
-          }
-          id="login-tab"
-          onClick={() => { this.swapState(this.props.PanelType.LOGIN) }} >
-          <div><p>LOGIN</p></div>
-        </div>
-        <div
-          className={
-            "tabButton " +
-            ((currentPanel == this.props.PanelType.SIGNUP) ? "activeTabButton" : "")
-          }
-          id="signup-tab"
-          onClick={() => { this.swapState(this.props.PanelType.SIGNUP) }} >
-          <div><p>SIGN UP</p></div>
-        </div>
+          <div
+            className= {
+              "tabButton " +
+              ((currentPanel == this.props.PanelType.LOGIN) ? "activeTabButton" : "")
+            }
+            id="login-tab"
+            onClick={() => { this.swapState(this.props.PanelType.LOGIN) }} >
+            <div><p>LOGIN</p></div>
+          </div>
+          <div
+            className={
+              "tabButton " +
+              ((currentPanel == this.props.PanelType.SIGNUP) ? "activeTabButton" : "")
+            }
+            id="signup-tab"
+            onClick={() => { this.swapState(this.props.PanelType.SIGNUP) }} >
+            <div><p>SIGN UP</p></div>
+          </div>
         </div>
         <form className="auth-form" onSubmit={this.handleSubmit}>
           { this.state.currentPanel == this.props.PanelType.SIGNUP ?
