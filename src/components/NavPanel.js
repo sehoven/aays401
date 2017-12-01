@@ -61,7 +61,7 @@ export default class NavPanel extends Component {
     if (!this.props.active) return null;
     return (
       <div className="navPanel">
-        <input type="text" id="search-box" onChange={this.onChange}/>
+        <input type="text" id="search-box" placeholder="Search" onChange={this.onChange}/>
         <NavList
           map={this.props.map}
           maps={this.props.maps}

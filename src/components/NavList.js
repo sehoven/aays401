@@ -20,18 +20,18 @@ class IconCanvas extends Component {
     if (context != null) {
       let item = this.props.item;
       let points = item.points;
-      let scaleFactor = (size*0.9)/Math.max(item.width, item.height);
-      let xx = (size/2) + (points[0].lat - item.center.lat) * scaleFactor;
-      let yy = (size/2) + (points[0].lng - item.center.lng) * scaleFactor;
+      let scaleFactor = (size*0.9)/Math.max(item.height * 0.59, item.width);
+      let yy = (size/2) + (item.center.lat - points[0].lat) * scaleFactor;
+      let xx = (size/2) + (points[0].lng - item.center.lng) * scaleFactor * 0.59;
       context.moveTo(xx, yy);
       context.beginPath();
       for (let i = 1; i < points.length; i += 1){
-        let xx = (size/2) + (points[i].lat - item.center.lat) * scaleFactor;
-        let yy = (size/2) + (points[i].lng - item.center.lng) * scaleFactor;
+        let yy = (size/2) + (item.center.lat - points[i].lat) * scaleFactor;
+        let xx = (size/2) + (points[i].lng - item.center.lng) * scaleFactor * 0.59;
         context.lineTo(xx, yy);
       }
       context.closePath();
-      context.fillStyle = "rgb(150,150,255)";
+      context.fillStyle = "#9ea7aa";
       context.lineWidth = 2;
       context.strokeStyle = "black";
       context.fill();
@@ -100,8 +100,9 @@ export default class NavList extends React.Component {
     }
     this.polygon = new this.props.maps.Polygon({
       paths: itemData.points,
-      strokeWeight: 0,
-      fillOpacity: 0.10,
+      strokeColor: '#000000',
+      strokeWeight: 1,
+      fillOpacity: 0.1,
       zIndex: 1
     });
     this.polygon.setMap(map);
@@ -121,7 +122,7 @@ export default class NavList extends React.Component {
       )
     } else {
       return (
-        <div id="navbar-list">
+        <div id="navbar-list-search">
           {this.props.autocomplete.map((itemData, i) =>
             <div className="navbar-list-autocomplete-item"
             key={i}

@@ -13,7 +13,7 @@
     "test": "jest",
     "deploy": "npm run build && npm run git-commit && npm run git-push",
     "build": "webpack",
-    "start": "webpack-dev-server --port 8080 --hot --host localhost"
+    "start": "webpack-dev-server --port 8080 --hot --host 127.0.0.1"
   },
   "jest": {
     "globals": {
@@ -37,9 +37,12 @@
   "dependencies": {
     "bcrypt": "^1.0.3",
     "body-parser": "^1.18.2",
+    "cookie-parser": "^1.4.3",
     "dotenv": "^4.0.0",
     "enumify": "^1.0.4",
     "express": "^4.15.4",
+    "express-session": "^1.15.6",
+    "file-loader": "^1.1.5",
     "google-map-react": "^0.24.0",
     "immutable": "^3.8.1",
     "jquery": "^3.2.1",
@@ -75,6 +78,7 @@
     "enzyme": "^3.2.0",
     "enzyme-adapter-react-15": "^1.0.5",
     "extract-text-webpack-plugin": "^3.0.0",
+    "file-loader": "^1.1.5",
     "gulp": "^3.9.1",
     "gulp-apidoc": "^0.2.6",
     "html-webpack-plugin": "^2.30.1",
@@ -83,6 +87,7 @@
     "react-test-renderer": "^15.5.0",
     "sass-loader": "^6.0.6",
     "style-loader": "^0.18.2",
+    "url-loader": "^0.6.2",
     "webpack": "^3.6.0",
     "webpack-dev-server": "^2.9.4"
   }
