@@ -117,6 +117,8 @@ export default class OverlayContainer extends Component {
     super(props);
 
     this.polygonArray = new PolygonArray(this.props.map, this.props.maps, this);
+    this.lastFlag = null;
+    this.cancelFlag = null;
 
     this.state = {
       filter: {
@@ -151,11 +153,18 @@ export default class OverlayContainer extends Component {
   }
 
   confirmClickCallback() {
+    this.lastFlag = false;
     this.polygonArray.saveEdits();
     this.setState({ isEditing: false, isDrawing: false, buttons: 3 });
   }
 
+  completedFlag(flag){
+    this.lastFlag = flag;
+  }
+
   cancelClickCallback() {
+    this.polygonArray.setNoCirclesFlag(true);
+    this.cancelFlag = true;
     if (this.state.isEditing){
       this.polygonArray.cancelEdits();
       this.setState({ isEditing: false, isDrawing: false, buttons: 3 });
@@ -164,16 +173,15 @@ export default class OverlayContainer extends Component {
       this.setState({ isDrawing: false, buttons: 1 });
     }
     if (this.state.isDrawing && this.polygonArray.getLength() == 1){
-      this.polygonArray.pop();
       this.setState({ isDrawing: false, buttons: 1 });
     }
     if (this.state.isDrawing && this.polygonArray.getLength() > 1){
-      this.polygonArray.pop();
       this.setState({ isDrawing: false, buttons: 3 });
     }
   }
 
   drawClickCallback(){
+    this.cancelFlag = false;
     this.setState({ isDrawing: true, buttons: 2 });
   }
 
@@ -183,10 +191,9 @@ export default class OverlayContainer extends Component {
   }
 
   addClickCallback() {
+    this.cancelFlag = false;
     this.setState({isDrawing: true, buttons: 2 });
   }
-
-  updatePolygonData() {}
 
   checkOuterPolygonExists() {
     return this.polygonArray.outerExists();
@@ -203,8 +210,17 @@ export default class OverlayContainer extends Component {
   setPolygonArray(polygon) {
     if(polygon != null) {
       this.polygonArray.pushNew(polygon);
+      if (this.lastFlag && this.cancelFlag) {
+        this.polygonArray.pop();
+        this.lastFlag = false;
+        this.cancelFlag = false;
+      }
     }
-    this.setState({ isDrawing: false, buttons: 3 });
+    if (this.polygonArray.getLength()) {
+      this.setState({ isDrawing: false, buttons: 3 });
+    } else {
+      this.setState({ isDrawing: false, buttons: 1 });
+    }
   }
 
   progressBarData() {
@@ -237,7 +253,8 @@ export default class OverlayContainer extends Component {
           <DrawingTools map={this.props.map}
                         maps={this.props.maps}
                         addPolygon={(polygon) => this.setPolygonArray(polygon)}
-                        polyNum={this.checkOuterPolygonExists()} /> : null
+                        polyNum={this.checkOuterPolygonExists()}
+                        flagCallback={(value) => this.completedFlag(value)} /> : null
         }
         { this.props.active &&
           <div className="parent-height">
@@ -457,6 +474,7 @@ class PolygonArray {
     this.industrialFilter = true;
     this.commercialFilter = true;
     this.unspecifiedFilter = true;
+    this.noCirclesFlag = false;
   }
 
   getAll() {
@@ -640,7 +658,7 @@ class PolygonArray {
       this.arr.push(polygon);
       polygon.setClickListener(this.maps);
       this.deselectAll();
-      if (this.arr.length == 1){
+      if (this.arr.length == 1 && !this.noCirclesFlag){
         createNotification('loading-units');
         // Creates a circle for each point, and a marker for the number
         // Circles are much faster than Markers, so markers are used sparingly
@@ -709,8 +727,13 @@ class PolygonArray {
           }
         });
       }
+      this.noCirclesFlag = false;
       this.updateData([this.arr.length - 1]);
     }
+  }
+
+  setNoCirclesFlag(flag){
+    this.noCirclesFlag = flag;
   }
 
   pushBasic(googlePoly){
@@ -738,13 +761,6 @@ class PolygonArray {
     if (this.arr.length == 0){
       this.clearCircles();
     }
-  }
-
-  removeAll() {
-    for (let i = this.arr.length - 1; i >= 0; --i) {
-      this.arr[i].setMap(null);
-    }
-    this.arr = [];
   }
 
   remove(i) {
