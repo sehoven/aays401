@@ -13,7 +13,7 @@ export default class LandingPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isAuthenticated: false
+      isAuthenticated: true
     }
 
     this.setAuthenticated = this.setAuthenticated.bind(this);
@@ -30,9 +30,62 @@ export default class LandingPage extends Component {
       <div>
         <AppBar />
         { this.state.isAuthenticated ?
-          <MapContainer /> :
+          <PostAuthPage /> :
           <AuthPage PanelType={PanelType}
                     setAuthenticated={this.setAuthenticated}/> }
+      </div>
+    );
+  }
+}
+
+class PostAuthPage extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      newPartition: false
+    }
+
+    this.newPartition = this.newPartition.bind(this);
+  }
+
+  newPartition() {
+    this.setState({
+      newPartition: true
+    });
+  }
+
+  loadPartition() {
+
+  }
+
+  render() {
+    return (
+      <div>
+        { this.state.newPartition ?
+          <MapContainer /> :
+          <div className="post-auth">
+            <div className="post-auth-group">
+              <button className="post-auth-button center-horizontal" onClick={this.newPartition}>
+                NEW PARTITION
+              </button>
+            </div>
+            <div className="post-auth-group">
+              <button className="post-auth-button center-horizontal" onClick={this.loadPartition}>
+                LOAD PARTITION
+              </button>
+              <table>
+                <tr>
+                  <td>Time Stamp</td>
+                  <td>Name</td>
+                </tr>
+                <tr>
+                  <td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        }
       </div>
     );
   }
