@@ -548,6 +548,8 @@ export default class OverlayContainer extends Component {
     var zipFilename = this.state.filename+".zip";
     urls.forEach(function(url){
       var filename = "map"+urls.indexOf(url)+".png";
+
+      //console.log(newurl);
       jszipUtils.getBinaryContent(url, function (err, data) {
         if(err) {
           console.log(err);
