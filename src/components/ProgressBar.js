@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import SteppedProgressBar from 'patchkit-stepped-progress-bar';
 
 export default class ProgressBarView extends Component {
   constructor(props) {
@@ -11,7 +10,7 @@ export default class ProgressBarView extends Component {
   render() {
     return (
       <div>
-        <SteppedProgressBar current={this.state.index()} num={3} labels={['first', 'second', 'third']}/>
+      //  <SteppedProgressBar current={this.state.index()} num={3} labels={['first', 'second', 'third']}/>
       </div>
     )
 

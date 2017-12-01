@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
-import ProgressBarView from './ProgressBar.js';
+// import ProgressBarView from './ProgressBar.js';
 import DrawingTools, { PolygonTools } from './DrawingTools.js';
 import 'react-notifications/lib/notifications.css';
 import { STATIC_STYLE, IMAGE_DIMENSIONS } from '../settings';
-import SteppedProgressBar from 'patchkit-stepped-progress-bar';
+// import SteppedProgressBar from 'patchkit-stepped-progress-bar';
 
 const HTTPService = require('./HTTPService.js');
 const notificationTimer = 2000;
@@ -75,8 +75,8 @@ export class Overlay extends Component {
       createNotification(this.state.notification);
   }
 
-  renderButtonGroup (){
-    switch (this.props.containerState){
+  renderButtonGroup() {
+    switch (this.props.containerState) {
       case 1:
         return (
           <button id="draw-button" onClick={this.drawClick.bind(this)} style={{width: "90%"}} key="0">DRAW</button>
@@ -84,7 +84,7 @@ export class Overlay extends Component {
       case 2:
         return [
           <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)} style={{width: "45%"}} key="0">CANCEL</button>,
-          <button id="finish-draw-button" onClick={this.confirmClick.bind(this)} style={{width: "45%"}} key="1">CONFIRM</button>
+          <button id="confirm-draw-button" onClick={this.confirmClick.bind(this)} style={{width: "45%"}} key="1">CONFIRM</button>
         ];
       case 3:
         return [
@@ -100,10 +100,9 @@ export class Overlay extends Component {
 
     return (
       <div className="overlayContainer">
-        { this.state.banner }
         <NotificationContainer/>
         <center>
-        { this.renderButtonGroup()}
+          { this.renderButtonGroup()}
         </center>
         &nbsp;
       </div>
@@ -212,10 +211,11 @@ export default class OverlayContainer extends Component {
   }
 
   render() {
+    //      <ProgressBarView data={this.progressBarData.bind(this)}/>
+
     if (!this.props.active) return null;
     return (
       <div className={this.props.active && "navPanel"}>
-      <ProgressBarView data={this.progressBarData.bind(this)}/>
         <Overlay
           active={this.props.active}
           containerState={this.state.buttons}
@@ -793,7 +793,7 @@ class PolygonArray {
   }
 }
 
-function createNotification(type){
+function createNotification(type) {
   switch (type) {
       case 'draw':
         NotificationManager.info('Draw Outer Delivery Zone','',notificationTimer);

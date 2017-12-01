@@ -48,7 +48,6 @@
     "jquery": "^3.2.1",
     "node-fetch": "^1.7.3",
     "node-sass": "^4.7.2",
-    "patchkit-stepped-progress-bar": "^1.0.4",
     "pg": "^7.4.0",
     "point-in-geopolygon": "^1.0.1",
     "point-in-polygon": "^1.0.1",
