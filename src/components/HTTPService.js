@@ -2,12 +2,23 @@ const fetch = require('node-fetch');
 import { LOCATIONS_ADDRESS, COUNT_ADDRESS,
           LOGIN_ADDRESS, SIGNUP_ADDRESS } from '../settings';
 
+export function getUnits(points) {
+  let body = JSON.stringify({ "poly" : points});
+  return fetch( `http://localhost:3000/getUnits` ,
+                { "method": 'POST',
+                  "body": body,
+                  "headers": {  'Content-Type': 'application/json',
+                                'Content-Length': new Buffer(body).length }})
+    .then(function(res) {
+        return res.json();
+    });
+}
+
 export function searchLists(term) {
   return fetch(`${LOCATIONS_ADDRESS}name=${term}` )
     .then(function(response) {
       return response.json();
     });
-
 }
 
 export function countPolyResidences(polyData) {
