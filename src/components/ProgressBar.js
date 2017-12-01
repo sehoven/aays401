@@ -5,13 +5,13 @@ export default class ProgressBarView extends Component {
   constructor(props) {
     super(props);
     this.state =({
-      index: 0
+      getIndex: this.props.data
     });
   }
   render() {
     return (
       <div>
-        <SteppedProgressBar current={this.state.index} num={3} labels={['draw outer polygon', 'draw inner polygons', 'export polygon images']}/>
+        <SteppedProgressBar current={this.state.getIndex()} num={3} labels={['draw outer polygon', 'draw inner polygons', 'export polygon images']}/>
       </div>
     )
 

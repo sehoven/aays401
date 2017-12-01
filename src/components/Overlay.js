@@ -601,15 +601,6 @@ export default class OverlayContainer extends Component {
     }));
   }
 
-  progressBarData() {
-    if (this.checkOuterPolygonExists()) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
   renderPolygonName(i) {
       if(i == 0) {
           return 'Delivery Zone';

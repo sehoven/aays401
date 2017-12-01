@@ -16,4 +16,3 @@ export class AppBar extends Component {
     )
   }
 }
-//data={this.progressBarData.bind(this)}
