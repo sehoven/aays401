@@ -9,6 +9,7 @@ export class AppBar extends Component {
     return (
       <div className="header">
         ANTHONY AT YOUR SERVICE
+        {this.props.children}
       </div>
     )
   }

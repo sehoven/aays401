@@ -150,3 +150,5 @@ export const LOCATIONS_ADDRESS = `${SERVER_ADDRESS}locations?`;
 export const COUNT_ADDRESS = `${SERVER_ADDRESS}addressCount`;
 export const LOGIN_ADDRESS = `${SERVER_ADDRESS}login`;
 export const SIGNUP_ADDRESS = `${SERVER_ADDRESS}signup`;
+export const LOGOUT_ADDRESS = `${SERVER_ADDRESS}logout`;
+export const USERAUTHCHECK_ADDRESS = `${SERVER_ADDRESS}userAuthCheck`;
