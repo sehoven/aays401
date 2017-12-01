@@ -8,15 +8,15 @@ class Canvas extends React.Component {
     img.onload = () => {
       ctx.drawImage(img, 0, 0)
       ctx.font = "50px Courier"
-      ctx.fillText(this.props.text, 50,500 )
+      ctx.fillText(this.props.text, 25,550 )
 
     }
     const dataURL = canvas.toDataURL()
   }
   render() {
     return(
-      <div>
-        <canvas ref="canvas" width={640} height={640} />
+      <div className="CanvasContainer">
+        <canvas className="Canvas" ref="canvas" width={640} height={640} />
         <img ref="image" src={this.props.imgsrc} className="hidden" />
       </div>
     )

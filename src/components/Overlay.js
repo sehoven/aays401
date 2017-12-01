@@ -588,7 +588,7 @@ export default class OverlayContainer extends Component {
                         addPolygon={(polygon) => this.addPolygon(polygon)}
                         polyNum={this.state.polyNum} /> : null
         }
-        {!this.state.isDrawing && this.state.polyNum>0?
+        {!this.state.isDrawing && this.state.polyNum>0 && this.state.dataReady?
           <div>
             <button onClick={this.handleOpenModal} className="output-button">Output Map</button>
             <Modal
@@ -600,7 +600,7 @@ export default class OverlayContainer extends Component {
                 >
                 {this.state.filename==null
                 ?<div>
-                  <input type="text" onChange={this.getInput} defaultValue="Enter the filename:" />
+                  <input type="text" className="filename-input" onChange={this.getInput} defaultValue="Enter the filename:" />
                   <button onClick={this.setFilename}>confirm</button>
                   </div>
                 :
@@ -610,7 +610,9 @@ export default class OverlayContainer extends Component {
                       <div className="vertical-button-text">◀</div>
                     </div>
                   </div>
-                  <Canvas id="export-modal-center" imgsrc= {this.state.url[this.state.currentImage]} text={this.state.currentTotal} />
+                  <div id="export-modal-center">
+                    <Canvas imgsrc= {this.state.url[this.state.currentImage]} text={this.state.currentTotal} />
+                  </div>
                   <div id="export-modal-right">
                   <div className={"buttonVertical " + ((this.state.currentImage == this.state.polyNum-1) ? "hide" : "" )} onClick = {this.NextImage}>
                     <div className="vertical-button-text">▶</div>
