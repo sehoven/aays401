@@ -665,23 +665,23 @@ export default class OverlayContainer extends Component {
                   <div className="navbar-image-box"><a href={this.state.url[i]} download="map">{<img className="image" src= {this.state.url[i]}/>}</a></div>
                   <div className="navbar-count-poly-text">
                     { this.state.residenceFilter &&
-                      <label className="containerButton">Residences: {this.state.dataReady? itemData.Residential.total:"?"}
+                      <label className="containerLabel">Residences: {this.state.dataReady? itemData.Residential.total:"?"}
                       </label>
                     }
                     { this.state.apartmentFilter &&
-                      <label className="containerButton">Apartments: {this.state.dataReady? itemData.Apartment.total:"?"}
+                      <label className="containerLabel">Apartments: {this.state.dataReady? itemData.Apartment.total:"?"}
                       </label>
                     }
                     { this.state.industrialFilter &&
-                      <label className="containerButton">Industrial: {this.state.dataReady? itemData.Industrial.total:"?"}
+                      <label className="containerLabel">Industrial: {this.state.dataReady? itemData.Industrial.total:"?"}
                       </label>
                     }
                     { this.state.commercialFilter &&
-                      <label className="containerButton">Commercial: {this.state.dataReady? itemData.Commercial.total:"?"}
+                      <label className="containerLabel">Commercial: {this.state.dataReady? itemData.Commercial.total:"?"}
                       </label>
                     }
                     { this.state.unspecifiedFilter &&
-                      <label className="containerButton">Unspecified: {this.state.dataReady? itemData.Other:"?"}
+                      <label className="containerLabel">Unspecified: {this.state.dataReady? itemData.Other:"?"}
                       </label>
                     }
                   </div>
