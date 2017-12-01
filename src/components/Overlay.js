@@ -177,7 +177,7 @@ export class Overlay extends Component {
     //   <button id="finish-draw-button" onClick={this.finishClick.bind(this)} style={{width: "45%"}} key="1">ADD</button>,
     // ];
     // return drawButtonGroup;
-      if(!this.props.hasDeliveryZone){
+      if(!this.props.hasDeliveryZone()){
           let drawButtonGroup = [
             <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)} style={{width: "45%"}} key="0">CANCEL</button>,
             <button id="finish-draw-button" onClick={this.finishClick.bind(this)} style={{width: "45%"}} key="1">CONFIRM</button>,
@@ -319,6 +319,10 @@ export default class OverlayContainer extends Component {
       this.state.outerPolygon.restore();
     }
     for(var i=0;i<this.getInnerPolygonsCount();i++){
+      // console.log("11 "+this.state.innerPolygons.getAt(i).polygon + " 33 "+this.state.innerPolygons.getAt(i).prevPath);
+      // if(this.state.innerPolygons.getAt(i).polygon==null){
+      //   console.log("nuuuu");
+      // }
       this.state.innerPolygons.getAt(i).restore();
     }
     //console.log("ddddd "+this.state.innerPolygons.getAt(0).convertToLatLng());
@@ -538,8 +542,7 @@ export default class OverlayContainer extends Component {
     if (!this.props.active) return null;
     return (
       <div className={this.props.active && "navPanel"}>
-      <SteppedProgressBar current={this.progressBarData()} num={3} labels={['first', 'second', 'third']}/>
-
+      <ProgressBarView data={this.progressBarData.bind(this)}/>
         <Overlay
           active={this.props.active}
           toggleDrawingTools={this.toggleDrawingTools.bind(this)}
@@ -641,8 +644,11 @@ class Polygon {
     }
 
     restore() {
-      console.log(this.polygon, this.prevPath);
-      this.polygon.setPath(this.prevPath);
+      console.log(this.polygon);
+      console.log("ffff "+this.prevPath);
+      if(this.prevPath!=null){
+        this.polygon.setPath(this.prevPath);
+      }
     }
 
     remove(){
