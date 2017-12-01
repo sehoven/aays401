@@ -18,50 +18,6 @@ export class PolygonTools extends Component {
     this.mapListener = null;
   }
 
-  // Before the component mounts, set the polygon and add the listeners
-  componentWillMount() {
-    let that = this;
-
-    for(var i = 0; i < this.props.polygons.size(); ++i) {
-      let dataItem = {
-        polygon: this.props.polygons.getAt(i).polygon,
-        polygonListener: null,
-        isSelected: false
-      }
-      this.data.push(dataItem);
-    }
-
-    for(var i = 0; i < this.data.length; ++i) {
-      if(this.data[i].polygonListener == null) {
-        let data = this.data[i];
-        let polygonListener = this.props.maps.event.addListener(data.polygon, "click", function(e) {
-          // When the user clicks on a node, that node will be deleted from the polygon.
-          if(e.vertex != null) {
-            let path = data.polygon.getPaths().getAt(e.path);
-            path.removeAt(e.vertex);
-            if(path.length < 3) {
-              that.deleteOnePolygon(data.polygon);
-            }
-          } else {
-            if(data.isSelected) {
-              that.deselectOnePolygon(data.polygon);
-            } else {
-              that.selectOnePolygon(data.polygon);
-            }
-          }
-        });
-
-        data.polygonListener = polygonListener;
-      }
-    }
-
-    if(this.mapListener == null) {
-      this.mapListener = this.props.maps.event.addListener(this.props.map, "click", function(e) {
-        that.deselectAllPolygons();
-      });
-    }
-  }
-
   componentWillUnmount() {
     // Before unmounting, "deselect" all polygons and remove all listeners
     this.deselectAllPolygons();
@@ -74,7 +30,7 @@ export class PolygonTools extends Component {
     for(let i = 0; i < this.data.length; ++i) {
       polygons.push(this.data[i].polygon);
     }
-    this.props.setPolygonArray(polygons);
+    this.props.setPolygonArray(polygons[0]);
   }
 
   findData(key, value) {
@@ -87,10 +43,6 @@ export class PolygonTools extends Component {
   }
 
   removeAllListeners() {
-    for(let i = 0; i < this.data.length; ++i) {
-      this.props.maps.event.removeListener(this.data[i].polygonListener);
-      this.data[i].polygonListener = null;
-    }
     if(this.mapListener != null) {
       this.props.maps.event.removeListener(this.mapListener);
       this.mapListener = null;
@@ -110,13 +62,6 @@ export class PolygonTools extends Component {
     }
   }
 
-  selectPolygon(dataItem) {
-    if(dataItem != null && dataItem.polygon != null) {
-      dataItem.polygon.setEditable(true);
-      dataItem.isSelected = true;
-    }
-  }
-
   deselectAllPolygons() {
     for(let i = 0; i < this.data.length; ++i) {
       this.deselectPolygon(this.data[i]);
@@ -127,13 +72,6 @@ export class PolygonTools extends Component {
     let toDeselect = this.findData("polygon", polygon);
     if(toDeselect != null) {
       this.deselectPolygon(toDeselect);
-    }
-  }
-
-  deselectPolygon(dataItem) {
-    if(dataItem != null && dataItem.polygon != null) {
-      dataItem.polygon.setEditable(false);
-      dataItem.isSelected = false;
     }
   }
 
@@ -155,7 +93,6 @@ export class PolygonTools extends Component {
     if(index > -1) {
       let removed = this.data.splice(index, 1);
       if(removed.length > 0) {
-        this.props.maps.event.removeListener(removed[0].polygonListener);
         removed[0].polygon.setMap(null);
       }
     }
@@ -173,9 +110,7 @@ export default class DrawingTools extends Component {
     super(props);
 
     this.polygon = null;
-    this.isSelected = false;
     this.drawingManager = null;
-    this.polygonListener = null;
     this.mapListener = null;
 
     if (this.props.polyNum == 0){
@@ -206,53 +141,13 @@ export default class DrawingTools extends Component {
   }
 
   componentWillUnmount() {
-    this.props.getPolygon(this.polygon);
-    //this.props.addPolygon(this.polygon);
+    this.props.addPolygon(this.polygon);
     this.removeDrawingTools();
   }
 
   removeDrawingTools() {
-    if(this.polygon) {
-      this.polygon.setEditable(false);
-    }
-    if(this.polygonListener) {
-      this.props.maps.event.removeListener(this.polygonListener);
-    }
     if(this.drawingManager) {
       this.drawingManager.setMap(null);
-    }
-    if(this.mapListener) {
-      this.props.maps.event.removeListener(this.mapListener);
-    }
-  }
-
-  selectPolygon() {
-    if(this.polygon) {
-      this.polygon.setEditable(true);
-      this.isSelected = true;
-    }
-  }
-
-  deselectPolygon() {
-    if(this.isSelected) {
-      if(this.polygon != null) {
-        this.polygon.setEditable(false);
-      }
-      this.isSelected = false;
-    }
-  }
-
-  deletePolygon() {
-    // When the polygon is deleted, the user can draw a polygon again (limit to one)
-    this.resetDrawingTools();
-    if(this.polygonListener) {
-      this.props.maps.event.removeListener(this.polygonListener);
-      this.polygonListener = null;
-    }
-    if(this.polygon != null) {
-      this.polygon.setMap(null);
-      this.polygon = null;
-      this.isSelected = false;
     }
   }
 
@@ -286,33 +181,7 @@ export default class DrawingTools extends Component {
         drawingControl: false
       });
       that.polygon = polygon;
-      that.isSelected = true;
-
-      let polygonListener = that.props.maps.event.addListener(polygon, "click", function(e) {
-        // When the user clicks on a node, that node will be deleted from the polygon.
-        if(e.vertex != null) {
-          let path = polygon.getPaths().getAt(e.path);
-          path.removeAt(e.vertex);
-          if(path.length < 3) {
-            that.deletePolygon();
-          }
-        } else {
-          if(that.isSelected) {
-            that.deselectPolygon();
-          } else {
-            that.selectPolygon();
-          }
-        }
-      });
-      that.polygonListener = polygonListener;
-      that.selectPolygon();
     });
-
-    if(this.mapListener == null) {
-      this.mapListener = this.props.maps.event.addListener(map, "click", function(e) {
-        that.deselectPolygon();
-      });
-    }
   }
 
   render() {
