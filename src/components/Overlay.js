@@ -541,6 +541,7 @@ export default class OverlayContainer extends Component {
     if (!this.props.active) return null;
     return (
       <div className={this.props.active && "navPanel"}>
+        <button onClick={this.handleOpenModal} id="output-button">EXPORT</button>
         <Overlay
           active={this.props.active}
           toggleDrawingTools={this.toggleDrawingTools.bind(this)}
@@ -564,7 +565,6 @@ export default class OverlayContainer extends Component {
         }
         {!this.state.isDrawing && this.state.polyNum>0?
           <div>
-            <button onClick={this.handleOpenModal} className="output-button">Output Map</button>
             <Modal
                   isOpen={this.state.showModal}
                   contentLabel="Output Map"
