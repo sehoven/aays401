@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
+import ProgressBarView from './ProgressBar.js';
 import DrawingTools, { PolygonTools } from './DrawingTools.js';
 import { STATIC_STYLE, IMAGE_DIMENSIONS } from '../settings';
+import SteppedProgressBar from 'patchkit-stepped-progress-bar';
 
 const HTTPService = require('./HTTPService.js');
 const notificationTimer = 2000;
@@ -515,6 +517,15 @@ export default class OverlayContainer extends Component {
     }));
   }
 
+  progressBarData() {
+    if (this.checkOuterPolygonExists()) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
   renderPolygonName(i) {
       if(i == 0) {
           return 'Delivery Zone';
@@ -527,6 +538,8 @@ export default class OverlayContainer extends Component {
     if (!this.props.active) return null;
     return (
       <div className={this.props.active && "navPanel"}>
+      <SteppedProgressBar current={this.progressBarData()} num={3} labels={['first', 'second', 'third']}/>
+
         <Overlay
           active={this.props.active}
           toggleDrawingTools={this.toggleDrawingTools.bind(this)}
