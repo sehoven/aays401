@@ -58,6 +58,58 @@ run ">npm test -- --watch" this will run any tests that have been changed
 
 ## Deployment
 
+* sudo apt-get update
+* sudo apt-get upgrade
+
+* http://www.hostingadvice.com/how-to/install-nodejs-ubuntu-14-04/ (Option 2)
+* sudo apt-get install -y nodejs
+* sudo apt-get install -y npm
+* sudo apt-get install postgresql-9.6
+* Next follow the instructions in the database setup instructions
+
+* Make symbolic link:
+* sudo ln -s /usr/bin/nodejs /usr/bin/node
+
+* Test:
+* node -v
+* npm -v
+* (Should see version number)
+
+* If node is not most up to date version (for example, if “node -v” yields “v0.10.25”):
+* sudo apt-get install curl
+* (For version 8)
+* curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+* sudo apt-get install -y nodejs
+
+* Now if you test:
+* node -v
+* It should give you something like: 
+* v8.9.0
+
+* sudo apt-get install -y git
+* Generate ssh key to clone repo:
+* git config --global user.email "email"
+* ssh-keygen -t rsa
+* eval "$(ssh-agent -s)"
+* ssh-add -k <path to key>
+* ssh-add -l (should print line with your key name at the end)
+
+* Add ssh public key to github account with repo permissions
+
+* Check connection with:
+* ssh -T git@github.com
+
+* Clone the repo onto the server:
+* git clone git@github.com:Etiennera/aays401.git
+* Install dependencies:
+* npm install
+* Might need to run sudo npm install
+
+* Install PM2 (http://pm2.keymetrics.io/docs/usage/quick-start/) 
+* npm install pm2@latest -g
+* pm2 start server.js
+* pm2 start npm -- start
+
 TODO
 
 ## Built With
