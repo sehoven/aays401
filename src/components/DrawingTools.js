@@ -208,7 +208,8 @@ export default class DrawingTools extends Component {
   }
 
   componentWillUnmount() {
-    this.props.addPolygon(this.polygon);
+    this.props.getPolygon(this.polygon);
+    //this.props.addPolygon(this.polygon);
     this.removeDrawingTools();
   }
 

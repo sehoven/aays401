@@ -80,7 +80,7 @@ export class Overlay extends Component {
   cancelClick() {
     let callback;
     if(this.props.cancelClickCallback) {
-      callback = () => { this.props.cancelClickCallback(); };
+      callback = () => { this.props.cancelClickCallback('cancel'); };
     }
     this.toggleIsDrawing(callback);
 
@@ -99,6 +99,31 @@ export class Overlay extends Component {
     this.state.notification = 'inner';
     this.createNotification(this.state.notification);
     this.state.notification = 'nothing';
+  }
+
+  editClick(){
+      let callback;
+      if(this.props.editClickCallback) {
+        callback = () => { this.props.editClickCallback(); };
+      }
+      this.toggleIsDrawing(callback);
+
+      this.state.notification = 'cancel';
+      this.createNotification(this.state.notification);
+      this.state.notification = 'nothing';
+      // this.props.editClickCallback();
+  }
+
+  editUpdateClick() {
+      let callback;
+      if(this.props.editClickCallback) {
+        callback = () => { this.props.editUpdateClickCallback();; };
+      }
+      this.toggleIsDrawing(callback);
+
+      this.state.notification = 'cancel';
+      this.createNotification(this.state.notification);
+      this.state.notification = 'nothing';
   }
 
   createNotification (type){
@@ -127,27 +152,56 @@ export class Overlay extends Component {
       };
   };
 
+  renderButtonGroup (){
+      if(this.props.hasDeliveryZone) {
+          let buttonGroup = [
+            <button id="draw-button" onClick={this.drawClick.bind(this)} style={{width: "28%"}} key="0">ADD</button>,
+            <button id="clear-button" onClick={this.clearClick.bind(this)} style={{width: "28%"}} key="1">CLEAR</button>,
+            <button id="edit-button" onClick={this.editClick.bind(this)} style={{width: "28%"}} key="9">EDIT</button>
+          ];
+          return buttonGroup;
+      }
+      else {
+          return (
+              <button id="draw-button" onClick={this.drawClick.bind(this)} style={{width: "45%"}} key="0">DRAW</button>
+          );
+      }
+  }
+
+  renderDrawButtonGroup (){
+      if(!this.props.hasDeliveryZone){
+          let drawButtonGroup = [
+            <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)} style={{width: "45%"}} key="0">CANCEL</button>,
+            <button id="finish-draw-button" onClick={this.finishClick.bind(this)} style={{width: "45%"}} key="1">CONFIRM</button>,
+        ];
+        return drawButtonGroup;
+    }
+    else if(this.props.isEditing){
+        let drawButtonGroup = [
+          <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)} style={{width: "45%"}} key="0">CANCEL</button>,
+          <button id="finish-draw-button" onClick={this.editUpdateClick.bind(this)} style={{width: "45%"}} key="1">CONFIRM EDIT</button>,
+      ];
+      return drawButtonGroup;
+  }
+      else {
+          let drawButtonGroup = [
+            <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)} style={{width: "45%"}} key="0">CANCEL</button>,
+            <button id="finish-draw-button" onClick={this.finishClick.bind(this)} style={{width: "45%"}} key="1">ADD</button>,
+        ];
+        return drawButtonGroup;
+      }
+  }
   render() {
 
     if (!this.props.active) return null;
-
-    let buttonGroup = [
-      <button id="draw-button" onClick={this.drawClick.bind(this)} style={{width: "45%"}} key="0">DRAW</button>,
-      <button id="clear-button" onClick={this.clearClick.bind(this)} style={{width: "45%"}} key="1">CLEAR</button>
-    ];
-    let drawButtonGroup = [
-      <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)} style={{width: "28%"}} key="0">RETURN</button>,
-      <button id="finish-draw-button" onClick={this.finishClick.bind(this)} style={{width: "28%"}} key="1">FINISH</button>,
-      <button id="add-draw-button" onClick={this.addClick.bind(this)} style={{width: "28%"}} key="2">ADD</button>
-    ]
 
     return (
       <div className="overlayContainer">
         { this.state.banner }
         <NotificationContainer/>
         <center>
-        { this.state.isDrawing ? null : buttonGroup }
-        { !this.state.isDrawing ? null : drawButtonGroup }
+        { this.state.isDrawing ? null : this.renderButtonGroup()}
+        { !this.state.isDrawing ? null : this.renderDrawButtonGroup()}
         </center>
         &nbsp;
       </div>
@@ -165,6 +219,9 @@ export default class OverlayContainer extends Component {
     // data refers to the unit count data
     this.state = {
       isDrawing: false,
+      isEditing: false,
+      notification: null,
+      tempPolygon: null,
       outerPolygon: null,
       innerPolygons: new PolygonArray(),
       polyNum: 0,
@@ -222,17 +279,39 @@ export default class OverlayContainer extends Component {
   }
 
   finishClickCallback() {
+    this.addPolygon();
     this.updatePolygonData();
   }
 
-  cancelClickCallback() {
-    this.updatePolygonData();
+  cancelClickCallback(buttonState) {
+
+    let that = this;
+    let appendPromise = new Promise(function(resolve, reject) {
+      resolve();
+    });
+
+    appendPromise.then(() => {
+      that.setState({
+          isDrawing: false
+      });
+    });
+    let polygon = this.state.tempPolygon;
+    polygon.setMap(null);
+    this.setState({tempPolygon: null});
+  }
+
+  editClickCallback() {
+      this.setState({isDrawing: false, isEditing: true});
+  }
+
+  editUpdateClickCallback() {
+      this.updatePolygonData();
+      this.setState({isDrawing: false, isEditing: false});
   }
 
   addClickCallback() {
     let that = this;
     let appendPromise = new Promise(function(resolve, reject) {
-      that.appendPolygonData();
       resolve();
     });
     appendPromise.then(() => {
@@ -241,6 +320,9 @@ export default class OverlayContainer extends Component {
   }
 
   appendPolygonData() {
+
+      this.addPolygon();
+
       let that = this;
       let polygon = null;
       var fillColor, fillOpacity;
@@ -323,6 +405,7 @@ export default class OverlayContainer extends Component {
       }
       this.setState({
           isDrawing: false,
+          isEditing: false,
           outerPolygon: null,
           innerPolygons: new PolygonArray(),
           polyNum: 0,
@@ -342,17 +425,24 @@ export default class OverlayContainer extends Component {
       }
   }
 
-  addPolygon(polygon) {
+  getPolygon(polygon) {
+      this.setState({tempPolygon: polygon});
+  }
+
+  addPolygon() {
+
+    let polygon = this.state.tempPolygon;
     if(polygon != null) {
-        if(this.state.outerPolygon==null){
-            this.setState({outerPolygon: new Polygon(polygon)});
-        }
-        else{
-            let polygonArray = this.state.innerPolygons;
-            polygonArray.push(new Polygon(polygon));
-            this.setState({innerPolygons: polygonArray});
-        }
+      if(this.state.outerPolygon==null){
+        this.setState({outerPolygon: new Polygon(polygon), innerPolygons: new PolygonArray()});
+      }
+      else{
+        let polygonArray = this.state.innerPolygons;
+        polygonArray.push(new Polygon(polygon));
+        this.setState({innerPolygons: polygonArray});
+      }
     }
+    this.setState({tempPolygon: null});
   }
 
   setPolygonArray(polygons) {
@@ -388,6 +478,14 @@ export default class OverlayContainer extends Component {
     }));
   }
 
+  renderPolygonName(i) {
+      if(i == 0) {
+          return 'Delivery Zone';
+      }
+      else {
+          return 'Delivery Route ' + (i);
+      }
+  }
   render() {
     if (!this.props.active) return null;
     return (
@@ -397,10 +495,14 @@ export default class OverlayContainer extends Component {
           toggleDrawingTools={this.toggleDrawingTools.bind(this)}
           drawClickCallback={this.drawClickCallback.bind(this)}
           clearClickCallback={this.clearClickCallback.bind(this)}
+          hasDeliveryZone={this.checkOuterPolygonExists()}
+          isEditing={this.state.isEditing}
           finishClickCallback={this.finishClickCallback.bind(this)}
           addClickCallback = {this.addClickCallback.bind(this)}
+          editClickCallback = {this.editClickCallback.bind(this)}
+          editUpdateClickCallback = {this.editUpdateClickCallback.bind(this)}
           cancelClickCallback={this.cancelClickCallback.bind(this)} />
-        { this.state.isDrawing && this.state.polyNum > 0 ?
+        { (this.state.isDrawing || this.state.isEditing) && this.checkOuterPolygonExists() > 0 ?
           <PolygonTools map={this.props.map}
                         maps={this.props.maps}
                         outerPolygon={this.state.outerPolygon}
@@ -410,14 +512,14 @@ export default class OverlayContainer extends Component {
         { this.state.isDrawing ?
           <DrawingTools map={this.props.map}
                         maps={this.props.maps}
-                        addPolygon={(polygon) => this.addPolygon(polygon)}
-                        polyNum={this.state.polyNum} /> : null
+                        getPolygon={(polygon) => this.getPolygon(polygon)}
+                        polyNum={this.checkOuterPolygonExists()} /> : null
         }
         { this.props.active &&
           <div id="navbar-list">
             {this.state.dataReady ? this.state.data.map((itemData, i)=>
               <div className="navbar-count-poly-box" key={i}>
-                <div className="navbar-count-poly-title"><p style={{padding: 15}}>POLYGON {i+1}</p></div>
+                <div className="navbar-count-poly-title"><p style={{padding: 15}}>{this.renderPolygonName(i)}</p></div>
                 <ul className="navbar-count-poly-text">
                   <label className="containerButton">Residences: {this.state.dataReady? itemData.Residential.total:"?"}
                     <input type="checkbox" defaultChecked={true}></input>
