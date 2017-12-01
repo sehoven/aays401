@@ -104,8 +104,6 @@ run ">npm test -- --watch" this will run any tests that have been changed
 * pm2 start server.js
 * pm2 start npm -- start
 
-TODO
-
 ## Built With
 
 * [Node.js](https://nodejs.org/en/about/) - Back End Framework
