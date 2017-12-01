@@ -108,6 +108,11 @@ run ">npm test -- --watch" this will run any tests that have been changed
 
 * [Node.js](https://nodejs.org/en/about/) - Back End Framework
 * [React JS](https://facebook.github.io/react/) - Front End Framework
+* [PostgreSQL](https://www.postgresql.org/) - Database
+
+## More Open Data
+
+* https://www.opendatanetwork.com
 
 ## Authors
 
