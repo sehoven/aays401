@@ -27,6 +27,7 @@ export default class LandingPage extends Component {
   }
 
   componentWillMount() {
+    ReactModal.setAppElement('body');
     let that = this;
     HTTPService.userAuthCheck().then(function(json){
       that.setState({isAuthenticated: json[0].value || false, isReady: true});
@@ -195,22 +196,14 @@ export class AuthPage extends Component {
         res.body.then(function(data){
           switch(res.statusCode) {
             case 400:
-              that.setState({
-                modalTitle: "Login Error",
-                modalMessage: data[0].reason,
-                showModal: true
-              });
+              that.errorCallback("Login Error", data[0].reason);
               break;
             case 200:
               that.props.setAuthenticated();
               document.cookie = data[0].pseudoCookie;
               break;
             default:
-              that.setState({
-                modalTitle: "Unexpected Response",
-                modalMessage: data[0].reason,
-                showModal: true
-              });
+              that.errorCallback("Unexpected Response", data[0].reason);
               break;
           }
         });
