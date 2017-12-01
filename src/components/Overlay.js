@@ -5,6 +5,7 @@ import 'react-notifications/lib/notifications.css';
 import { STATIC_STYLE, IMAGE_DIMENSIONS } from '../settings';
 import Modal from 'react-modal';
 import jszipUtils from 'jszip-utils';
+import Canvas from './Canvas.js'
 const HTTPService = require('./HTTPService.js');
 const notificationTimer = 2000;
 
@@ -144,6 +145,7 @@ export default class OverlayContainer extends Component {
     this.handleCloseModal = this.handleCloseModal.bind(this);
     this.PreviousImage = this.PreviousImage.bind(this);
     this.NextImage = this.NextImage.bind(this);
+    //this.getTotal = this.getTotal.bind(this);
   }
 
   toggleFilter(filter){
@@ -486,6 +488,12 @@ export default class OverlayContainer extends Component {
     let next = this.state.currentImage+1
     {next<this.state.polyNum&&this.setState({currentImage:next})}
   }
+  /*
+  getTotal(){
+    let current = this.state.data[this.state.currentImage];
+    return current.Residential.total
+  }
+  */
   saveImages(){
     var urls = this.state.url;
     console.log(urls);
@@ -547,9 +555,8 @@ export default class OverlayContainer extends Component {
                   overlayClassName="modal-overlay"
                 >
                 <center>
-                  <a href={this.state.url[this.state.currentImage]} download="map">{<img className="modal-image" src= {this.state.url[this.state.currentImage]}/>}</a>
+                  <Canvas text = {"hah"} imgsrc = {this.state.url[this.state.currentImage]}/>
                 </center>
-
                 <div className="modal-wrapper">
                   <button onClick = {this.PreviousImage}>Previous</button>
                   {this.state.currentImage==this.state.polyNum-1
