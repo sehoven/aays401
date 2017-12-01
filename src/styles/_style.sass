@@ -31,6 +31,13 @@ body, input
   -ms-user-select: none
   user-select: none
 
+input, textarea
+  -webkit-user-select: text
+  -khtml-user-select: text
+  -moz-user-select: text
+  -ms-user-select: text
+  user-select: text
+
 *:focus
   outline: 5px auto #babdbe
 
@@ -150,16 +157,26 @@ body, input
   overflow: hidden
 
 .container .left
-  max-width: 30%
-  min-width: $navPanelMinWidth
-  float: left
   box-shadow: 3px 0 5px -2px #888
   z-index: 1
   border: 1px solid black
 
-.container .right
+.left
+  float: left
+  max-width: 30%
+  min-width: $navPanelMinWidth
+
+.right
   height: 100%
   width: 100%
+
+.app-bar-child
+  left: 0
+  right: 0
+  width: 50%
+  position: absolute
+  margin-left: 30%
+  margin-top: -35px
 
 #search-box
   font-family: 'Raleway'
@@ -448,7 +465,9 @@ buttonLarge:hover
     opacity: 0
 
 #logout
-  float: right
+  right: 0
+  position: absolute
+  padding-right: 10px
 
 #checkbox-red
   input:checked ~ .checkmark

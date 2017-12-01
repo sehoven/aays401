@@ -4,6 +4,8 @@ import { Enum } from 'enumify';
 import { AppBar } from './UIComponents.js';
 import MapContainer from './MapContainer.js';
 const HTTPService = require('./HTTPService.js');
+import ProgressBarView from './ProgressBar.js';
+import SteppedProgressBar from 'patchkit-stepped-progress-bar';
 
 class PanelType extends Enum {}
 PanelType.initEnum(['LOGIN', 'SIGNUP']);
@@ -42,9 +44,15 @@ export default class LandingPage extends Component {
     if (this.state.isReady) {
       if (this.state.isAuthenticated){
         return (
-          <div><AppBar>
-            <div id="logout" onClick={() => {this.logout()}}>LOGOUT</div>
-          </AppBar><MapContainer /></div>
+          <div>
+            <AppBar>
+              <div className="app-bar-child">
+                <ProgressBarView />
+              </div>
+              <div id="logout" onClick={() => {this.logout()}}>LOGOUT</div>
+            </AppBar>
+            <MapContainer />
+          </div>
         )
       } else {
         return <div><AppBar /><AuthPage PanelType={PanelType}

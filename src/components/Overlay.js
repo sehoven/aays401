@@ -622,7 +622,6 @@ export default class OverlayContainer extends Component {
     if (!this.props.active) return null;
     return (
       <div className={this.props.active && "navPanel"}>
-      <ProgressBarView data={this.progressBarData.bind(this)}/>
         <Overlay
           active={this.props.active}
           toggleDrawingTools={this.toggleDrawingTools.bind(this)}
