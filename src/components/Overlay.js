@@ -3,7 +3,8 @@ import {NotificationContainer, NotificationManager} from 'react-notifications';
 import DrawingTools, { PolygonTools } from './DrawingTools.js';
 import 'react-notifications/lib/notifications.css';
 import { STATIC_STYLE, IMAGE_DIMENSIONS } from '../settings';
-
+import Modal from 'react-modal';
+import jszipUtils from 'jszip-utils';
 const HTTPService = require('./HTTPService.js');
 const notificationTimer = 2000;
 
@@ -133,10 +134,16 @@ export default class OverlayContainer extends Component {
       apartmentFilter: true,
       industrialFilter: true,
       commercialFilter: true,
-      unspecifiedFilter: true
+      unspecifiedFilter: true,
+      showModal: false,
+      currentImage: 0
     }
-
     this.circles = []; // Changing this data shouldn't cause re-render
+
+    this.handleOpenModal = this.handleOpenModal.bind(this);
+    this.handleCloseModal = this.handleCloseModal.bind(this);
+    this.PreviousImage = this.PreviousImage.bind(this);
+    this.NextImage = this.NextImage.bind(this);
   }
 
   toggleFilter(filter){
@@ -401,6 +408,7 @@ export default class OverlayContainer extends Component {
       outerPolygon: null,
       innerPolygons: new PolygonArray(),
       polyNum: 0,
+      currentImage: 0,
       dataReady: false,
       data: [],
       url: []
@@ -462,11 +470,78 @@ export default class OverlayContainer extends Component {
       url: [...prevState.url, url]
     }));
   }
+  handleOpenModal () {
+    this.setState({ showModal: true,currentImage:0});
 
+    console.log("open modal");
+  }
+
+  handleCloseModal () {
+    this.setState({ showModal: false });
+  }
+  PreviousImage(){
+    let previous = this.state.currentImage-1
+    {previous>=0&& this.setState({currentImage:previous})}
+  }
+  NextImage(){
+    let next = this.state.currentImage+1
+    {next<this.state.polyNum&&this.setState({currentImage:next})}
+  }
+  saveImages(type){
+    var urls;
+    switch (type) {
+      case "color":
+        urls = this.state.url;
+        break;
+      case "bw":
+        console.log(this.state.innerPolygons);
+        urls = this.state.innerPolygons.getAll().map(function(poly){
+          let polygon = poly.convertToLatLng();
+          let url = "https://maps.googleapis.com/maps/api/staticmap?"
+                  + "key=AIzaSyC2mXFuLvwiASA3mSr2kz79fnXUYRwLKb8"
+                  + STATIC_STYLE + "&size=" + IMAGE_DIMENSIONS + "&path=color:" + "0x000000"
+                  + "|weight:5|fillcolor:" + "0x00000000";
+          if(polygon != null && polygon.length >= 2) {
+            polygon.forEach(function(position) {
+              url += "|" + position.lat.toFixed(6) + "," + position.lng.toFixed(6);
+            });
+            // Static API doesn't have polygon autocomplete. Close the path manually.
+            url += "|" + polygon[0].lat + "," + polygon[0].lng;
+          }
+          return url;
+        });
+        break;
+      default:
+        urls = [];
+        break;
+    }
+    var JSZip = require("jszip");
+    var FileSaver = require('file-saver');
+    var zip = new JSZip();
+    var count = 0;
+    var zipFilename = "zipFilename.zip";
+    urls.forEach(function(url){
+      var filename = "map"+urls.indexOf(url)+".png";
+      jszipUtils.getBinaryContent(url, function (err, data) {
+        if(err) {
+          console.log(err);
+          throw err; // or handle the error
+        }
+        zip.file(filename, data, {binary:true});
+        count++;
+        if (count == urls.length) {
+          var zipFile = zip.generate({type: "blob"});
+          FileSaver.saveAs(zipFile, zipFilename);
+        }
+      })
+    })
+  }
   render() {
+    console.log(this.state.data, this.state.currentImage)
     if (!this.props.active) return null;
     return (
       <div className={this.props.active && "navPanel"}>
+        <button onClick={this.handleOpenModal} id="output-button">EXPORT</button>
         <Overlay
           active={this.props.active}
           toggleDrawingTools={this.toggleDrawingTools.bind(this)}
@@ -487,6 +562,63 @@ export default class OverlayContainer extends Component {
                         maps={this.props.maps}
                         addPolygon={(polygon) => this.addPolygon(polygon)}
                         polyNum={this.state.polyNum} /> : null
+        }
+        {!this.state.isDrawing && this.state.polyNum>0?
+          <div>
+            <Modal
+                  isOpen={this.state.showModal}
+                  contentLabel="Output Map"
+                  onRequestClose={this.handleCloseModal}
+                  className = "modal-window"
+                  overlayClassName="modal-overlay"
+                >
+                <div id="modal-box">
+                  <div id="export-modal-left">
+                    <div className={"buttonVertical " + ((this.state.currentImage == 0) ? "hide" : "" )} onClick = {this.PreviousImage}>
+                      <div className="vertical-button-text">◀</div>
+                    </div>
+                  </div>
+                  <a id="export-modal-center"><img className="modal-image"src= {this.state.url[this.state.currentImage]}/></a>
+                  <div id="export-modal-right">
+                  <div className={"buttonVertical " + ((this.state.currentImage == this.state.polyNum-1) ? "hide" : "" )} onClick = {this.NextImage}>
+                    <div className="vertical-button-text">▶</div>
+                  </div>
+                  </div>
+                    <div>
+                      { (this.state.showModal && this.state.dataReady) &&
+                        <div className="modal-text" style={{color: "black",
+                                                            marginLeft: "-55px"}}>
+                          { this.state.residenceFilter &&
+                            <div style={{ fontSize: "20px", paddingTop: "40px"}}>Residences: {this.state.data[this.state.currentImage].Residential.total}
+                            </div>
+                          }
+                          { this.state.apartmentFilter &&
+                            <div style={{ fontSize: "20px"}}>Apartments: {this.state.data[this.state.currentImage].Apartment.total}
+                            </div>
+                          }
+                          { this.state.industrialFilter &&
+                            <div style={{ fontSize: "20px"}}>Industrial: {this.state.data[this.state.currentImage].Industrial.total}
+                            </div>
+                          }
+                          { this.state.commercialFilter &&
+                            <div style={{ fontSize: "20px"}}>Commercial: {this.state.data[this.state.currentImage].Commercial.total}
+                            </div>
+                          }
+                          { this.state.unspecifiedFilter &&
+                            <div style={{ fontSize: "20px"}}>Unspecified: {this.state.data[this.state.currentImage].Other}
+                            </div>
+                          }
+                        </div>
+                      }
+                      <button className={(this.state.currentImage == this.state.polyNum-1) ? "" : "hide" }
+                      onClick = {() => {this.saveImages("color")}}>Save In Color</button>
+                      <button  className={(this.state.currentImage == this.state.polyNum-1) ? "" : "hide" }
+                      onClick = {() => {this.saveImages("bw")}}>Save In Black And White</button>
+                    </div>
+                  </div>
+              </Modal>
+          </div>
+          :null
         }
         { this.props.active &&
           <div className="parent-height">
@@ -533,23 +665,23 @@ export default class OverlayContainer extends Component {
                   <div className="navbar-image-box"><a href={this.state.url[i]} download="map">{<img className="image" src= {this.state.url[i]}/>}</a></div>
                   <div className="navbar-count-poly-text">
                     { this.state.residenceFilter &&
-                      <label className="containerButton">Residences: {this.state.dataReady? itemData.Residential.total:"?"}
+                      <label className="containerLabel">Residences: {this.state.dataReady? itemData.Residential.total:"?"}
                       </label>
                     }
                     { this.state.apartmentFilter &&
-                      <label className="containerButton">Apartments: {this.state.dataReady? itemData.Apartment.total:"?"}
+                      <label className="containerLabel">Apartments: {this.state.dataReady? itemData.Apartment.total:"?"}
                       </label>
                     }
                     { this.state.industrialFilter &&
-                      <label className="containerButton">Industrial: {this.state.dataReady? itemData.Industrial.total:"?"}
+                      <label className="containerLabel">Industrial: {this.state.dataReady? itemData.Industrial.total:"?"}
                       </label>
                     }
                     { this.state.commercialFilter &&
-                      <label className="containerButton">Commercial: {this.state.dataReady? itemData.Commercial.total:"?"}
+                      <label className="containerLabel">Commercial: {this.state.dataReady? itemData.Commercial.total:"?"}
                       </label>
                     }
                     { this.state.unspecifiedFilter &&
-                      <label className="containerButton">Unspecified: {this.state.dataReady? itemData.Other:"?"}
+                      <label className="containerLabel">Unspecified: {this.state.dataReady? itemData.Other:"?"}
                       </label>
                     }
                   </div>
@@ -558,6 +690,7 @@ export default class OverlayContainer extends Component {
             </div>
           </div>
         }
+
       </div>
     )
   }

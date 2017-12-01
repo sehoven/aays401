@@ -8,8 +8,10 @@ export class AppBar extends Component {
   render() {
     return (
       <div className="header">
-        ANTHONY AT YOUR SERVICE
-        {this.props.children}
+        <div className="left">AaYS</div>
+        <div>
+          {this.props.children}
+        </div>
       </div>
     )
   }

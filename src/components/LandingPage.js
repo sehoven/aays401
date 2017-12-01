@@ -4,6 +4,8 @@ import { Enum } from 'enumify';
 import { AppBar } from './UIComponents.js';
 import MapContainer from './MapContainer.js';
 const HTTPService = require('./HTTPService.js');
+import ProgressBarView from './ProgressBar.js';
+import SteppedProgressBar from 'patchkit-stepped-progress-bar';
 
 class PanelType extends Enum {}
 PanelType.initEnum(['LOGIN', 'SIGNUP']);
@@ -25,6 +27,7 @@ export default class LandingPage extends Component {
   }
 
   componentWillMount() {
+    ReactModal.setAppElement('body');
     let that = this;
     HTTPService.userAuthCheck().then(function(json){
       that.setState({isAuthenticated: json[0].value || false, isReady: true});
@@ -38,22 +41,39 @@ export default class LandingPage extends Component {
     });
   }
 
+  progressBarData() {
+    return 0;
+    // TODO
+    // This function should derive its state from the overlay class
+  }
+
   render() {
     if (this.state.isReady) {
       if (this.state.isAuthenticated){
         return (
-          <div><AppBar>
-            <div id="logout" onClick={() => {this.logout()}}>LOGOUT</div>
-          </AppBar><MapContainer /></div>
-        )
-      } else {
-        return <div><AppBar /><AuthPage PanelType={PanelType}
-                            setAuthenticated={this.setAuthenticated}/></div>
-      }
-    } else {
-      return <AppBar />;
-    }
-  }
+          <div>
+            <AppBar>
+              <div className="app-bar-child">
+                <ProgressBarView data={this.progressBarData.bind(this)} />
+              </div>
+              <div id="logout" onClick={() => {this.logout()}}>LOGOUT</div>
+            </AppBar>
+           <MapContainer />
+         </div>
+       )
+     } else {
+       return (
+         <div>
+           <AppBar />
+           <AuthPage PanelType={PanelType}
+                     setAuthenticated={this.setAuthenticated}/>
+         </div>
+       )
+     }
+   } else {
+     return <AppBar />;
+   }
+ }
 }
 
 export class AuthPage extends Component {
@@ -176,22 +196,14 @@ export class AuthPage extends Component {
         res.body.then(function(data){
           switch(res.statusCode) {
             case 400:
-              that.setState({
-                modalTitle: "Login Error",
-                modalMessage: data[0].reason,
-                showModal: true
-              });
+              that.errorCallback("Login Error", data[0].reason);
               break;
             case 200:
               that.props.setAuthenticated();
               document.cookie = data[0].pseudoCookie;
               break;
             default:
-              that.setState({
-                modalTitle: "Unexpected Response",
-                modalMessage: data[0].reason,
-                showModal: true
-              });
+              that.errorCallback("Unexpected Response", data[0].reason);
               break;
           }
         });
