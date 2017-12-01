@@ -4,6 +4,7 @@ import DrawingTools, { PolygonTools } from './DrawingTools.js';
 import 'react-notifications/lib/notifications.css';
 import { STATIC_STYLE, IMAGE_DIMENSIONS } from '../settings';
 import Modal from 'react-modal';
+import jszipUtils from 'jszip-utils';
 const HTTPService = require('./HTTPService.js');
 const notificationTimer = 2000;
 
@@ -143,6 +144,7 @@ export default class OverlayContainer extends Component {
     this.handleCloseModal = this.handleCloseModal.bind(this);
     this.PreviousImage = this.PreviousImage.bind(this);
     this.NextImage = this.NextImage.bind(this);
+  }
 
   toggleFilter(filter){
     switch (filter){
@@ -484,6 +486,31 @@ export default class OverlayContainer extends Component {
     let next = this.state.currentImage+1
     {next<this.state.polyNum&&this.setState({currentImage:next})}
   }
+  saveImages(){
+    var urls = this.state.url;
+    console.log(urls);
+    var JSZip = require("jszip");
+    var FileSaver = require('file-saver');
+    var zip = new JSZip();
+    var count = 0;
+    var zipFilename = "zipFilename.zip";
+    urls.forEach(function(url){
+      var filename = "map"+urls.indexOf(url);
+      jszipUtils.getBinaryContent(url, function (err, data) {
+        if(err) {
+          console.log(err);
+          throw err; // or handle the error
+        }
+        zip.file(filename, data, {binary:true});
+        count++;
+        if (count == urls.length) {
+          var zipFile = zip.generate({type: "blob"});
+          FileSaver.saveAs(zipFile, zipFilename);
+
+        }
+      })
+    })
+  }
   render() {
     if (!this.props.active) return null;
     return (
@@ -516,19 +543,21 @@ export default class OverlayContainer extends Component {
                   isOpen={this.state.showModal}
                   contentLabel="Output Map"
                   onRequestClose={this.handleCloseModal}
-                  className="Modal"
+                  className = "modal-window"
                   overlayClassName="modal-overlay"
                 >
-                <div className="modal-text">Click the image to download!</div>
-                <center className="modal-image">
-                  <a href={this.state.url[this.state.currentImage]} download="map">{<img className="image" src= {this.state.url[this.state.currentImage]}/>}</a>
+                <center>
+                  <a href={this.state.url[this.state.currentImage]} download="map">{<img className="modal-image" src= {this.state.url[this.state.currentImage]}/>}</a>
                 </center>
-                <div>
-                  <button className="modal-previous" onClick = {this.PreviousImage}>Previous</button>
-                  <button  onClick = {this.NextImage}>Next</button>
-                </div>
 
-                <button className="modal-back" onClick ={this.handleCloseModal} >Back</button>
+                <div className="modal-wrapper">
+                  <button onClick = {this.PreviousImage}>Previous</button>
+                  {this.state.currentImage==this.state.polyNum-1
+                    ?<button onClick = {() => {this.saveImages()}}>Save</button>
+                    :<button onClick = {this.NextImage}>Next</button>
+                  }
+
+                </div>
               </Modal>
           </div>
           :null

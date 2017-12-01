@@ -67,14 +67,27 @@ body, input
 
 .modal button
   float: right
+.modal-window
+  position: absolute
+  top: 40px
+  left: 300px
+  right: 300px
+  bottom: 40px
+  background-color: white
+  padding: 10px
+  border: solid 1px black
+  margin: 0 auto
+  text-align: center
+  color: white
 
 .modal-overlay
   position: fixed
   top: 70px
-  left: 40vh
-  right: 40vh
-  bottom: 70px
+  left: 0
+  right: 0
+  bottom: 0
   background-color: rgba(0,0,0,0.7)
+  border: solid 1px black
   z-index: 15
 .modal-text
   text-align: center
@@ -84,11 +97,13 @@ body, input
 .modal-image
   margin-top: 5vh
   margin-bottom: 5vh
-.modal-previous
-  margin-left: 35vh
+  height: 200px
+  width: 200px
+  border: solid 5px black
+.modal-wrapper
+  text-align: center
+  display: inline-block
 
-.modal-back
-  margin-right: 20vh
 .auth-form
   margin-top: 40px
   margin-bottom: 40px
