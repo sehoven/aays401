@@ -172,32 +172,32 @@ export class Overlay extends Component {
   }
 
   renderDrawButtonGroup (){
-    let drawButtonGroup = [
-      <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)} style={{width: "45%"}} key="0">CANCEL</button>,
-      <button id="finish-draw-button" onClick={this.finishClick.bind(this)} style={{width: "45%"}} key="1">ADD</button>,
-    ];
-    return drawButtonGroup;
-  //     if(!this.props.hasDeliveryZone){
-  //         let drawButtonGroup = [
-  //           <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)} style={{width: "45%"}} key="0">CANCEL</button>,
-  //           <button id="finish-draw-button" onClick={this.finishClick.bind(this)} style={{width: "45%"}} key="1">CONFIRM</button>,
-  //       ];
-  //       return drawButtonGroup;
-  //   }
-  //   else if(this.props.isEditing){
-  //       let drawButtonGroup = [
-  //         <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)} style={{width: "45%"}} key="0">CANCEL</button>,
-  //         <button id="finish-draw-button" onClick={this.editUpdateClick.bind(this)} style={{width: "45%"}} key="1">CONFIRM EDIT</button>,
-  //     ];
-  //     return drawButtonGroup;
-  // }
-  //     else {
-  //         let drawButtonGroup = [
-  //           <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)} style={{width: "45%"}} key="0">CANCEL</button>,
-  //           <button id="finish-draw-button" onClick={this.finishClick.bind(this)} style={{width: "45%"}} key="1">ADD</button>,
-  //       ];
-  //       return drawButtonGroup;
-  //     }
+    // let drawButtonGroup = [
+    //   <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)} style={{width: "45%"}} key="0">CANCEL</button>,
+    //   <button id="finish-draw-button" onClick={this.finishClick.bind(this)} style={{width: "45%"}} key="1">ADD</button>,
+    // ];
+    // return drawButtonGroup;
+      if(!this.props.hasDeliveryZone){
+          let drawButtonGroup = [
+            <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)} style={{width: "45%"}} key="0">CANCEL</button>,
+            <button id="finish-draw-button" onClick={this.finishClick.bind(this)} style={{width: "45%"}} key="1">CONFIRM</button>,
+        ];
+        return drawButtonGroup;
+    }
+    else if(this.props.isEditing){
+        let drawButtonGroup = [
+          <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)} style={{width: "45%"}} key="0">CANCEL</button>,
+          <button id="finish-draw-button" onClick={this.editUpdateClick.bind(this)} style={{width: "45%"}} key="1">CONFIRM</button>,
+      ];
+      return drawButtonGroup;
+  }
+      else {
+          let drawButtonGroup = [
+            <button id="cancel-draw-button" onClick={this.cancelClick.bind(this)} style={{width: "45%"}} key="0">CANCEL</button>,
+            <button id="finish-draw-button" onClick={this.finishClick.bind(this)} style={{width: "45%"}} key="1">CONFIRM</button>,
+        ];
+        return drawButtonGroup;
+      }
   }
 
   render() {
