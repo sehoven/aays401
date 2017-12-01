@@ -110,8 +110,8 @@ export default class DrawingTools extends Component {
     super(props);
 
     this.polygon = null;
+    this.listener = null;
     this.drawingManager = null;
-    this.mapListener = null;
 
     if (this.props.polyNum == 0){
       polygonOptions.fillOpacity = 0.1;
@@ -126,6 +126,7 @@ export default class DrawingTools extends Component {
   }
 
   componentDidMount() {
+    this.props.flagCallback(false);
     this.setDrawingTools(this.props.map);
   }
 
@@ -141,7 +142,8 @@ export default class DrawingTools extends Component {
   }
 
   componentWillUnmount() {
-    this.props.addPolygon(this.polygon);
+    this.props.addPolygon(this.polygon, this.completedFlag);
+    this.props.maps.event.removeListener(this.listener);
     this.removeDrawingTools();
   }
 
@@ -179,6 +181,18 @@ export default class DrawingTools extends Component {
       that.drawingManager.setDrawingMode(null);
       that.drawingManager.setOptions({
         drawingControl: false
+      });
+
+      that.props.flagCallback(true);
+
+      that.listener = that.props.maps.event.addListener(polygon, "click", function(e) {
+        if(e.vertex != null) {
+          let path = this.getPaths().getAt(e.path);
+          path.removeAt(e.vertex);
+          if(path.length < 3) {
+            this.setMap(null);
+          }
+        }
       });
       that.polygon = polygon;
     });
