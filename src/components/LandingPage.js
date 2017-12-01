@@ -66,6 +66,14 @@ class AuthPage extends Component {
     this.handleCloseModal = this.handleCloseModal.bind(this);
   }
 
+  errorCallback(title, message) {
+    this.setState({
+      modalTitle: title,
+      modalMessage: message,
+      showModal: true
+    });
+  }
+
   handleCloseModal () {
     this.setState({
       showModal: false,
@@ -143,28 +151,26 @@ class AuthPage extends Component {
       username: this.state.username,
       password: this.state.password
     }
-    HTTPService.login(loginJson).then(function(res) {
-      res.body.then(function(data) {
-        switch(res.statusCode) {
-          case 400:
-            that.setState({
-              modalTitle: "Login Error",
-              modalMessage: data[0].reason,
-              showModal: true
-            });
-            break;
-          case 200:
-            that.props.setAuthenticated(true);
-            break;
-          default:
-            that.setState({
-              modalTitle: "Unexpected Response",
-              modalMessage: data[0].reason,
-              showModal: true
-            });
-            break;
-        }
-      });
+    HTTPService.login(loginJson).catch(function(err) {
+      that.errorCallback(err.name, err.message);
+    }).then(function(res) {
+      if(res && res.body) {
+        res.body.then(function(data) {
+          switch(res.statusCode) {
+            case 400:
+              that.errorCallback("Login Error", data[0].reason);
+              break;
+            case 200:
+              that.props.setAuthenticated(true);
+              break;
+            default:
+              that.errorCallback("Unexpected Response", data[0].reason)
+              break;
+          }
+        });
+      } else {
+        that.errorCallback("Error", "Login attempt yielded no response.");
+      }
     });
   }
 
@@ -175,31 +181,31 @@ class AuthPage extends Component {
       username: this.state.username,
       password: this.state.password
     }
-    HTTPService.signup(signupJson).then(function(res) {
-      res.body.then(function(data) {
-        switch(res.statusCode) {
-          case 400:
-            that.setState({
-              modalTitle: "SignUp Error",
-              modalMessage: data[0].reason,
-              showModal: true
-            });
-            break;
-          case 200:
-            //modal window
-            that.clearAllInput();
-            that.swapState(that.props.PanelType.LOGIN);
-            successCallback();
-            break;
-          default:
-            that.setState({
-              modalTitle: "Unexpected Response",
-              modalMessage: data[0].reason,
-              showModal: true
-            });
-            break;
-        }
-      });
+    HTTPService.signup(signupJson).catch(function(err) {
+      that.errorCallback(err.name, err.message);
+    }).then(function(res) {
+      if(res && res.body) {
+        res.body.then(function(data) {
+          switch(res.statusCode) {
+            case 400:
+              that.errorCallback("SignUp Error", data[0].reason)
+              break;
+            case 200:
+              //modal window
+              that.clearAllInput();
+              that.swapState(that.props.PanelType.LOGIN);
+              if(successCallback != null) {
+                successCallback();
+              }
+              break;
+            default:
+              that.errorCallback("Unexpected Response", data[0].reason);
+              break;
+          }
+        });
+      } else {
+        that.errorCallback("Error", "Signup attempt yielded no response.")
+      }
     });
   }
 
@@ -266,7 +272,7 @@ class AuthPage extends Component {
               <p className="warning">Passwords do not match.</p> : null}
           </div> : null }
           <div className="auth-block">
-            <button>
+            <button disabled={this.state.passMismatch}>
               {this.state.currentPanel == this.props.PanelType.SIGNUP ? "SIGN UP" : "LOGIN" }
             </button>
           </div>
