@@ -142,7 +142,7 @@ export default class OverlayContainer extends Component {
       filename: null,
       input:null
     }
-    this.circles = []; // Changing this data shouldn't cause re-render
+
 
     this.handleOpenModal = this.handleOpenModal.bind(this);
     this.handleCloseModal = this.handleCloseModal.bind(this);
@@ -151,6 +151,7 @@ export default class OverlayContainer extends Component {
     this.getTotal = this.getTotal.bind(this);
     this.setFilename = this.setFilename.bind(this);
     this.getInput = this.getInput.bind(this);
+    this.circles = [];
   }
 
   toggleFilter(filter){
@@ -415,7 +416,6 @@ export default class OverlayContainer extends Component {
       outerPolygon: null,
       innerPolygons: new PolygonArray(),
       polyNum: 0,
-      currentImage: 0,
       dataReady: false,
       data: [],
       url: []
@@ -727,7 +727,6 @@ export default class OverlayContainer extends Component {
             </div>
           </div>
         }
-
       </div>
     )
   }
