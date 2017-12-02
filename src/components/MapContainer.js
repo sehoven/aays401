@@ -38,7 +38,7 @@ export default class MapContainer extends Component {
               <Tabs
                 map={this.state.map}
                 maps={this.state.maps}
-                PanelType={PanelType} />
+                PanelType={PanelType} setProgressState={this.props.setProgressState.bind(this)}/>
             }
           </div>
           <div className="right">

@@ -163,6 +163,12 @@ export default class OverlayContainer extends Component {
     this.polygonArray.pop();
     if (this.polygonArray.getLength() == 0){
       this.setState({ buttons: 1 });
+      this.props.setProgressState(0);
+    }
+    if(this.polygonArray.getAllInner().length > 0) {
+      this.props.setProgressState(2);
+    } else if(this.polygonArray.getOuter()) {
+      this.props.setProgressState(1);
     }
   }
 
@@ -170,6 +176,11 @@ export default class OverlayContainer extends Component {
     this.lastFlag = false;
     this.polygonArray.saveEdits();
     this.setState({ isEditing: false, isDrawing: false, buttons: 3 });
+    if(this.polygonArray.getAllInner().length > 0) {
+      this.props.setProgressState(2);
+    } else {
+      this.props.setProgressState(1);
+    }
   }
 
   completedFlag(flag){
@@ -182,15 +193,19 @@ export default class OverlayContainer extends Component {
     if (this.state.isEditing){
       this.polygonArray.cancelEdits();
       this.setState({ isEditing: false, isDrawing: false, buttons: 3 });
+      this.props.setProgressState(1);
     }
     if (this.state.isDrawing && this.polygonArray.getLength() == 0){
       this.setState({ isDrawing: false, buttons: 1 });
+      this.props.setProgressState(0);
     }
     if (this.state.isDrawing && this.polygonArray.getLength() == 1){
       this.setState({ isDrawing: false, buttons: 1 });
+      this.props.setProgressState(0);
     }
     if (this.state.isDrawing && this.polygonArray.getLength() > 1){
       this.setState({ isDrawing: false, buttons: 3 });
+      this.props.setProgressState(1);
     }
   }
 
@@ -200,12 +215,15 @@ export default class OverlayContainer extends Component {
   }
 
   editClickCallback() {
-      this.polygonArray.setModeEdit();
-      this.setState({isEditing: true, buttons: 2});
+    this.polygonArray.setModeEdit();
+    this.setState({isEditing: true, buttons: 2});
   }
+
   outputClickCallback(){
-      this.handleOpenModal();
+    this.handleOpenModal();
+    this.props.setProgressState(2);
   }
+
   addClickCallback() {
     this.cancelFlag = false;
     this.setState({isDrawing: true, buttons: 2 });
@@ -235,18 +253,20 @@ export default class OverlayContainer extends Component {
     }
     if (this.polygonArray.getLength()) {
       this.setState({ isDrawing: false, buttons: 3 });
+      if(this.polygonArray.getAllInner().length > 0) {
+        this.props.setProgressState(2);
+      } else {
+        this.props.setProgressState(1);
+      }
     } else {
       this.setState({ isDrawing: false, buttons: 1 });
+      this.props.setProgressState(0);
     }
-  }
-
-  getotBarData() {
-    return 0;
   }
 
   handleOpenModal () {
     if (this.polygonArray.getLength() > 1){
-      this.setState({ showModal: true,currentImage: 1 });
+      this.setState({ showModal: true, currentImage: 1 });
     }
   }
 

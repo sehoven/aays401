@@ -5,16 +5,23 @@ import Steps, { Step } from 'rc-steps';
 
 export default class ProgressBarView extends Component {
   constructor(props) {
+    console.log("CONSTRUCT");
     super(props);
     this.state = {
-      index: this.props.data
+      index: 0
     }
+  }
+
+  setData(data) {
+    this.setState({
+      index: data
+    });
   }
 
   render() {
     return (
       <div>
-        <Steps labelPlacement="vertical" current={this.state.index()}>
+        <Steps labelPlacement="vertical" current={this.state.index}>
           <Step title="draw outer polygon" />
           <Step title="draw inner polygons" />
           <Step title="export polygon images" />

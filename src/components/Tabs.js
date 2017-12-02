@@ -52,7 +52,8 @@ export default class Tabs extends Component {
           ref={(instance) => {this.overlay = instance}}
           active={ currentPanel == this.props.PanelType.DRAW }
           map={this.props.map}
-          maps={this.props.maps} />
+          maps={this.props.maps}
+          setProgressState={this.props.setProgressState.bind(this)} />
       </div>
     )
   }

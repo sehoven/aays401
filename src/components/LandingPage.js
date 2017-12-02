@@ -40,8 +40,9 @@ export default class LandingPage extends Component {
     });
   }
 
-  progressBarData() {
-    return 0;
+  progressBarData(data) {
+    console.log(data);
+    this.progressBarView.setData(data);
     // TODO
     // This function should derive its state from the overlay class
   }
@@ -53,11 +54,11 @@ export default class LandingPage extends Component {
           <div>
             <AppBar>
               <div className="app-bar-child">
-                <ProgressBarView data={this.progressBarData.bind(this)} />
+                <ProgressBarView ref={(instance) => { this.progressBarView = instance}} />
               </div>
               <div id="logout" onClick={() => {this.logout()}}>LOGOUT</div>
             </AppBar>
-           <MapContainer />
+           <MapContainer setProgressState={this.progressBarData.bind(this)}/>
          </div>
        )
      } else {
