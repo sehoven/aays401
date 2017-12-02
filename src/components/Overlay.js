@@ -96,9 +96,9 @@ export class Overlay extends Component {
         ];
       case 3:
         return [
-          <button id="draw-button" onClick={this.drawClick.bind(this)} style={{width: "20%",height: "50%"}} key="0">ADD</button>,
-          <button id="clear-button" onClick={this.clearClick.bind(this)} style={{width: "20%",height: "50%"}} key="1">CLEAR</button>,
-          <button id="edit-button" onClick={this.editClick.bind(this)} style={{width: "20%",height: "50%"}} key="9">EDIT</button>,
+          <button id="draw-button" onClick={this.drawClick.bind(this)} style={{width: "28%",height: "50%"}} key="0">ADD</button>,
+          <button id="clear-button" onClick={this.clearClick.bind(this)} style={{width: "28%",height: "50%"}} key="1">CLEAR</button>,
+          <button id="edit-button" onClick={this.editClick.bind(this)} style={{width: "28%",height: "50%"}} key="9">EDIT</button>,
         ];
     }
   }
@@ -371,34 +371,35 @@ export default class OverlayContainer extends Component {
                     <div className="vertical-button-text">▶</div>
                   </div>
                   </div>
-                    <div>
-                        <div className="modal-text" style={{color: "black",
-                                                            marginLeft: "-55px"}}>
-                          { this.state.filter.residenceFilter &&
-                            <label className="containerButton">Residences: {this.state.iterable[this.state.currentImage].values? this.state.iterable[this.state.currentImage].values.Residential.total:"?"}
-                            </label>
-                          }
-                          { this.state.filter.apartmentFilter &&
-                            <label className="containerButton">Apartments: {this.state.iterable[this.state.currentImage].values? this.state.iterable[this.state.currentImage].values.Apartment.total:"?"}
-                            </label>
-                          }
-                          { this.state.filter.industrialFilter &&
-                            <label className="containerButton">Industrial: {this.state.iterable[this.state.currentImage].values? this.state.iterable[this.state.currentImage].values.Industrial.total:"?"}
-                            </label>
-                          }
-                          { this.state.filter.commercialFilter &&
-                            <label className="containerButton">Commercial: {this.state.iterable[this.state.currentImage].values? this.state.iterable[this.state.currentImage].values.Commercial.total:"?"}
-                            </label>
-                          }
-                          { this.state.filter.unspecifiedFilter &&
-                            <label className="containerButton">Unspecified: {this.state.iterable[this.state.currentImage].values? this.state.iterable[this.state.currentImage].values.Other:"?"}
-                            </label>
-                          }
-                        </div>
-                      <button className={(this.state.currentImage == this.polygonArray.getLength()-1) ? "" : "hide" }
-                      onClick = {() => {this.saveImages("color")}}>Save In Color</button>
-                      <button  className={(this.state.currentImage == this.polygonArray.getLength()-1 ) ? "" : "hide" }
-                      onClick = {() => {this.saveImages("bw")}}>Save In Black And White</button>
+                    <div className="export-modal-details">
+                      <div id="modal-data-box" className="modal-text">
+                        { this.state.filter.residenceFilter &&
+                          <label className="containerButton">Residences: {this.state.iterable[this.state.currentImage].values? this.state.iterable[this.state.currentImage].values.Residential.total:"?"}
+                          </label>
+                        }
+                        { this.state.filter.apartmentFilter &&
+                          <label className="containerButton">Apartments: {this.state.iterable[this.state.currentImage].values? this.state.iterable[this.state.currentImage].values.Apartment.total:"?"}
+                          </label>
+                        }
+                        { this.state.filter.industrialFilter &&
+                          <label className="containerButton">Industrial: {this.state.iterable[this.state.currentImage].values? this.state.iterable[this.state.currentImage].values.Industrial.total:"?"}
+                          </label>
+                        }
+                        { this.state.filter.commercialFilter &&
+                          <label className="containerButton">Commercial: {this.state.iterable[this.state.currentImage].values? this.state.iterable[this.state.currentImage].values.Commercial.total:"?"}
+                          </label>
+                        }
+                        { this.state.filter.unspecifiedFilter &&
+                          <label className="containerButton">Unspecified: {this.state.iterable[this.state.currentImage].values? this.state.iterable[this.state.currentImage].values.Other:"?"}
+                          </label>
+                        }
+                      </div>
+                      <div id="save-button-group">
+                        <button className={(this.state.currentImage == this.polygonArray.getLength()-1) ? "" : "hide" }
+                        onClick = {() => {this.saveImages("color")}}>Save In Color</button>
+                        <button  className={(this.state.currentImage == this.polygonArray.getLength()-1) ? "" : "hide" }
+                        onClick = {() => {this.saveImages("bw")}}>Save In Black And White</button>
+                      </div>
                     </div>
                   </div>
               </Modal>
