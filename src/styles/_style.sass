@@ -1,5 +1,4 @@
 @import url('https://fonts.googleapis.com/css?family=Raleway:300')
-@import "node_modules/patchkit-stepped-progress-bar/styles.less"
 
 $uiWidth: 400px
 $mapControlHeight: 5vh
@@ -31,21 +30,33 @@ body, input
   -ms-user-select: none
   user-select: none
 
+input, textarea
+  -webkit-user-select: text
+  -khtml-user-select: text
+  -moz-user-select: text
+  -ms-user-select: text
+  user-select: text
+
 *:focus
   outline: 5px auto #babdbe
 
 .center-horizontal
   margin: 0 auto
 
+.hide
+  visibility: hidden
+
 .header
   font-family: 'Raleway'
   height: $headerHeight
   background: linear-gradient(to bottom, #000000, #102027)
-  font-size: 36px
   font-weight: normal
-  text-align: center
-  padding: 13px 10px 10px 10px
+  padding: 10px
   color: white
+
+.title
+  font-size: 48px
+  font-weight: bold
 
 .modal
   position: absolute
@@ -56,6 +67,8 @@ body, input
   padding: 10px
   border: solid 1px black
   margin: 0 auto
+  text-align: center
+  color: white
 
 .modal-auth
   width: 30vw
@@ -66,6 +79,103 @@ body, input
 
 .modal button
   float: right
+
+#modal-title, #modal-message
+  color: black
+
+.modal-window
+  width: 800px
+  height: 500px
+  background-color: white
+  padding: 10px
+  border: solid 1px black
+  border-radius: 2px
+  margin: 0 auto
+  z-index: 10
+  font-size: 100px
+
+.modal-overlay
+  position: fixed
+  top: 70px
+  left: 0
+  right: 0
+  bottom: 0
+  background-color: rgba(0,0,0,0.7)
+  border: solid 1px black
+  z-index: 15
+
+#modal-data-box
+  text-align: left
+  margin-top: 40px
+  margin-right: 40px
+  margin-left: 10px
+  padding: 10px
+  border: solid 2px #9ea7aa
+  color: black
+
+.modal-text
+  text-align: center
+  color: white
+  font-size: 24px
+  margin-top: 5vh
+
+.modal-image
+  margin-top: auto
+  margin-bottom: auto
+  margin-left: 10px
+  margin-right: 10px
+  height: 400px
+  width: 400px
+  border: solid 5px black
+
+.modal-wrapper
+  text-align: center
+  display: inline-block
+
+.modal-save
+  width: 120%
+
+#modal-box
+  display: table
+  width: 800px
+  height: 500px
+
+#export-modal-top
+  height: 98%
+  width: 80%
+
+#export-modal-left
+  display: table-cell
+  vertical-align: middle
+  line-height: 100px
+  width: 50px
+
+#export-modal-center
+  display: table-cell
+  vertical-align: middle
+  line-height: 100px
+  width: 50px
+  margin-left: 100%
+  //display: table-cell
+  //height: 100%
+  //vertical-align: middle
+  //width: 640
+  //margin-left: 50px
+  //margin-right: 50px
+  //border: solid 5px black
+
+#export-modal-right
+  display: table-cell
+  vertical-align: middle
+  line-height: 100px
+  width: 50px
+
+#export-modal-details
+  display: table-cell
+
+#save-button-group
+  display: inline-grid
+  margin-left: 15px
 
 .auth-form
   margin-top: 40px
@@ -150,16 +260,38 @@ body, input
   overflow: hidden
 
 .container .left
-  max-width: 30%
-  min-width: $navPanelMinWidth
-  float: left
   box-shadow: 3px 0 5px -2px #888
   z-index: 1
   border: 1px solid black
 
-.container .right
+.left
+  float: left
+  max-width: 30%
+  min-width: $navPanelMinWidth
+
+.right
   height: 100%
   width: 100%
+
+.app-bar-child
+  left: 0
+  right: 0
+  width: 50%
+  position: absolute
+  margin-left: 32%
+
+// Overriding some styles from the progress bar
+.rc-steps-label-vertical .rc-steps-item-content
+  text-align: left
+  width: inherit
+  margin-left: -12px
+  margin-top: 0
+
+.rc-steps-item-process .rc-steps-item-title
+  color: white
+
+.rc-steps-item-title
+  color: white
 
 #search-box
   font-family: 'Raleway'
@@ -287,6 +419,17 @@ body, input
   position: absolute
   z-index: 2
 
+#output-button
+  position: absolute
+  bottom: 0
+  right: 0
+  margin-right: 50px
+  margin-bottom: 20px
+  width: 100px
+
+.middle-image
+  text-align:center
+
 #map
   text-align: center
   position: absolute
@@ -306,12 +449,25 @@ button
   padding-top: 20px
   padding-bottom: 20px
   width: 185px
-  transition: all 0.2s
+  transition: background-color 0.2s
   cursor: pointer
   margin: 5px
 
 button:hover
   background-color: #babdbe
+
+.buttonVertical
+  border-radius: 4px
+  background-color: #4f5b62
+  vertical-align: middle
+  border: none
+  color: #FFFFFF
+  text-align: center
+  font-size: 14px
+  width: 58px
+  height: 100px
+  transition: all 0.2s
+  cursor: pointer
 
 button:disabled
   background-color: #babdbe
@@ -421,8 +577,11 @@ buttonLarge:hover
   &:before
     content: ""
 
-.containerButton
+.containerLabel
   display: block
+  margin-left: 20px
+
+.containerButton
   position: relative
   display: flex
   flex-direction: column
@@ -448,7 +607,14 @@ buttonLarge:hover
     opacity: 0
 
 #logout
-  float: right
+  font-size: 24px
+  right: 0
+  position: absolute
+  padding-top: 10px
+  padding-right: 15px
+  cursor: pointer
+  &:hover
+    color: #babdbe
 
 #checkbox-red
   input:checked ~ .checkmark

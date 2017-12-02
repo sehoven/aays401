@@ -322,7 +322,7 @@ describe("PolygonArray", () => {
     }
   });
 
-  it("contructor with one element", () => {
+  it("constructor with one element", () => {
     let polygon = new Polygon();
     let polygons = new PolygonArray(google.map, google.maps, overlayContainer(), polygon);
     expect(polygons.arr.length).toBe(1);

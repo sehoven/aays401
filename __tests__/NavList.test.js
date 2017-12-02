@@ -101,6 +101,7 @@ describe("NavList", () => {
           ready: true,
           data: []
         },
+        tabsRef: { },
         autocomplete: [],
         map: new google.maps.Map(),
         maps: google.maps
@@ -128,16 +129,20 @@ describe("NavList", () => {
       it("clicking on item", () => {
         navList().find("#navbar-list-search").childAt(0).simulate("click", {stopPropagation: () => undefined});
         // TODO
-        // How should we test that map centered on id?
+        // How should we test that map actually centered on id?
         // How do we qualify the result of this test?
       });
     });
 
     describe("with data", () => {
       let data = [{}, {}, {}];
+      let mockInjectNeighborhood = jest.fn();
+      let mockSetCenter = jest.fn();
 
       beforeEach(() => {
         props.data.data = data;
+        props.tabsRef.injectNeighborhood = mockInjectNeighborhood;
+        props.map.setCenter = mockSetCenter;
       });
 
       it("renders correct number of data results", () => {
@@ -145,10 +150,9 @@ describe("NavList", () => {
       });
 
       it("clicking on item", () => {
-        //navList().find("#navbar-list").childAt(0).simulate("click", {stopPropagation: () => undefined});
-        // TODO
-        // Need to deal with dependency on Tabs element to complete this test
-        // Also how do we qualify the result of this test?
+        navList().find("#navbar-list-search").childAt(0).simulate("click", {stopPropagation: () => undefined});
+        expect(mockSetCenter).toHaveBeenCalled();
+        expect(mockInjectNeighborhood).toHaveBeenCalled();
       });
     });
   });

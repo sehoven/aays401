@@ -84,7 +84,6 @@ export default class NavList extends React.Component {
     });
   }
 
-
   neighbourhoodClicked(center, itemData){
     let map = this.props.map;
     let baseZoom = 9;

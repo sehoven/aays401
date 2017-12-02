@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
-// import ProgressBarView from './ProgressBar.js';
 import DrawingTools from './DrawingTools.js';
 import 'react-notifications/lib/notifications.css';
 import { STATIC_STYLE, IMAGE_DIMENSIONS } from '../settings';
-// import SteppedProgressBar from 'patchkit-stepped-progress-bar';
-
+import Modal from 'react-modal';
+import jszipUtils from 'jszip-utils';
 const HTTPService = require('./HTTPService.js');
 const notificationTimer = 2000;
 
@@ -132,8 +131,12 @@ export default class OverlayContainer extends Component {
       isDrawing: false,
       isEditing: false
     }
-
     this.circles = []; // Changing this data shouldn't cause re-render
+
+    this.handleOpenModal = this.handleOpenModal.bind(this);
+    this.handleCloseModal = this.handleCloseModal.bind(this);
+    this.PreviousImage = this.PreviousImage.bind(this);
+    this.NextImage = this.NextImage.bind(this);
   }
 
   componentWillReceiveProps(props){
@@ -226,12 +229,75 @@ export default class OverlayContainer extends Component {
     return 0;
   }
 
-  render() {
-    //      <ProgressBarView data={this.progressBarData.bind(this)}/>
+  handleOpenModal () {
+    console.log("OPEN MODAL");
+    this.setState({ showModal: true, currentImage:0});
+  }
 
+  handleCloseModal () {
+    this.setState({ showModal: false });
+  }
+  PreviousImage(){
+    let previous = this.state.currentImage-1
+    {previous>=0&& this.setState({currentImage:previous})}
+  }
+  NextImage(){
+    let next = this.state.currentImage+1
+    {next<this.state.polyNum&&this.setState({currentImage:next})}
+  }
+  saveImages(type){
+    var urls;
+    switch (type) {
+      case "color":
+        urls = this.state.url;
+        break;
+      case "bw":
+        urls = this.state.innerPolygons.getAll().map(function(poly){
+          let polygon = poly.convertToLatLng();
+          let url = "https://maps.googleapis.com/maps/api/staticmap?"
+                  + "key=AIzaSyC2mXFuLvwiASA3mSr2kz79fnXUYRwLKb8"
+                  + STATIC_STYLE + "&size=" + IMAGE_DIMENSIONS + "&path=color:" + "0x000000"
+                  + "|weight:5|fillcolor:" + "0x00000000";
+          if(polygon != null && polygon.length >= 2) {
+            polygon.forEach(function(position) {
+              url += "|" + position.lat.toFixed(6) + "," + position.lng.toFixed(6);
+            });
+            // Static API doesn't have polygon autocomplete. Close the path manually.
+            url += "|" + polygon[0].lat + "," + polygon[0].lng;
+          }
+          return url;
+        });
+        break;
+      default:
+        urls = [];
+        break;
+    }
+    var JSZip = require("jszip");
+    var FileSaver = require('file-saver');
+    var zip = new JSZip();
+    var count = 0;
+    var zipFilename = "zipFilename.zip";
+    urls.forEach(function(url){
+      var filename = "map"+urls.indexOf(url)+".png";
+      jszipUtils.getBinaryContent(url, function (err, data) {
+        if(err) {
+          throw err; // or handle the error
+        }
+        zip.file(filename, data, {binary:true});
+        count++;
+        if (count == urls.length) {
+          var zipFile = zip.generate({type: "blob"});
+          FileSaver.saveAs(zipFile, zipFilename);
+        }
+      })
+    })
+  }
+
+  render() {
     if (!this.props.active) return null;
     return (
       <div className={"navPanel"}>
+        <button onClick={this.handleOpenModal} id="output-button">EXPORT</button>
         <Overlay
           active={this.props.active}
           containerState={this.state.buttons}
@@ -249,6 +315,63 @@ export default class OverlayContainer extends Component {
                         addPolygon={(polygon) => this.setPolygonArray(polygon)}
                         polyNum={this.checkOuterPolygonExists()}
                         flagCallback={(value) => this.completedFlag(value)} /> : null
+        }
+        {!this.state.isDrawing &&
+          <div>
+            <Modal
+                  isOpen={this.state.showModal}
+                  contentLabel="Output Map"
+                  onRequestClose={this.handleCloseModal}
+                  className = "modal-window"
+                  overlayClassName="modal-overlay"
+                >
+                <div id="modal-box">
+                  <div id="export-modal-left">
+                    <div className={"buttonVertical " + ((this.state.currentImage == 0) ? "hide" : "" )} onClick = {this.PreviousImage}>
+                      <div className="vertical-button-text">◀</div>
+                    </div>
+                  </div>
+                  <a id="export-modal-center"><img className="modal-image"src= {this.state.url[this.state.currentImage]}/></a>
+                  <div id="export-modal-right">
+                  <div className={"buttonVertical " + ((this.state.currentImage == this.state.polyNum-1) ? "hide" : "" )} onClick = {this.NextImage}>
+                    <div className="vertical-button-text">▶</div>
+                  </div>
+                  </div>
+                  <div className="export-modal-details">
+                    { (this.state.showModal && this.state.dataReady) &&
+                      <div id="modal-data-box" className="modal-text">
+                        { this.state.residenceFilter &&
+                          <div style={{ fontSize: "20px"}}>Residences: {this.state.data[this.state.currentImage].Residential.total}
+                          </div>
+                        }
+                        { this.state.apartmentFilter &&
+                          <div style={{ fontSize: "20px"}}>Apartments: {this.state.data[this.state.currentImage].Apartment.total}
+                          </div>
+                        }
+                        { this.state.industrialFilter &&
+                          <div style={{ fontSize: "20px"}}>Industrial: {this.state.data[this.state.currentImage].Industrial.total}
+                          </div>
+                        }
+                        { this.state.commercialFilter &&
+                          <div style={{ fontSize: "20px"}}>Commercial: {this.state.data[this.state.currentImage].Commercial.total}
+                          </div>
+                        }
+                        { this.state.unspecifiedFilter &&
+                          <div style={{ fontSize: "20px"}}>Unspecified: {this.state.data[this.state.currentImage].Other}
+                          </div>
+                        }
+                      </div>
+                    }
+                    <div id="save-button-group">
+                      <button className={(this.state.currentImage == this.state.polyNum-1) ? "" : "hide" }
+                      onClick = {() => {this.saveImages("color")}}>Save In Color</button>
+                      <button  className={(this.state.currentImage == this.state.polyNum-1) ? "" : "hide" }
+                      onClick = {() => {this.saveImages("bw")}}>Save In Black And White</button>
+                    </div>
+                  </div>
+                </div>
+              </Modal>
+          </div>
         }
         <div className="parent-height">
           <div className="checkbox-holder">
