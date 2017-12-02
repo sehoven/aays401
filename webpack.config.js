@@ -18,7 +18,7 @@ module.exports = {
       },
       {
         "test": /\.jsx$/,
-        loader: "babel-loader"
+        "loader": 'babel-loader'
       },
       {
         "test": /\.sass$/,
@@ -26,14 +26,14 @@ module.exports = {
         "loaders": ['style-loader', 'css-loader', 'sass-loader']
       },
       {
-        test: /\.(ttf|eot|svg|woff(2)?)(\S+)?$/,
-        loader: 'file-loader?publicPath=/&name=fonts/[name].[ext]'
+        "test": /\.(ttf|eot|svg|woff(2)?)(\S+)?$/,
+        "loader": 'file-loader?publicPath=/&name=fonts/[name].[ext]'
       },
       {
         "test": /\.css$/,
-        use: ExtractTextPlugin.extract({
-          fallback: "style-loader",
-          use: "css-loader"
+        "use": ExtractTextPlugin.extract({
+          "fallback": "style-loader",
+          "use": "css-loader"
         })
       }
     ]

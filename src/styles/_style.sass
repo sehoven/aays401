@@ -53,6 +53,8 @@ input, textarea
   font-weight: normal
   padding: 10px
   color: white
+.hidden
+  display: none
 
 .title
   font-size: 48px
@@ -170,6 +172,24 @@ input, textarea
   line-height: 100px
   width: 50px
 
+.filename-input
+  width: 500px
+  height: 50px
+
+.Canvas
+  width: 80%
+  height: 80%
+  margin: 0
+  border: solid 5px black
+
+.CanvasContainer
+  width: 400px
+  height: 400px
+  padding: 0
+  margin-left: 25px
+  margin-right: -50px
+  border: 0
+
 #export-modal-details
   display: table-cell
 
@@ -214,7 +234,7 @@ input, textarea
   overflow: auto
   padding: 10px
 
-.tabButtons
+#tabButtons
   display: table
   width: 100%
   table-layout: fixed
@@ -311,11 +331,11 @@ input, textarea
 
 #navbar-list-search
   overflow-y: auto
-  height: calc(100% - 40px)
+  height: calc(100vh - 190px)
 
 #navbar-list-draw
   overflow-y: auto
-  height: calc(100vh - 320px)
+  height: calc(100vh - 305px)
 
 .navbar-list-autocomplete-item
   height: 60px
@@ -419,6 +439,9 @@ input, textarea
   position: absolute
   z-index: 2
 
+.output-button
+  margin-left: 3vh
+
 #output-button
   position: absolute
   bottom: 0
@@ -471,6 +494,18 @@ button:hover
 
 button:disabled
   background-color: #babdbe
+.buttonVertical
+  border-radius: 4px
+  background-color: #4f5b62
+  vertical-align: middle
+  border: none
+  color: #FFFFFF
+  text-align: center
+  font-size: 14px
+  width: 58px
+  height: 100px
+  transition: all 0.2s
+  cursor: pointer
 
 buttonLarge
   border-radius: 4px
@@ -580,6 +615,14 @@ buttonLarge:hover
 .containerLabel
   display: block
   margin-left: 20px
+
+.containerModalButton
+  position: relative
+  display: flex
+  flex-direction: column
+  align-items: left
+  font-size: 20px
+  cursor: pointer
 
 .containerButton
   position: relative

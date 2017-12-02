@@ -23,7 +23,7 @@ export default class Tabs extends Component {
     const { currentPanel } = this.state;
     return (
       <div className="tabContainer">
-        <div className="tabButtons">
+        <div id="tabButtons">
           <div
             className= {
               "tabButton " +
@@ -52,7 +52,8 @@ export default class Tabs extends Component {
           ref={(instance) => {this.overlay = instance}}
           active={ currentPanel == this.props.PanelType.DRAW }
           map={this.props.map}
-          maps={this.props.maps} />
+          maps={this.props.maps}
+          setProgressState={this.props.setProgressState} />
       </div>
     )
   }
