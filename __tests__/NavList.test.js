@@ -122,11 +122,11 @@ describe("NavList", () => {
       });
 
       it("renders correct number of autocomplete results", () => {
-        expect(navList().find("#navbar-list").children().length).toBe(data.length);
+        expect(navList().find("#navbar-list-search").children().length).toBe(data.length);
       });
 
       it("clicking on item", () => {
-        navList().find("#navbar-list").childAt(0).simulate("click", {stopPropagation: () => undefined});
+        navList().find("#navbar-list-search").childAt(0).simulate("click", {stopPropagation: () => undefined});
         // TODO
         // How should we test that map centered on id?
         // How do we qualify the result of this test?
@@ -141,7 +141,7 @@ describe("NavList", () => {
       });
 
       it("renders correct number of data results", () => {
-        expect(navList().find("#navbar-list").children().length).toBe(data.length);
+        expect(navList().find("#navbar-list-search").children().length).toBe(data.length);
       });
 
       it("clicking on item", () => {

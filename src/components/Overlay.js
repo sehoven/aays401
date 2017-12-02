@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
 // import ProgressBarView from './ProgressBar.js';
-import DrawingTools, { PolygonTools } from './DrawingTools.js';
+import DrawingTools from './DrawingTools.js';
 import 'react-notifications/lib/notifications.css';
 import { STATIC_STYLE, IMAGE_DIMENSIONS } from '../settings';
 // import SteppedProgressBar from 'patchkit-stepped-progress-bar';
@@ -63,7 +63,7 @@ export class Overlay extends Component {
       callback = this.props.addClickCallback();
     }
 
-    createNotification(this.state.notification);
+    createNotification('inner');
   }
 
   editClick(){
@@ -72,7 +72,7 @@ export class Overlay extends Component {
         callback = this.props.editClickCallback();
       }
 
-      createNotification(this.state.notification);
+      createNotification('edit');
   }
 
   renderButtonGroup() {
@@ -231,7 +231,7 @@ export default class OverlayContainer extends Component {
 
     if (!this.props.active) return null;
     return (
-      <div className={this.props.active && "navPanel"}>
+      <div className={"navPanel"}>
         <Overlay
           active={this.props.active}
           containerState={this.state.buttons}
@@ -243,12 +243,6 @@ export default class OverlayContainer extends Component {
           addClickCallback = {this.addClickCallback.bind(this)}
           editClickCallback = {this.editClickCallback.bind(this)}
           cancelClickCallback={this.cancelClickCallback.bind(this)} />
-        { this.state.isEditing && this.checkOuterPolygonExists() ?
-          <PolygonTools map={this.props.map}
-                        maps={this.props.maps}
-                        polygons={this.state.polygons}
-                        setPolygonArray={(polygons) => this.setPolygonArray(polygons)} /> : null
-        }
         { this.state.isDrawing ?
           <DrawingTools map={this.props.map}
                         maps={this.props.maps}
@@ -256,82 +250,80 @@ export default class OverlayContainer extends Component {
                         polyNum={this.checkOuterPolygonExists()}
                         flagCallback={(value) => this.completedFlag(value)} /> : null
         }
-        { this.props.active &&
-          <div className="parent-height">
-            <div className="checkbox-holder">
-              <div className="fifth-checkbox">
-                <label id="checkbox-red" className="containerButton">
-                  <input type="checkbox" onClick={() => this.polygonArray.toggleFilter("Residences")} defaultChecked={true}></input>
-                  <span className="checkmark"></span>
-                  Residences
-                </label>
-              </div>
-              <div className="fifth-checkbox">
-              <label id="checkbox-orange" className="containerButton">
-                <input type="checkbox" onClick={() => this.polygonArray.toggleFilter("Apartments")} defaultChecked={true} defaultChecked={true}></input>
+        <div className="parent-height">
+          <div className="checkbox-holder">
+            <div className="fifth-checkbox">
+              <label id="checkbox-red" className="containerButton">
+                <input type="checkbox" onClick={() => this.polygonArray.toggleFilter("Residences")} defaultChecked={true}></input>
                 <span className="checkmark"></span>
-                Apartments
+                Residences
               </label>
-              </div>
-              <div className="fifth-checkbox">
-              <label id="checkbox-green" className="containerButton">
-                <input type="checkbox" onClick={() => this.polygonArray.toggleFilter("Industrial")} defaultChecked={true} defaultChecked={true}></input>
-                <span className="checkmark"></span>
-                Industrial
-              </label>
-              </div>
-              <div className="fifth-checkbox">
-              <label id="checkbox-blue" className="containerButton">
-                <input type="checkbox" onClick={() => this.polygonArray.toggleFilter("Commercial")} defaultChecked={true} defaultChecked={true}></input>
-                <span className="checkmark"></span>
-                Commercial
-              </label>
-              </div>
-              <div className="fifth-checkbox">
-              <label id="checkbox-black" className="containerButton">
-                <input type="checkbox" onClick={() => this.polygonArray.toggleFilter("Unspecified")} defaultChecked={true} defaultChecked={true}></input>
-                <span className="checkmark"></span>
-                Unspecified
-              </label>
-              </div>
             </div>
-            <div id="navbar-list-draw">
-              { this.state.iterable ? this.state.iterable.map((itemData, i)=>
-                <div className="navbar-count-poly-box" key={i}>
-                  <div className="navbar-image-box"><a href={itemData.image} download="map">{<img className="image" src= {itemData.image}/>}</a></div>
-                  <div className="navbar-count-poly-text">
-                    { this.state.filter.residenceFilter &&
-                      <label className="containerButton">Residences: {itemData.values? itemData.values.Residential.total:"?"}
-                      </label>
-                    }
-                    { this.state.filter.apartmentFilter &&
-                      <label className="containerButton">Apartments: {itemData.values? itemData.values.Apartment.total:"?"}
-                      </label>
-                    }
-                    { this.state.filter.industrialFilter &&
-                      <label className="containerButton">Industrial: {itemData.values? itemData.values.Industrial.total:"?"}
-                      </label>
-                    }
-                    { this.state.filter.commercialFilter &&
-                      <label className="containerButton">Commercial: {itemData.values? itemData.values.Commercial.total:"?"}
-                      </label>
-                    }
-                    { this.state.filter.unspecifiedFilter &&
-                      <label className="containerButton">Unspecified: {itemData.values? itemData.values.Other:"?"}
-                      </label>
-                    }
-                  </div>
-                </div>
-              ): null}
+            <div className="fifth-checkbox">
+            <label id="checkbox-orange" className="containerButton">
+              <input type="checkbox" onClick={() => this.polygonArray.toggleFilter("Apartments")} defaultChecked={true} defaultChecked={true}></input>
+              <span className="checkmark"></span>
+              Apartments
+            </label>
+            </div>
+            <div className="fifth-checkbox">
+            <label id="checkbox-green" className="containerButton">
+              <input type="checkbox" onClick={() => this.polygonArray.toggleFilter("Industrial")} defaultChecked={true} defaultChecked={true}></input>
+              <span className="checkmark"></span>
+              Industrial
+            </label>
+            </div>
+            <div className="fifth-checkbox">
+            <label id="checkbox-blue" className="containerButton">
+              <input type="checkbox" onClick={() => this.polygonArray.toggleFilter("Commercial")} defaultChecked={true} defaultChecked={true}></input>
+              <span className="checkmark"></span>
+              Commercial
+            </label>
+            </div>
+            <div className="fifth-checkbox">
+            <label id="checkbox-black" className="containerButton">
+              <input type="checkbox" onClick={() => this.polygonArray.toggleFilter("Unspecified")} defaultChecked={true} defaultChecked={true}></input>
+              <span className="checkmark"></span>
+              Unspecified
+            </label>
             </div>
           </div>
-        }
+          <div id="navbar-list-draw">
+            { this.state.iterable ? this.state.iterable.map((itemData, i)=>
+              <div className="navbar-count-poly-box" key={i}>
+                <div className="navbar-image-box"><a href={itemData.image} download="map">{<img className="image" src= {itemData.image}/>}</a></div>
+                <div className="navbar-count-poly-text">
+                  { this.state.filter.residenceFilter &&
+                    <label className="containerButton">Residences: {itemData.values? itemData.values.Residential.total:"?"}
+                    </label>
+                  }
+                  { this.state.filter.apartmentFilter &&
+                    <label className="containerButton">Apartments: {itemData.values? itemData.values.Apartment.total:"?"}
+                    </label>
+                  }
+                  { this.state.filter.industrialFilter &&
+                    <label className="containerButton">Industrial: {itemData.values? itemData.values.Industrial.total:"?"}
+                    </label>
+                  }
+                  { this.state.filter.commercialFilter &&
+                    <label className="containerButton">Commercial: {itemData.values? itemData.values.Commercial.total:"?"}
+                    </label>
+                  }
+                  { this.state.filter.unspecifiedFilter &&
+                    <label className="containerButton">Unspecified: {itemData.values? itemData.values.Other:"?"}
+                    </label>
+                  }
+                </div>
+              </div>
+            ): null}
+          </div>
+        </div>
       </div>
     )
   }
 }
 
-class Polygon {
+export class Polygon {
   constructor(x){
     this.polygon = x;
     this.unitCounts;
@@ -442,12 +434,12 @@ class Polygon {
     return !this.exists;
   }
 
-  restore(map){
+  restore(map) {
     this.polygon.setMap(map);
     this.exists = true;
   }
 
-  convertToLatLng(){
+  convertToLatLng() {
     let latLngs = [];
     let path = this.polygon.getPath();
     for(let i = 0; i < path.getLength(); ++i) {
@@ -462,7 +454,7 @@ class Polygon {
 }
 
 // Class to handle the polygon objects visible on the map.
-class PolygonArray {
+export class PolygonArray {
   constructor(map, maps, parent, ...x) {
     this.map = map;
     this.maps = maps;
@@ -486,7 +478,7 @@ class PolygonArray {
   }
 
   getOuter() {
-    return this.arr.splice(0, 1);
+    return this.arr.slice(0, 1);
   }
 
   outerExists(){
@@ -505,7 +497,7 @@ class PolygonArray {
     return thia;
   }
 
-  setModeAddPolygon(){
+  setModeAddPolygon() {
     this.arr.forEach((polygon) => function(){
       polygon.setEditable(false);
       polygon.setClickable(false);
@@ -513,7 +505,7 @@ class PolygonArray {
     })
   }
 
-  setModeEdit(){
+  setModeEdit() {
     this.arr.forEach(function(polygon){
       polygon.setEditable(true);
       polygon.savePath();
@@ -525,14 +517,14 @@ class PolygonArray {
     }
   }
 
-  deselectAll(){
+  deselectAll() {
     this.arr.forEach(function(polygon){
       polygon.setEditable(false);
       polygon.setClickable(false);
     });
   }
 
-  cancelEdits(){
+  cancelEdits() {
     let that = this;
     this.arr.forEach(function(polygon){
       polygon.restore(that.map);
@@ -566,9 +558,9 @@ class PolygonArray {
     });
   }
 
-  pruneDeleted(){
+  pruneDeleted() {
     this.arr = this.arr.filter(function(item){
-        return !item.isDeleted();
+      return !item.isDeleted();
     });
   }
 
@@ -732,18 +724,18 @@ class PolygonArray {
     }
   }
 
-  setNoCirclesFlag(flag){
+  setNoCirclesFlag(flag) {
     this.noCirclesFlag = flag;
   }
 
-  pushBasic(googlePoly){
+  pushBasic(googlePoly) {
     let polygon = new Polygon(googlePoly);
     polygon.setFillColor("0x000000");
     polygon.setFillOpacity(0.1);
     this.push(polygon);
   }
 
-  pushNew(googlePoly){
+  pushNew(googlePoly) {
     let polygon = new Polygon(googlePoly);
     polygon.setFillColor(googlePoly.fillColor);
     if (this.arr.length == 0){
@@ -763,31 +755,6 @@ class PolygonArray {
     }
   }
 
-  remove(i) {
-    let removed;
-    if(i > -1 && i < this.arr.length) {
-      removed = this.arr.splice(i, 1);
-      if(removed[0] != null) {
-        removed[0].setMap(null);
-      }
-      return removed[0];
-    }
-    return null;
-  }
-
-  getAt(i) {
-    return this.arr[i];
-  }
-
-  indexOf(polygon) {
-    for(let i = 0; i < this.arr.length; ++i) {
-      if(polygon == this.arr[i]) {
-        return i;
-      }
-    }
-    return -1;
-  }
-
   clear() {
     while(this.arr.length) {
       this.pop();
@@ -802,7 +769,7 @@ class PolygonArray {
   convertAllToLatLng() {
     let allPolygons = [];
     for(let i = 0; i < this.arr.length; ++i) {
-      allPolygons.push(convertToLatLng(this.arr[i]));
+      allPolygons.push(this.arr[i].convertToLatLng());
     }
 
     return allPolygons;
@@ -813,6 +780,9 @@ function createNotification(type) {
   switch (type) {
       case 'draw':
         NotificationManager.info('Draw Outer Delivery Zone','',notificationTimer);
+        break;
+      case 'edit':
+        NotificationManager.info('Edit Delivery Zone','',notificationTimer);
         break;
       case 'inner':
         NotificationManager.info('Draw Individual Zones Routes','',notificationTimer);

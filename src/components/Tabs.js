@@ -23,7 +23,7 @@ export default class Tabs extends Component {
     const { currentPanel } = this.state;
     return (
       <div className="tabContainer">
-        <div className="tabButtons">
+        <div id="tabButtons">
         <div
           className= {
             "tabButton " +
