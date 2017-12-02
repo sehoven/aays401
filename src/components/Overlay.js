@@ -433,7 +433,7 @@ export default class OverlayContainer extends Component {
               <label id="checkbox-orange" className="containerButton">
                 <input type="checkbox" onClick={() => this.polygonArray.toggleFilter("Apartments")} defaultChecked={true} defaultChecked={true}></input>
                 <span className="checkmark"></span>
-                Residences
+                Apartments
               </label>
             </div>
             <div className="fifth-checkbox">
