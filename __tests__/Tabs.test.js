@@ -48,25 +48,18 @@ describe("Tabs", () => {
     });
 
     it("show only one tab", () => {
-      let child;
-      let tabButtons = tabs().find("#tabButtons");
-      let countActive = 0;
-      for(let i = 0; i < tabButtons.children().length; ++i) {
-        if(tabButtons.childAt(i).hasClass("activeTabButton")) {
-          countActive++;
-        }
-      }
-      expect(countActive).toBe(1);
+      let activeTabs = tabs().find(".activeTabButton");
+      expect(activeTabs.length).toBe(1);
     });
 
     it("show SEARCH tab", () => {
       tabs().find("#search-tab").hasClass("activeTabButton");
     });
 
-    it("onClick switches to this tab", () => {
-      tabs().find("#search-tab").simulate("click", {stopPropagation: () => undefined});
-      expect(tabs().state().currentPanel).toEqual(PanelType.SEARCH);
-      expect(tabs().find("#search-tab").hasClass("activeTabButton")).toBe(true);
+    it("onClick on draw tab switches to draw tab", () => {
+      tabs().find("#draw-tab").simulate("click", {stopPropagation: () => undefined});
+      expect(tabs().state().currentPanel).toEqual(PanelType.DRAW);
+      expect(tabs().find("#draw-tab").hasClass("activeTabButton")).toBe(true);
     });
   });
 
@@ -76,25 +69,18 @@ describe("Tabs", () => {
     });
 
     it("show only one tab", () => {
-      let child;
-      let tabButtons = tabs().find("#tabButtons");
-      let countActive = 0;
-      for(let i = 0; i < tabButtons.children().length; ++i) {
-        if(tabButtons.childAt(i).hasClass("activeTabButton")) {
-          countActive++;
-        }
-      }
-      expect(countActive).toBe(1);
+      let activeTabs = tabs().find(".activeTabButton");
+      expect(activeTabs.length).toBe(1);
     });
 
     it("show DRAW tab", () => {
       tabs().find("#draw-tab").hasClass("activeTabButton");
     });
 
-    it("onClick switches to this tab", () => {
-      tabs().find("#draw-tab").simulate("click", {stopPropagation: () => undefined});
-      expect(tabs().state().currentPanel).toEqual(PanelType.DRAW);
-      expect(tabs().find("#draw-tab").hasClass("activeTabButton")).toBe(true);
+    it("onClick on search tab switches to search tab", () => {
+      tabs().find("#search-tab").simulate("click", {stopPropagation: () => undefined});
+      expect(tabs().state().currentPanel).toEqual(PanelType.SEARCH);
+      expect(tabs().find("#search-tab").hasClass("activeTabButton")).toBe(true);
     });
   });
 });

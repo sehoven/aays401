@@ -4,7 +4,6 @@ import ProgressBarView from './ProgressBar.js';
 import DrawingTools, { PolygonTools } from './DrawingTools.js';
 import 'react-notifications/lib/notifications.css';
 import { STATIC_STYLE, IMAGE_DIMENSIONS } from '../settings';
-import SteppedProgressBar from 'patchkit-stepped-progress-bar';
 import Modal from 'react-modal';
 import jszipUtils from 'jszip-utils';
 import Canvas from './Canvas.js'
@@ -49,7 +48,7 @@ export class Overlay extends Component {
 
     createNotification('finish');
   }
-  
+
   outputClick(){
     let callback;
     if(this.props.outputClickCallback) {
@@ -100,7 +99,6 @@ export class Overlay extends Component {
           <button id="draw-button" onClick={this.drawClick.bind(this)} style={{width: "20%",height: "50%"}} key="0">ADD</button>,
           <button id="clear-button" onClick={this.clearClick.bind(this)} style={{width: "20%",height: "50%"}} key="1">CLEAR</button>,
           <button id="edit-button" onClick={this.editClick.bind(this)} style={{width: "20%",height: "50%"}} key="9">EDIT</button>,
-          <button id="output-button" onClick={this.outputClick.bind(this)} style={{width: "20%",height: "50%"}} key="5">Output</button>
         ];
     }
   }
@@ -131,6 +129,10 @@ export default class OverlayContainer extends Component {
     this.cancelFlag = null;
 
     this.state = {
+      iterable: null,
+      buttons: 1,
+      isDrawing: false,
+      isEditing: false,
       filter: {
         residenceFilter: true,
         apartmentFilter: true,
@@ -138,27 +140,8 @@ export default class OverlayContainer extends Component {
         commercialFilter: true,
         unspecifiedFilter: true
       },
-      iterable: null,
-      buttons: 1,
-      isDrawing: false,
-      isEditing: false,
-      outerPolygon: null,
-      innerPolygons: new PolygonArray(),
-      polyNum: 0,
-      dataReady: false,
-      data: [],
-      url: [],
-      residenceFilter: true,
-      apartmentFilter: true,
-      industrialFilter: true,
-      commercialFilter: true,
-      unspecifiedFilter: true,
       showModal: false,
-      currentImage: 0,
-      currentTotal:0,
-      filename: null,
-      input:null
-
+      currentImage: 1,
     }
     this.circles = []; // Changing this data shouldn't cause re-render
 
@@ -166,9 +149,6 @@ export default class OverlayContainer extends Component {
     this.handleCloseModal = this.handleCloseModal.bind(this);
     this.PreviousImage = this.PreviousImage.bind(this);
     this.NextImage = this.NextImage.bind(this);
-    this.getTotal = this.getTotal.bind(this);
-    this.setFilename = this.setFilename.bind(this);
-    this.getInput = this.getInput.bind(this);
   }
 
   componentWillReceiveProps(props){
@@ -235,26 +215,6 @@ export default class OverlayContainer extends Component {
   checkOuterPolygonExists() {
     return this.polygonArray.outerExists();
   }
-  removeAllPolygons() {
-    if(this.checkOuterPolygonExists()) {
-      this.state.outerPolygon.remove();
-    }
-    if(this.state.innerPolygons.size > 0) {
-      for(let i = 0; i < this.state.innerPolygons.size; i++) {
-        this.state.innerPolygons.getAt(i).remove();
-      }
-    }
-    this.setState({
-      isDrawing: false,
-      outerPolygon: null,
-      innerPolygons: new PolygonArray(),
-      polyNum: 0,
-      currentImage: 0,
-      dataReady: false,
-      data: [],
-      url: []
-    });
-  }
 
   addFirstPolygon(polygon) {
     if (polygon != null){
@@ -280,53 +240,40 @@ export default class OverlayContainer extends Component {
     }
   }
 
-  progressBarData() {
+  getotBarData() {
     return 0;
   }
-  handleOpenModal () {
-    this.setState({ showModal: true,currentImage:0,filename:null});
-    this.getTotal();
 
+  handleOpenModal () {
+    if (this.polygonArray.getLength() > 1){
+      this.setState({ showModal: true,currentImage: 1 });
+    }
   }
 
   handleCloseModal () {
     this.setState({ showModal: false });
   }
+
   PreviousImage(){
     let previous = this.state.currentImage-1
     {previous>=0&& this.setState({currentImage:previous})}
   }
+
   NextImage(){
     let next = this.state.currentImage+1
-    {next<this.state.polyNum&&this.setState({currentImage:next})}
+    {next<this.polygonArray.getLength()&&this.setState({currentImage:next})}
   }
-  setFilename(){
-    var filename = this.state.input
-    this.setState({filename:filename})
-  }
-  getInput(event){
-    this.setState({input:event.target.value})
-  }
-  getTotal(){
-    var total = 0
-    var text = "Number of units: "
-    console.log(this.state.iterable);
-    total += this.state.iterable[this.state.currentImage].values.Residential.total
-    total += this.state.iterable[this.state.currentImage].values.Commercial.total
-    total += this.state.iterable[this.state.currentImage].values.Industrial.total
-    total += this.state.iterable[this.state.currentImage].values.Apartment.total
-    total += this.state.iterable[this.state.currentImage].values.Other
-    this.setState({currentTotal:text+total});
-  }
+
   saveImages(type){
     var urls;
     switch (type) {
       case "color":
-        urls = this.state.url;
+        urls = this.polygonArray.getListIterable().map(function(item){
+          return item.image;
+        }).slice(1,-1);
         break;
       case "bw":
-
-        urls = this.state.innerPolygons.getAll().map(function(poly){
+        urls = this.polygonArray.getAllInner().map(function(poly){
           let polygon = poly.convertToLatLng();
           let url = "https://maps.googleapis.com/maps/api/staticmap?"
                   + "key=AIzaSyC2mXFuLvwiASA3mSr2kz79fnXUYRwLKb8"
@@ -351,12 +298,11 @@ export default class OverlayContainer extends Component {
     var FileSaver = require('file-saver');
     var zip = new JSZip();
     var count = 0;
-    var zipFilename = this.state.filename+".zip";
+    var zipFilename = "Download.zip";
     urls.forEach(function(url){
       var filename = "map"+urls.indexOf(url)+".png";
       jszipUtils.getBinaryContent(url, function (err, data) {
         if(err) {
-          console.log(err);
           throw err; // or handle the error
         }
         zip.file(filename, data, {binary:true});
@@ -368,12 +314,14 @@ export default class OverlayContainer extends Component {
       })
     })
   }
-  render() {
 
+  render() {
     if (!this.props.active) return null;
     return (
       <div className={this.props.active && "navPanel"}>
-      <ProgressBarView data={this.progressBarData.bind(this)}/>
+      { this.polygonArray.getLength() > 1 &&
+        <button onClick={this.handleOpenModal} id="output-button">EXPORT</button>
+      }
         <Overlay
           active={this.props.active}
           containerState={this.state.buttons}
@@ -401,7 +349,6 @@ export default class OverlayContainer extends Component {
         }
         { this.state.showModal ?
           <div>
-            
             <Modal
                   isOpen={this.state.showModal}
                   contentLabel="Output Map"
@@ -409,60 +356,51 @@ export default class OverlayContainer extends Component {
                   className = "modal-window"
                   overlayClassName="modal-overlay"
                 >
-    
-                {this.state.filename==null
-                ?<div>
-                  <input type="text" className="filename-input" onChange={this.getInput} defaultValue="Enter the filename:" />
-                  <button onClick={this.setFilename}>confirm</button>
-                  </div>
-                :
+
                 <div id="modal-box">
                   <div id="export-modal-left">
-                    <div className={"buttonVertical " + ((this.state.currentImage == 0) ? "hide" : "" )} onClick = {this.PreviousImage}>
+                    <div className={"buttonVertical " + ((this.state.currentImage == 1) ? "hide" : "" )} onClick = {this.PreviousImage}>
                       <div className="vertical-button-text">◀</div>
                     </div>
                   </div>
                   <div id="export-modal-center">
-                    <Canvas imgsrc= {this.state.iterable[this.state.currentImage].image} text={this.state.currentTotal} />
+                    <img className="modal-image"src={this.state.iterable[this.state.currentImage].image}/>
                   </div>
                   <div id="export-modal-right">
-                  <div className={"buttonVertical " + ((this.state.currentImage == this.state.polyNum-1) ? "hide" : "" )} onClick = {this.NextImage}>
+                  <div className={"buttonVertical " + ((this.state.currentImage == this.polygonArray.getLength()-1) ? "hide" : "" )} onClick = {this.NextImage}>
                     <div className="vertical-button-text">▶</div>
                   </div>
                   </div>
                     <div>
-                      
                         <div className="modal-text" style={{color: "black",
                                                             marginLeft: "-55px"}}>
-                          { this.state.residenceFilter &&
-                            <div style={{ fontSize: "20px", paddingTop: "40px"}}>Residences: {this.state.iterable[this.state.currentImage].values.Residential.total}
-                            </div>
+                          { this.state.filter.residenceFilter &&
+                            <label className="containerButton">Residences: {this.state.iterable[this.state.currentImage].values? this.state.iterable[this.state.currentImage].values.Residential.total:"?"}
+                            </label>
                           }
-                          { this.state.apartmentFilter &&
-                            <div style={{ fontSize: "20px"}}>Apartments: {this.state.iterable[this.state.currentImage].values.Apartment.total}
-                            </div>
+                          { this.state.filter.apartmentFilter &&
+                            <label className="containerButton">Apartments: {this.state.iterable[this.state.currentImage].values? this.state.iterable[this.state.currentImage].values.Apartment.total:"?"}
+                            </label>
                           }
-                          { this.state.industrialFilter &&
-                            <div style={{ fontSize: "20px"}}>Industrial: {this.state.iterable[this.state.currentImage].values.Industrial.total}
-                            </div>
+                          { this.state.filter.industrialFilter &&
+                            <label className="containerButton">Industrial: {this.state.iterable[this.state.currentImage].values? this.state.iterable[this.state.currentImage].values.Industrial.total:"?"}
+                            </label>
                           }
-                          { this.state.commercialFilter &&
-                            <div style={{ fontSize: "20px"}}>Commercial: {this.state.iterable[this.state.currentImage].values.Commercial.total}
-                            </div>
+                          { this.state.filter.commercialFilter &&
+                            <label className="containerButton">Commercial: {this.state.iterable[this.state.currentImage].values? this.state.iterable[this.state.currentImage].values.Commercial.total:"?"}
+                            </label>
                           }
-                          { this.state.unspecifiedFilter &&
-                            <div style={{ fontSize: "20px"}}>Unspecified: {this.state.iterable[this.state.currentImage].values.Other}
-                            </div>
+                          { this.state.filter.unspecifiedFilter &&
+                            <label className="containerButton">Unspecified: {this.state.iterable[this.state.currentImage].values? this.state.iterable[this.state.currentImage].values.Other:"?"}
+                            </label>
                           }
                         </div>
-                      
-                      <button className={(this.state.currentImage == this.state.polyNum-1) ? "" : "hide" }
+                      <button className={(this.state.currentImage == this.polygonArray.getLength()-1) ? "" : "hide" }
                       onClick = {() => {this.saveImages("color")}}>Save In Color</button>
-                      <button  className={(this.state.currentImage == this.state.polyNum-1) ? "" : "hide" }
+                      <button  className={(this.state.currentImage == this.polygonArray.getLength()-1 ) ? "" : "hide" }
                       onClick = {() => {this.saveImages("bw")}}>Save In Black And White</button>
                     </div>
                   </div>
-                }
               </Modal>
           </div>
         :null
@@ -1014,7 +952,7 @@ class PolygonArray {
   convertAllToLatLng() {
     let allPolygons = [];
     for(let i = 0; i < this.arr.length; ++i) {
-      allPolygons.push(convertToLatLng(this.arr[i]));
+      allPolygons.push(this.arr[i].convertToLatLng());
     }
 
     return allPolygons;

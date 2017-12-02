@@ -16,6 +16,9 @@
     "start": "webpack-dev-server --port 8080 --hot --host 127.0.0.1"
   },
   "jest": {
+    "transform": {
+      "^.+\\.jsx?$": "babel-jest"
+    },
     "globals": {
       "google": {}
     },
@@ -57,6 +60,7 @@
     "point-in-polygon": "^1.0.1",
     "prop-types": "^15.6.0",
     "randomcolor": "^0.5.3",
+    "rc-steps": "^3.0.1",
     "react": "^15.6.2",
     "react-dom": "^15.6.2",
     "react-google-maps": "^8.3.0",
@@ -91,7 +95,7 @@
     "sass-loader": "^6.0.6",
     "style-loader": "^0.18.2",
     "url-loader": "^0.6.2",
-    "webpack": "^3.6.0",
-    "webpack-dev-server": "^2.9.4"
+    "webpack": "^3.9.1",
+    "webpack-dev-server": "^2.9.5"
   }
 }

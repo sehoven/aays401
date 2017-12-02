@@ -31,6 +31,13 @@ body, input
   -ms-user-select: none
   user-select: none
 
+input, textarea
+  -webkit-user-select: text
+  -khtml-user-select: text
+  -moz-user-select: text
+  -ms-user-select: text
+  user-select: text
+
 *:focus
   outline: 5px auto #babdbe
 
@@ -44,13 +51,16 @@ body, input
   font-family: 'Raleway'
   height: $headerHeight
   background: linear-gradient(to bottom, #000000, #102027)
-  font-size: 36px
   font-weight: normal
-  text-align: center
-  padding: 13px 10px 10px 10px
+  padding: 10px
   color: white
 .hidden
   display: none
+
+.title
+  font-size: 48px
+  font-weight: bold
+
 .modal
   position: absolute
   top: 40px
@@ -73,6 +83,9 @@ body, input
 .modal button
   float: right
 
+#modal-title, #modal-message
+  color: black
+
 .modal-window
   width: 800px
   height: 500px
@@ -93,6 +106,15 @@ body, input
   background-color: rgba(0,0,0,0.7)
   border: solid 1px black
   z-index: 15
+
+#modal-data-box
+  text-align: left
+  margin-top: 40px
+  margin-right: 40px
+  margin-left: 10px
+  padding: 10px
+  border: solid 2px #9ea7aa
+  color: black
 
 .modal-text
   text-align: center
@@ -154,7 +176,7 @@ body, input
 .filename-input
   width: 500px
   height: 50px
-  
+
 .Canvas
   width: 80%
   height: 80%
@@ -168,6 +190,14 @@ body, input
   margin-left: 25px
   margin-right: -50px
   border: 0
+
+#export-modal-details
+  display: table-cell
+
+#save-button-group
+  display: inline-grid
+  margin-left: 15px
+
 .auth-form
   margin-top: 40px
   margin-bottom: 40px
@@ -251,16 +281,38 @@ body, input
   overflow: hidden
 
 .container .left
-  max-width: 30%
-  min-width: $navPanelMinWidth
-  float: left
   box-shadow: 3px 0 5px -2px #888
   z-index: 1
   border: 1px solid black
 
-.container .right
+.left
+  float: left
+  max-width: 30%
+  min-width: $navPanelMinWidth
+
+.right
   height: 100%
   width: 100%
+
+.app-bar-child
+  left: 0
+  right: 0
+  width: 50%
+  position: absolute
+  margin-left: 32%
+
+// Overriding some styles from the progress bar
+.rc-steps-label-vertical .rc-steps-item-content
+  text-align: left
+  width: inherit
+  margin-left: -12px
+  margin-top: 0
+
+.rc-steps-item-process .rc-steps-item-title
+  color: white
+
+.rc-steps-item-title
+  color: white
 
 #search-box
   font-family: 'Raleway'
@@ -284,7 +336,7 @@ body, input
 
 #navbar-list-draw
   overflow-y: auto
-  height: calc(100% - 180px)
+  height: calc(100vh - 320px)
 
 .navbar-list-autocomplete-item
   height: 60px
@@ -391,6 +443,14 @@ body, input
 .output-button
   margin-left: 3vh
 
+#output-button
+  position: absolute
+  bottom: 0
+  right: 0
+  margin-right: 50px
+  margin-bottom: 20px
+  width: 100px
+
 .middle-image
   text-align:center
 
@@ -420,6 +480,18 @@ button
 button:hover
   background-color: #babdbe
 
+.buttonVertical
+  border-radius: 4px
+  background-color: #4f5b62
+  vertical-align: middle
+  border: none
+  color: #FFFFFF
+  text-align: center
+  font-size: 14px
+  width: 58px
+  height: 100px
+  transition: all 0.2s
+  cursor: pointer
 
 button:disabled
   background-color: #babdbe
@@ -541,8 +613,11 @@ buttonLarge:hover
   &:before
     content: ""
 
-.containerButton
+.containerLabel
   display: block
+  margin-left: 20px
+
+.containerButton
   position: relative
   display: flex
   flex-direction: column
@@ -568,7 +643,14 @@ buttonLarge:hover
     opacity: 0
 
 #logout
-  float: right
+  font-size: 24px
+  right: 0
+  position: absolute
+  padding-top: 10px
+  padding-right: 15px
+  cursor: pointer
+  &:hover
+    color: #babdbe
 
 #checkbox-red
   input:checked ~ .checkmark

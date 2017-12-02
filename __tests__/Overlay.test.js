@@ -3,7 +3,7 @@ import { configure, shallow, mount } from "enzyme";
 import Adapter from "enzyme-adapter-react-15";
 import { NotificationContainer, NotificationManager } from "react-notifications";
 
-import OverlayContainer, { Overlay, PolygonArray } from "../src/components/Overlay.js";
+import OverlayContainer, { Overlay, Polygon, PolygonArray } from "../src/components/Overlay.js";
 import DrawingTools, { PolygonTools } from "../src/components/DrawingTools.js";
 
 // TO MOVE MOCK OBJECT TO GLOBAL LEVEL FOR ALL TESTS
@@ -377,6 +377,23 @@ describe("OverlayContainer shallow", () => {
   });
 });
 
+describe("Polygon", () => {
+  it("constructor with Google polygon input", () => {
+    let googlePolygon = new google.maps.Polygon();
+    let polygon = new Polygon(googlePolygon);
+    expect(polygon.polygon).toEqual(googlePolygon);
+  });
+
+  it("remove", () => {
+    let mockFunction = jest.fn();
+    let googlePolygon = new google.maps.Polygon();
+    googlePolygon.setMap = mockFunction;
+    let polygon = new Polygon(googlePolygon);
+    polygon.remove();
+    expect(mockFunction).toHaveBeenCalled();
+  });
+});
+
 describe("PolygonArray", () => {
   it("contructor with one element", () => {
     let polygon = new google.maps.Polygon();
@@ -416,13 +433,16 @@ describe("PolygonArray", () => {
   });
 
   it("remove", () => {
+    let mockFunction = jest.fn();
     let polygon0 = new google.maps.Polygon();
+    polygon0.setMap = mockFunction;
     let polygon1 = new google.maps.Polygon();
     let polygons = new PolygonArray(polygon0, polygon1);
     let removed = polygons.remove(0);
     expect(polygons.arr.length).toBe(1);
     expect(polygons.arr[0]).toEqual(polygon1);
     expect(removed).toEqual(polygon0);
+    expect(mockFunction).toHaveBeenCalled();
   });
 
   it("getAt", () => {
