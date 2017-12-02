@@ -51,13 +51,6 @@ describe("MapContainer", () => {
       map = {}, maps = {};
       mapContainer().setState({mapLoaded: true, map: map, maps: maps});
     });
-
-    it("receives three props from state", () => {
-      const tabs = mapContainer().find(Tabs);
-      expect(Object.keys(tabs.props()).length).toBe(3);
-      expect(tabs.props().map).toEqual(map);
-      expect(tabs.props().maps).toEqual(maps);
-    });
   });
 
   it("setMapRef updates states correctly", () => {

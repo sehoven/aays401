@@ -22,32 +22,219 @@ $overlayContainerHeight: 70px
 h1
   color: blue
 
-body
+body, input
   margin: 0
-  font-family: 'Raleway', sans-serif;
+  font-family: 'Raleway', sans-serif
+  -webkit-user-select: none
+  -moz-user-select: none
+  -ms-user-select: none
+  user-select: none
+
+input, textarea
+  -webkit-user-select: text
+  -khtml-user-select: text
+  -moz-user-select: text
+  -ms-user-select: text
+  user-select: text
+
+*:focus
+  outline: 5px auto #babdbe
 
 .center-horizontal
   margin: 0 auto
 
+.hide
+  visibility: hidden
+
 .header
   font-family: 'Raleway'
   height: $headerHeight
-  background: linear-gradient(to bottom, #232526, #414345)
-  font-size: 36px
+  background: linear-gradient(to bottom, #000000, #102027)
   font-weight: normal
-  text-align: center
   padding: 10px
   color: white
+.hidden
+  display: none
+
+.title
+  font-size: 48px
+  font-weight: bold
+
+.modal
+  position: absolute
+  top: 40px
+  left: 40px
+  right: 40px
+  background-color: white
+  padding: 10px
+  border: solid 1px black
+  margin: 0 auto
+  text-align: center
+  color: white
+
+.modal-auth
+  width: 30vw
+  overflow: auto
+
+.modal h2, p
+  text-align: center
+
+.modal button
+  float: right
+
+#modal-title, #modal-message
+  color: black
+
+.modal-window
+  width: 800px
+  height: 500px
+  background-color: white
+  padding: 10px
+  border: solid 1px black
+  border-radius: 2px
+  margin: 0 auto
+  z-index: 10
+  font-size: 100px
+
+.modal-overlay
+  position: fixed
+  top: 70px
+  left: 0
+  right: 0
+  bottom: 0
+  background-color: rgba(0,0,0,0.7)
+  border: solid 1px black
+  z-index: 15
+
+#modal-data-box
+  text-align: left
+  margin-top: 40px
+  margin-right: 40px
+  margin-left: 10px
+  padding: 10px
+  border: solid 2px #9ea7aa
+  color: black
+
+.modal-text
+  text-align: center
+  color: white
+  font-size: 24px
+  margin-top: 5vh
+
+.modal-image
+  margin-top: auto
+  margin-bottom: auto
+  margin-left: 10px
+  margin-right: 10px
+  height: 400px
+  width: 400px
+  border: solid 5px black
+
+.modal-wrapper
+  text-align: center
+  display: inline-block
+
+.modal-save
+  width: 120%
+
+#modal-box
+  display: table
+  width: 800px
+  height: 500px
+
+#export-modal-top
+  height: 98%
+  width: 80%
+
+#export-modal-left
+  display: table-cell
+  vertical-align: middle
+  line-height: 100px
+  width: 50px
+
+#export-modal-center
+  display: table-cell
+  vertical-align: middle
+  line-height: 100px
+  width: 50px
+  margin-left: 100%
+  //display: table-cell
+  //height: 100%
+  //vertical-align: middle
+  //width: 640
+  //margin-left: 50px
+  //margin-right: 50px
+  //border: solid 5px black
+
+#export-modal-right
+  display: table-cell
+  vertical-align: middle
+  line-height: 100px
+  width: 50px
+
+.filename-input
+  width: 500px
+  height: 50px
+
+.Canvas
+  width: 80%
+  height: 80%
+  margin: 0
+  border: solid 5px black
+
+.CanvasContainer
+  width: 400px
+  height: 400px
+  padding: 0
+  margin-left: 25px
+  margin-right: -50px
+  border: 0
+
+#export-modal-details
+  display: table-cell
+
+#save-button-group
+  display: inline-grid
+  margin-left: 15px
+
+.auth-form
+  margin-top: 40px
+  margin-bottom: 40px
+
+.auth-block
+  margin-top: 5px
+  text-align: center
+
+.auth-block input
+  padding: 5px
+  margin: 5px
+  width: 30vw
+  font-size: 24px
+
+.auth-block .mismatch
+  border: solid red 1px
+  background: rgba(255, 0, 0, 0.05)
+
+.auth-container
+  width: 40vw
+  height: 100%
+  margin: 0 auto
+  margin-top: 10vh
+  margin-bottom: 10vh
+  border: solid 1px black
+
+.warning
+  color: rgb(255, 0, 0)
 
 .tabContainer
   height: 100%
 
 .overlayContainer
-  display:block
-  overflow:auto
+  display: block
+  overflow: auto
   padding: 10px
 
-.tabButtons
+#tabButtons
   display: table
   width: 100%
   table-layout: fixed
@@ -55,11 +242,13 @@ body
 
 .tabButton
   width: 100%
-  background-color: rgb(150, 150, 150)
+  background-color: #4f5b62
   color: white
   display: table-cell
+  transition: all 0.2s
+  cursor: pointer
   &:hover
-    background-color: rgb(200, 200, 200)
+    background-color: #babdbe
 
 .tabButton p
   text-align: center
@@ -67,19 +256,20 @@ body
 .activeTabButton
   border-style: solid
   border-width: 5px
-  border-color: #5B84A2
+  border-color: #9ea7aa
   background-color: white
   color: black
-
+  cursor: default
+  &:hover
+    background-color: white
 
 .navPanel
-  height: calc(100% - #{$totalHeaderHeight} - #{$tabButtonsHeight} - 10px)
+  height: calc(100% - #{$totalHeaderHeight})
   width: calc(100% - (2 * #{$navPanelPadding})
   display: table
   padding: $navPanelPadding
-  background: linear-gradient(to bottom, #ada996, #f2f2f2, #dbdbdb, #eaeaea)
-
-  
+  overflow: hidden
+  background: linear-gradient(to top, #ffffff, #eceff1, #eceff1)
 
 .container
   position: absolute
@@ -90,16 +280,38 @@ body
   overflow: hidden
 
 .container .left
-  max-width: 30%
-  min-width: $navPanelMinWidth
-  float: left
   box-shadow: 3px 0 5px -2px #888
   z-index: 1
   border: 1px solid black
 
-.container .right
+.left
+  float: left
+  max-width: 30%
+  min-width: $navPanelMinWidth
+
+.right
   height: 100%
   width: 100%
+
+.app-bar-child
+  left: 0
+  right: 0
+  width: 50%
+  position: absolute
+  margin-left: 32%
+
+// Overriding some styles from the progress bar
+.rc-steps-label-vertical .rc-steps-item-content
+  text-align: left
+  width: inherit
+  margin-left: -12px
+  margin-top: 0
+
+.rc-steps-item-process .rc-steps-item-title
+  color: white
+
+.rc-steps-item-title
+  color: white
 
 #search-box
   font-family: 'Raleway'
@@ -117,10 +329,13 @@ body
   position: relative
   margin-bottom: 10px
 
-#navbar-list
+#navbar-list-search
   overflow-y: auto
-  height: 580px
-  padding-bottem: 50px
+  height: calc(100vh - 190px)
+
+#navbar-list-draw
+  overflow-y: auto
+  height: calc(100vh - 305px)
 
 .navbar-list-autocomplete-item
   height: 60px
@@ -141,6 +356,7 @@ body
   display: table-cell
   height: 50px
   padding-left: 10px
+  padding-right: 10px
   font-size: 25px
   vertical-align: middle
   text-overflow: ellipsis
@@ -170,7 +386,7 @@ body
   width: 100%
   padding: $navPanelPadding
   font-size: 25px
-  font-weight:extra-light
+  font-weight: extra-light
   position: relative
   top: 50%
   left: 50%
@@ -180,58 +396,36 @@ body
 .navbar-count-poly-box
   padding-top: 10px
   padding-bottom: 10px
-  padding-left: 20px
+  padding-left: 10px
   border-top: 1px solid gray
+  margin: $navBarListMargin
+  background-color: white
+  transition: background-color 0.1s
   display: table
-  
+  table-layout: fixed
+  -webkit-box-shadow: 2px 2px 3px 0px rgba(0,0,0,0.75)
+  -moz-box-shadow: 2px 2px 3px 0px rgba(0,0,0,0.75)
+  box-shadow: 2px 2px 3px 0px rgba(0,0,0,0.75)
+  border: 1px solid rgb(117, 117, 117)
 
-.navbar-count-poly-title
-  display: table-row
-  vertical-align: bottom
-  font-size: 20px
-  text-align: center
-  text-decoration: underline
-  font-weight: bold
-  width: 100%
 .navbar-count-poly-text
-  display: table-row
-  vertical-align: bottom
-  width: 100%
-  //height: 100px
-  margin-top: 5px
-  margin-left: 10px
-  font-size: 20px
+  display: table-cell
+  vertical-align: middle
 
+.navbar-image-box
+  display: table-cell
+  vertical-align: middle
+  width: 30%
+  img
+    width: 100%
+    border-radius: 2px
+    border: 5px #4f5b62 solid
+  img:hover
+    border: 5px #8bb4d3 solid
 
-.navbar-count-inner-poly-text
-  
-  display: inline-block
-  vertical-align: bottom
-  width: 100%
-  //height: 100px
-  margin-top: 5px
-  margin-left: 20px
-  font-size: 15px
-  font-weight: extra-light
 .fullScreen
   height: 100vh
   width: 100vw
-
-.navbar-count-poly-box a
-  display: table-row
-
-.buttonText
-  font-size: 25px
-  font-weight: bold
-  color: rgb(50, 50, 50)
-  margin: auto
-  p
-    position: absolute
-    top: 50%
-    left: 50%
-    -ms-transform: translateX(-50%) translateY(-50%) rotate(90deg)
-    -webkit-transform: translateX(-50%) translateY(-50%) rotate(90deg)
-    transform: translateX(-50%) translateY(-50%) rotate(90deg)
 
 .show-number
   text-align: left
@@ -245,6 +439,19 @@ body
   position: absolute
   z-index: 2
 
+.output-button
+  margin-left: 3vh
+
+#output-button
+  position: absolute
+  bottom: 0
+  right: 0
+  margin-right: 50px
+  margin-bottom: 20px
+  width: 100px
+
+.middle-image
+  text-align:center
 
 #map
   text-align: center
@@ -257,23 +464,52 @@ body
 
 button
   border-radius: 4px
-  background-color: #5B84A2
+  background-color: #4f5b62
   border: none
   color: #FFFFFF
   text-align: center
   font-size: 14px
-  padding: 20px
+  padding-top: 20px
+  padding-bottom: 20px
   width: 185px
-  transition: all 0.2s
+  transition: background-color 0.2s
   cursor: pointer
   margin: 5px
-  
+
 button:hover
-  background-color: #5D5D5D
+  background-color: #babdbe
+
+.buttonVertical
+  border-radius: 4px
+  background-color: #4f5b62
+  vertical-align: middle
+  border: none
+  color: #FFFFFF
+  text-align: center
+  font-size: 14px
+  width: 58px
+  height: 100px
+  transition: all 0.2s
+  cursor: pointer
+
+button:disabled
+  background-color: #babdbe
+.buttonVertical
+  border-radius: 4px
+  background-color: #4f5b62
+  vertical-align: middle
+  border: none
+  color: #FFFFFF
+  text-align: center
+  font-size: 14px
+  width: 58px
+  height: 100px
+  transition: all 0.2s
+  cursor: pointer
 
 buttonLarge
   border-radius: 4px
-  background-color: #5B84A2
+  background-color: #4f5b62
   border: none
   color: #FFFFFF
   text-align: center
@@ -292,12 +528,12 @@ buttonLarge:hover
 @font-face
   font-weight: normal
   font-style: normal
-  font-family: 'Raleway', sans-serif;
+  font-family: 'Raleway', sans-serif
 
 .notification-container
   box-sizing: border-box
   position: fixed
-  top: 0
+  top: calc(#{$headerHeight} + 15px)
   right: 0
   z-index: 999999
   width: 420px
@@ -376,59 +612,30 @@ buttonLarge:hover
   &:before
     content: ""
 
-img
-  height: 250px
-  border-radius: 2px
-  width: 250px
-  border-style: solid
-  border-width: 5px
-  border-color: #5B84A2
-img:hover
-  -webkit-transform: scale(1.1)
-  -moz-transform: scale(1.1)
-  -o-transform: scale(1.1)
-  -ms-transform: scale(1.1)
-  transform: scale(1.1)
-
-.containerButton
+.containerLabel
   display: block
-  position: relative
-  padding-left: 35px
-  margin-bottom: 12px
-  cursor: pointer
-  font-size: 22px
-  -webkit-user-select: none
-  -moz-user-select: none
-  -ms-user-select: none
-  user-select: none
-  input
-    position: absolute
-    opacity: 0
+  margin-left: 20px
 
-.checkmark
-  border: solid black
-  position: absolute
-  top: 0
-  left: 0
-  height: 25px
-  width: 25px
-  background-color: #eee
+.containerModalButton
+  position: relative
+  display: flex
+  flex-direction: column
+  align-items: left
+  font-size: 20px
+  cursor: pointer
 
 .containerButton
+  position: relative
+  display: flex
+  flex-direction: column
+  align-items: center
+  cursor: pointer
   &:hover input ~ .checkmark
     background-color: #ccc
-  input:checked ~ .checkmark
-    background-color: #5B84A2
-
-.checkmark:after
-  content: ""
-  position: absolute
-  display: none
-
-.containerButton
   input:checked ~ .checkmark:after
     display: block
   .checkmark:after
+    position: relative
     left: 9px
     top: 5px
     width: 5px
@@ -438,17 +645,63 @@ img:hover
     -webkit-transform: rotate(45deg)
     -ms-transform: rotate(45deg)
     transform: rotate(45deg)
+  input
+    position: absolute
+    opacity: 0
 
-.smallcontainer
-  input:checked ~ .checkmark:after
-    display: block
-  .checkmark:after
-    left: 9px
-    top: 5px
-    width: 2px
-    height: 5px
-    border: solid white
-    border-width: 0 3px 3px 0
-    -webkit-transform: rotate(45deg)
-    -ms-transform: rotate(45deg)
-    transform: rotate(45deg)
+#logout
+  font-size: 24px
+  right: 0
+  position: absolute
+  padding-top: 10px
+  padding-right: 15px
+  cursor: pointer
+  &:hover
+    color: #babdbe
+
+#checkbox-red
+  input:checked ~ .checkmark
+    background-color: rgb(160, 0, 55)
+
+#checkbox-orange
+  input:checked ~ .checkmark
+    background-color: #d3882b
+
+#checkbox-green
+  input:checked ~ .checkmark
+    background-color: #08d312
+
+#checkbox-blue
+  input:checked ~ .checkmark
+    background-color: #3e43d3
+
+#checkbox-black
+  input:checked ~ .checkmark
+    background-color: black
+
+.checkbox-holder
+  color: black
+  display: inline-block
+  margin: 0 auto
+  width: 100%
+  height: 60px
+  font-size: 10px
+
+.fifth-checkbox
+  display: inline-block
+  text-align: center
+  width: 20%
+
+.parent-height
+  height: inherit
+
+.checkmark
+  margin-bottom: 5px
+  border: solid black
+  height: 25px
+  width: 25px
+  background-color: #eee
+  &:after
+    content: ""
+    position: absolute
+    display: none
