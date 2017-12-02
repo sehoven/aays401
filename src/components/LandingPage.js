@@ -249,7 +249,7 @@ export class AuthPage extends Component {
     const { currentPanel } = this.state;
     return (
       <div className="auth-container">
-        <div className="tabButtons">
+        <div id="tabButtons">
           <div
             className= {
               "tabButton " +
