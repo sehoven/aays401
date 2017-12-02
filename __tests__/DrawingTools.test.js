@@ -2,7 +2,7 @@ import React from "react";
 import { configure, shallow, mount } from "enzyme";
 import Adapter from "enzyme-adapter-react-15";
 
-import DrawingTools, { PolygonTools } from "../src/components/DrawingTools.js";
+import DrawingTools from "../src/components/DrawingTools.js";
 import { PolygonArray } from "../src/components/Overlay.js";
 
 // TO MOVE MOCK OBJECT TO GLOBAL LEVEL FOR ALL TESTS
@@ -69,6 +69,7 @@ configure({ adapter: new Adapter() });
 describe("DrawingTools", () => {
   let mountedDrawingTools;
   let props;
+  let mockCallback = jest.fn();
 
   const drawingTools = () => {
     if(!mountedDrawingTools) {
@@ -81,60 +82,14 @@ describe("DrawingTools", () => {
     mountedDrawingTools = null;
     props = {
       map: new google.maps.Map(),
-      maps: google.maps
-    }
-  });
-
-  it("selectPolygon updates isSelected", () => {
-    drawingTools().instance().polygon = new google.maps.Polygon();
-    drawingTools().instance().selectPolygon();
-    expect(drawingTools().instance().isSelected).toEqual(true);
-  });
-
-  it("deselectPolygon updates isSelected", () => {
-    drawingTools().instance().polygon = new google.maps.Polygon();
-    drawingTools().instance().isSelected = true;
-    drawingTools().instance().deselectPolygon();
-    expect(drawingTools().instance().isSelected).toEqual(false);
-  });
-
-  it("deletePolygon updates isSelected", () => {
-    drawingTools().instance().polygon = new google.maps.Polygon();
-    drawingTools().instance().deletePolygon();
-    expect(drawingTools().instance().isSelected).toEqual(false);
-  });
-
-  // TODO More robust tests
-  // Cannot really test setting the drawing tools with just a mock google object
-});
-
-describe("PolygonTools", () => {
-  let mountedPolygonTools;
-  let props, polygon, polygons;
-
-  const polygonTools = () => {
-    if(!mountedPolygonTools) {
-      mountedPolygonTools = shallow(<PolygonTools {...props}/>);
-    }
-    return mountedPolygonTools;
-  }
-
-  beforeEach(() => {
-    mountedPolygonTools = null;
-    polygon = new google.maps.Polygon();
-    polygons = new PolygonArray(polygon);
-    props = {
-      map: new google.maps.Map(),
       maps: google.maps,
-      polygons: polygons
+      flagCallback: mockCallback
     }
   });
 
-  it("component mounted", () => {
-    expect(polygonTools().instance().data.length).toBe(polygons.size());
-    expect(polygonTools().instance().mapListener).not.toBeNull();
+  it("renders nothing", () => {
+    expect(drawingTools().children().length).toBe(0);
   });
 
-  // TODO Write useful tests for this component
-  // A lot of it is hard to test because it depends on google maps objects
+  // Nothing of value to test here because the Google API cannot be directly tested with React
 });

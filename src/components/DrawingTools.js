@@ -4,171 +4,10 @@ var randomColor = require('randomcolor');
 var polygonOptions = {
   strokeWeight: 0.2,
   strokeColor: '#000000',
-  fillOpacity: 0.20,
+  fillOpacity: 0.50,
   fillColor: '#000000',
   editable: true,
   zIndex: 1
-}
-
-export class PolygonTools extends Component {
-  constructor(props) {
-    super(props);
-
-    this.data = [];
-    this.mapListener = null;
-
-  }
-
-  // Before the component mounts, set the polygon and add the listeners
-  componentWillMount() {
-    let that = this;
-    let polygon = this.props.outerPolygon;
-    let polygonArray = this.props.innerPolygons;
-
-    this.data.push({polygon: this.props.outerPolygon.polygon, polygonListener: null, isSelected: false});
-    for(var i = 0; i < this.props.innerPolygons.size(); ++i) {
-      let dataItem = {
-        polygon: this.props.innerPolygons.getAt(i).polygon,
-        polygonListener: null,
-        isSelected: false
-      }
-      this.data.push(dataItem);
-    }
-
-    for(var i = 0; i < this.data.length; ++i) {
-      if(this.data[i].polygonListener == null) {
-        let data = this.data[i];
-        let polygonListener = this.props.maps.event.addListener(data.polygon, "click", function(e) {
-          // When the user clicks on a node, that node will be deleted from the polygon.
-          if(e.vertex != null) {
-            let path = data.polygon.getPaths().getAt(e.path);
-            path.removeAt(e.vertex);
-            if(path.length < 3) {
-              that.deleteOnePolygon(data.polygon);
-            }
-          } else {
-            if(data.isSelected) {
-              that.deselectOnePolygon(data.polygon);
-            } else {
-              that.selectOnePolygon(data.polygon);
-            }
-          }
-        });
-
-        data.polygonListener = polygonListener;
-      }
-    }
-
-    if(this.mapListener == null) {
-      this.mapListener = this.props.maps.event.addListener(this.props.map, "click", function(e) {
-        that.deselectAllPolygons();
-      });
-    }
-  }
-
-  componentWillUnmount() {
-    // Before unmounting, "deselect" all polygons and remove all listeners
-    this.deselectAllPolygons();
-    this.removeAllListeners();
-    this.setPolygonArray();
-  }
-
-  setPolygonArray() {
-    let polygons = [];
-    for(let i = 0; i < this.data.length; ++i) {
-      polygons.push(this.data[i].polygon);
-    }
-    this.props.setPolygonArray(polygons);
-  }
-
-  findData(key, value) {
-    for(let i = 0; i < this.data.length; ++i) {
-      if(this.data[i][key] == value) {
-        return this.data[i];
-      }
-    }
-    return null;
-  }
-
-  removeAllListeners() {
-    for(let i = 0; i < this.data.length; ++i) {
-      this.props.maps.event.removeListener(this.data[i].polygonListener);
-      this.data[i].polygonListener = null;
-    }
-    if(this.mapListener != null) {
-      this.props.maps.event.removeListener(this.mapListener);
-      this.mapListener = null;
-    }
-  }
-
-  selectAllPolygons() {
-    for(let i = 0; i < this.data.length; ++i) {
-      this.selectPolygon(this.data[i]);
-    }
-  }
-
-  selectOnePolygon(polygon) {
-    let toSelect = this.findData("polygon", polygon);
-    if(toSelect != null) {
-      this.selectPolygon(toSelect);
-    }
-  }
-
-  selectPolygon(dataItem) {
-    if(dataItem != null && dataItem.polygon != null) {
-      dataItem.polygon.setEditable(true);
-      dataItem.isSelected = true;
-    }
-  }
-
-  deselectAllPolygons() {
-    for(let i = 0; i < this.data.length; ++i) {
-      this.deselectPolygon(this.data[i]);
-    }
-  }
-
-  deselectOnePolygon(polygon) {
-    let toDeselect = this.findData("polygon", polygon);
-    if(toDeselect != null) {
-      this.deselectPolygon(toDeselect);
-    }
-  }
-
-  deselectPolygon(dataItem) {
-    if(dataItem != null && dataItem.polygon != null) {
-      dataItem.polygon.setEditable(false);
-      dataItem.isSelected = false;
-    }
-  }
-
-  deleteAllPolygons() {
-    for(let i = 0; i < this.data.length; ++i) {
-      this.deletePolygon(this.data[i]);
-    }
-  }
-
-  deleteOnePolygon(polygon) {
-    let toDelete = this.findData("polygon", polygon);
-    if(toDelete != null) {
-      this.deletePolygon(toDelete);
-    }
-  }
-
-  deletePolygon(dataItem) {
-    let index = this.data.indexOf(dataItem);
-    if(index > -1) {
-      let removed = this.data.splice(index, 1);
-      if(removed.length > 0) {
-        this.props.maps.event.removeListener(removed[0].polygonListener);
-        removed[0].polygon.setMap(null);
-      }
-    }
-    this.setPolygonArray();
-  }
-
-  render() {
-    return null;
-  }
 }
 
 // This component will be used to display the drawing tools and draw a polygon on the map
@@ -177,22 +16,23 @@ export default class DrawingTools extends Component {
     super(props);
 
     this.polygon = null;
-    this.isSelected = false;
+    this.listener = null;
     this.drawingManager = null;
-    this.polygonListener = null;
-    this.mapListener = null;
 
-    if(this.props.polyNum == 0){
+    if (this.props.polyNum == 0){
+      polygonOptions.fillOpacity = 0.1;
       polygonOptions.fillColor = '#000000';
-      polygonOptions.fillOpacity = 0.10;
+      polygonOptions.strokeWeight = 1;
     } else {
-      polygonOptions.fillColor = randomColor();
-      polygonOptions.fillOpacity = 0.20;
+      polygonOptions.fillColor = randomColor({ luminosity: 'bright' });
+      polygonOptions.fillOpacity = 0.5;
+      polygonOptions.strokeWeight = 0.2;
     }
     polygonOptions.strokeColor = polygonOptions.fillColor;
   }
 
   componentDidMount() {
+    this.props.flagCallback(false);
     this.setDrawingTools(this.props.map);
   }
 
@@ -201,59 +41,21 @@ export default class DrawingTools extends Component {
       polygonOptions.fillColor = '#000000';
       polygonOptions.fillOpacity = 0.20;
     } else {
-      polygonOptions.fillColor = randomColor();
-      polygonOptions.fillOpacity = 0.45;
+      polygonOptions.fillColor = randomColor({ luminosity: 'bright' });
+      polygonOptions.fillOpacity = 0.5;
     }
     polygonOptions.strokeColor = polygonOptions.fillColor;
   }
 
   componentWillUnmount() {
-    this.props.addPolygon(this.polygon);
+    this.props.addPolygon(this.polygon, this.completedFlag);
+    this.props.maps.event.removeListener(this.listener);
     this.removeDrawingTools();
   }
 
   removeDrawingTools() {
-    if(this.polygon) {
-      this.polygon.setEditable(false);
-    }
-    if(this.polygonListener) {
-      this.props.maps.event.removeListener(this.polygonListener);
-    }
     if(this.drawingManager) {
       this.drawingManager.setMap(null);
-    }
-    if(this.mapListener) {
-      this.props.maps.event.removeListener(this.mapListener);
-    }
-  }
-
-  selectPolygon() {
-    if(this.polygon) {
-      this.polygon.setEditable(true);
-      this.isSelected = true;
-    }
-  }
-
-  deselectPolygon() {
-    if(this.isSelected) {
-      if(this.polygon != null) {
-        this.polygon.setEditable(false);
-      }
-      this.isSelected = false;
-    }
-  }
-
-  deletePolygon() {
-    // When the polygon is deleted, the user can draw a polygon again (limit to one)
-    this.resetDrawingTools();
-    if(this.polygonListener) {
-      this.props.maps.event.removeListener(this.polygonListener);
-      this.polygonListener = null;
-    }
-    if(this.polygon != null) {
-      this.polygon.setMap(null);
-      this.polygon = null;
-      this.isSelected = false;
     }
   }
 
@@ -286,34 +88,20 @@ export default class DrawingTools extends Component {
       that.drawingManager.setOptions({
         drawingControl: false
       });
-      that.polygon = polygon;
-      that.isSelected = true;
 
-      let polygonListener = that.props.maps.event.addListener(polygon, "click", function(e) {
-        // When the user clicks on a node, that node will be deleted from the polygon.
+      that.props.flagCallback(true);
+
+      that.listener = that.props.maps.event.addListener(polygon, "click", function(e) {
         if(e.vertex != null) {
-          let path = polygon.getPaths().getAt(e.path);
+          let path = this.getPaths().getAt(e.path);
           path.removeAt(e.vertex);
           if(path.length < 3) {
-            that.deletePolygon();
-          }
-        } else {
-          if(that.isSelected) {
-            that.deselectPolygon();
-          } else {
-            that.selectPolygon();
+            this.setMap(null);
           }
         }
       });
-      that.polygonListener = polygonListener;
-      that.selectPolygon();
+      that.polygon = polygon;
     });
-
-    if(this.mapListener == null) {
-      this.mapListener = this.props.maps.event.addListener(map, "click", function(e) {
-        that.deselectPolygon();
-      });
-    }
   }
 
   render() {

@@ -101,6 +101,7 @@ describe("NavList", () => {
           ready: true,
           data: []
         },
+        tabsRef: { },
         autocomplete: [],
         map: new google.maps.Map(),
         maps: google.maps
@@ -122,33 +123,36 @@ describe("NavList", () => {
       });
 
       it("renders correct number of autocomplete results", () => {
-        expect(navList().find("#navbar-list").children().length).toBe(data.length);
+        expect(navList().find("#navbar-list-search").children().length).toBe(data.length);
       });
 
       it("clicking on item", () => {
-        navList().find("#navbar-list").childAt(0).simulate("click", {stopPropagation: () => undefined});
+        navList().find("#navbar-list-search").childAt(0).simulate("click", {stopPropagation: () => undefined});
         // TODO
-        // How should we test that map centered on id?
+        // How should we test that map actually centered on id?
         // How do we qualify the result of this test?
       });
     });
 
     describe("with data", () => {
       let data = [{}, {}, {}];
+      let mockInjectNeighborhood = jest.fn();
+      let mockSetCenter = jest.fn();
 
       beforeEach(() => {
         props.data.data = data;
+        props.tabsRef.injectNeighborhood = mockInjectNeighborhood;
+        props.map.setCenter = mockSetCenter;
       });
 
       it("renders correct number of data results", () => {
-        expect(navList().find("#navbar-list").children().length).toBe(data.length);
+        expect(navList().find("#navbar-list-search").children().length).toBe(data.length);
       });
 
       it("clicking on item", () => {
-        //navList().find("#navbar-list").childAt(0).simulate("click", {stopPropagation: () => undefined});
-        // TODO
-        // Need to deal with dependency on Tabs element to complete this test
-        // Also how do we qualify the result of this test?
+        navList().find("#navbar-list-search").childAt(0).simulate("click", {stopPropagation: () => undefined});
+        expect(mockSetCenter).toHaveBeenCalled();
+        expect(mockInjectNeighborhood).toHaveBeenCalled();
       });
     });
   });

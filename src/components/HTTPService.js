@@ -1,23 +1,30 @@
 const fetch = require('node-fetch');
 
-export function getNearby(lat, lng, rad) {
-  return fetch(` http://localhost:3000/nearby?lat=${lat}&lng=${lng}&rad=${rad}` )
-    .then(function(response) {
-      return response.json();
+import { LOCATIONS_ADDRESS, COUNT_ADDRESS,
+          LOGIN_ADDRESS, SIGNUP_ADDRESS,LOGOUT_ADDRESS,USERAUTHCHECK_ADDRESS } from '../settings';
+
+export function getUnits(points) {
+  let body = JSON.stringify({ "poly" : points});
+  return fetch( `http://localhost:3000/getUnits` ,
+                { "method": 'POST',
+                  "body": body,
+                  "headers": {  'Content-Type': 'application/json',
+                                'Content-Length': new Buffer(body).length }})
+    .then(function(res) {
+        return res.json();
     });
 }
 
 export function searchLists(term) {
-  return fetch(` http://localhost:3000/locations?name=${term}` )
+  return fetch(`${LOCATIONS_ADDRESS}name=${term}` )
     .then(function(response) {
       return response.json();
     });
-
 }
 
 export function countPolyResidences(polyData) {
   let body = JSON.stringify({ "poly" : polyData.points});
-  return fetch( `http://localhost:3000/addressCount` ,
+  return fetch( `${COUNT_ADDRESS}`,
                 { "method": 'POST',
                   "body": body,
                   "headers": {  'Content-Type': 'application/json',
@@ -29,26 +36,55 @@ export function countPolyResidences(polyData) {
 
 export function login(info) {
   let body = JSON.stringify({ "username" : info.username,"password":info.password});
-  return fetch( ` http://localhost:3000/login` ,
+  return fetch(`${LOGIN_ADDRESS}`,
                 { "method": 'POST',
                   "body": body,
+                  "credentials": 'same-origin',
                   "headers": {  'Content-Type': 'application/json',
                   'Content-Length': new Buffer(body).length }})
     .then(function(res) {
-      return res.json();
+      return {
+        statusCode: res.status,
+        body: res.json()
+      };
   });
-
 }
 
 export function signup(info) {
   let body = JSON.stringify({ "username" : info.username,"password":info.password,"email":info.email});
-  return fetch( ` http://localhost:3000/signup` ,
+  return fetch(`${SIGNUP_ADDRESS}`,
                 { "method": 'POST',
                     "body": body,
+                    "credentials": 'same-origin',
                     "headers": {  'Content-Type': 'application/json',
                     'Content-Length': new Buffer(body).length }})
     .then(function(res) {
-      return res.json();
+      return {
+        statusCode: res.status,
+        body: res.json()
+      };
   });
+}
 
+export function logout() {
+  return fetch(`${LOGOUT_ADDRESS}`,
+    { "method": 'GET',
+    "credentials": 'same-origin',
+  })
+    .then(function(response) {
+      return response.json();
+    });
+}
+
+export function userAuthCheck() {
+  let body = JSON.stringify({ "cookie" : document.cookie });
+  return fetch(`${USERAUTHCHECK_ADDRESS}`,
+                { "method": 'POST',
+                    "body": body,
+                    "credentials": 'same-origin',
+                    "headers": {  'Content-Type': 'application/json',
+                    'Content-Length': new Buffer(body).length }})
+    .then(function(response) {
+      return response.json();
+    });
 }

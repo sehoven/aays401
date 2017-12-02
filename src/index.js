@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
-import MapContainer from './components/MapContainer.js';
+import LandingPage from './components/LandingPage.js';
 const ReactDOM = require('react-dom');
-
+const HTTPService = require('./components/HTTPService.js');
 require('./styles/_style.sass');
+var isLoggedin;
+
 
 export class Index extends Component {
   constructor(props){
@@ -11,7 +13,7 @@ export class Index extends Component {
 
   render(){
     return (
-      <MapContainer />
+      <LandingPage />
     )
   }
 }

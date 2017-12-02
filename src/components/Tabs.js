@@ -23,25 +23,25 @@ export default class Tabs extends Component {
     const { currentPanel } = this.state;
     return (
       <div className="tabContainer">
-        <div className="tabButtons">
-        <div
-          className= {
-            "tabButton " +
-            ((currentPanel == this.props.PanelType.SEARCH) ? "activeTabButton" : "")
-          }
-          id="search-tab"
-          onClick={() => { this.swapState(this.props.PanelType.SEARCH) }} >
-          <div><p>Search</p></div>
-        </div>
-        <div
-          className={
-            "tabButton " +
-            ((currentPanel == this.props.PanelType.DRAW) ? "activeTabButton" : "")
-          }
-          id="draw-tab"
-          onClick={() => { this.swapState(this.props.PanelType.DRAW) }} >
-          <div><p>Draw</p></div>
-        </div>
+        <div id="tabButtons">
+          <div
+            className= {
+              "tabButton " +
+              ((currentPanel == this.props.PanelType.SEARCH) ? "activeTabButton" : "")
+            }
+            id="search-tab"
+            onClick={() => { this.swapState(this.props.PanelType.SEARCH) }} >
+            <div><p>Search</p></div>
+          </div>
+          <div
+            className={
+              "tabButton " +
+              ((currentPanel == this.props.PanelType.DRAW) ? "activeTabButton" : "")
+            }
+            id="draw-tab"
+            onClick={() => { this.swapState(this.props.PanelType.DRAW) }} >
+            <div><p>Draw</p></div>
+          </div>
         </div>
         <NavPanel
           map={this.props.map}
@@ -52,7 +52,8 @@ export default class Tabs extends Component {
           ref={(instance) => {this.overlay = instance}}
           active={ currentPanel == this.props.PanelType.DRAW }
           map={this.props.map}
-          maps={this.props.maps} />
+          maps={this.props.maps}
+          setProgressState={this.props.setProgressState} />
       </div>
     )
   }
