@@ -30,10 +30,10 @@ export class Overlay extends Component {
   }
 
   clearClick() {
-    let polycount = 0;
+    let callback;
 
     if(this.props.clearClickCallback) {
-      polycount = this.props.clearClickCallback();
+      callback = this.props.clearClickCallback();
     }
     if(this.props.hasDeliveryZone()) {
       createNotification('clear');
@@ -75,12 +75,12 @@ export class Overlay extends Component {
   }
 
   editClick(){
-      let callback;
-      if(this.props.editClickCallback) {
-        callback = this.props.editClickCallback();
-      }
+    let callback;
+    if(this.props.editClickCallback) {
+      callback = this.props.editClickCallback();
+    }
 
-      createNotification(this.state.notification);
+    createNotification(this.state.notification);
   }
 
   renderButtonGroup (){
@@ -160,14 +160,15 @@ export default class OverlayContainer extends Component {
   }
 
   clearClickCallback() {
-    this.polygonArray.pop();
-    if (this.polygonArray.getLength() == 0){
+    if(this.polygonArray.size() > 0) {
+      this.polygonArray.pop();
+    }
+    if(this.polygonArray.getLength() == 0){
       this.setState({ buttons: 1 });
       this.props.setProgressState(0);
-    }
-    if(this.polygonArray.getAllInner().length > 0) {
+    } else if (this.polygonArray.getAllInner().length > 0) {
       this.props.setProgressState(2);
-    } else if(this.polygonArray.getOuter()) {
+    } else if (this.polygonArray.getOuter()) {
       this.props.setProgressState(1);
     }
   }
@@ -228,7 +229,6 @@ export default class OverlayContainer extends Component {
     this.cancelFlag = false;
     this.setState({isDrawing: true, buttons: 2 });
   }
-
 
   checkOuterPolygonExists() {
     return this.polygonArray.outerExists();
@@ -354,12 +354,6 @@ export default class OverlayContainer extends Component {
           addClickCallback = {this.addClickCallback.bind(this)}
           editClickCallback = {this.editClickCallback.bind(this)}
           cancelClickCallback={this.cancelClickCallback.bind(this)} />
-        { this.state.isEditing && this.checkOuterPolygonExists() ?
-          <PolygonTools map={this.props.map}
-                        maps={this.props.maps}
-                        polygons={this.state.polygons}
-                        setPolygonArray={(polygons) => this.setPolygonArray(polygons)} /> : null
-        }
         { this.state.isDrawing ?
           <DrawingTools map={this.props.map}
                         maps={this.props.maps}
@@ -657,7 +651,7 @@ class PolygonArray {
   }
 
   getOuter() {
-    return this.arr.splice(0, 1);
+    return this.arr.slice(0, 1);
   }
 
   outerExists(){
@@ -926,7 +920,9 @@ class PolygonArray {
   }
 
   pop() {
+    console.log(this.arr);
     let popped = this.arr.pop();
+    console.log(popped);
     popped.delete()
     this.parent.setState({ iterable: this.getListIterable() });
     if (this.arr.length == 0){
