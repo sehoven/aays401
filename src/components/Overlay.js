@@ -177,13 +177,14 @@ export default class OverlayContainer extends Component {
     this.polygonArray.saveEdits();
     if (this.polygonArray.getLength() == 0){
       this.setState({ isEditing: false, isDrawing: false, buttons: 1 });
+      this.props.setProgressState(0);
     } else {
       this.setState({ isEditing: false, isDrawing: false, buttons: 3 });
-    }
-    if(this.polygonArray.getAllInner().length > 0) {
-      this.props.setProgressState(2);
-    } else {
-      this.props.setProgressState(1);
+      if (this.polygonArray.getAllInner().length > 0) {
+        this.props.setProgressState(2);
+      } else {
+        this.props.setProgressState(1);
+      }
     }
   }
 
@@ -793,6 +794,7 @@ export class PolygonArray {
     if (this.arr.length == 0){
       this.clearCircles();
     }
+    this.parent.setState({ iterable: this.getListIterable() });
   }
 
   updateData(indices){
