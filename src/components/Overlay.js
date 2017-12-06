@@ -47,7 +47,6 @@ export class Overlay extends Component {
     if(this.props.confirmClickCallback) {
       callback = this.props.confirmClickCallback();
     }
-
     createNotification('finish');
   }
 
@@ -176,7 +175,11 @@ export default class OverlayContainer extends Component {
   confirmClickCallback() {
     this.lastFlag = false;
     this.polygonArray.saveEdits();
-    this.setState({ isEditing: false, isDrawing: false, buttons: 3 });
+    if (this.polygonArray.getLength() == 0){
+      this.setState({ isEditing: false, isDrawing: false, buttons: 1 });
+    } else {
+      this.setState({ isEditing: false, isDrawing: false, buttons: 3 });
+    }
     if(this.polygonArray.getAllInner().length > 0) {
       this.props.setProgressState(2);
     } else {
@@ -603,7 +606,7 @@ export class Polygon {
   }
 
   setFillColor(color){
-    this.polygon.setOptions({fillColor: color});
+    this.polygon.setOptions({ fillColor: color });
     this.updateUrls();
   }
 
@@ -786,6 +789,10 @@ export class PolygonArray {
       indices.push(i);
     }
     this.updateData(indices);
+    this.push(null);
+    if (this.arr.length == 0){
+      this.clearCircles();
+    }
   }
 
   updateData(indices){
@@ -886,82 +893,87 @@ export class PolygonArray {
   }
 
   push(polygon) {
+    var points;
     if(polygon != null) {
       this.arr.push(polygon);
       polygon.setClickListener(this.maps);
       this.deselectAll();
-      if (this.arr.length == 1 && !this.noCirclesFlag){
-        createNotification('loading-units');
-        // Creates a circle for each point, and a marker for the number
-        // Circles are much faster than Markers, so markers are used sparingly
-        // for numbers. It's slower to render squares with Markers despite
-        // squares having far fewer edges.
-        let that = this;
-        let points = polygon.convertToLatLng();
-        HTTPService.getUnits(points)
-        .then(function(json){
-          that.clearCircles();
-          for (var item in json){
-            // radius = 3 @ 1, 6 @ 10, 9 @ 100, 12 @ 1000
-            let radius = (1 + Math.floor(Math.log10(json[item]["count"]))) * 3;
-            var color;
-            switch (json[item]["type"]){
-              case "Residential":
-                if (!that.residenceFilter) continue;
-                color = 'rgb(160, 0, 55)';
-                break;
-              case "Apartment":
-                if (!that.apartmentFilter) continue;
-                color = '#d3882b';
-                break;
-              case "Industrial":
-                if (!that.industrialFilter) continue;
-                color = '#08d312';
-                break;
-              case "Commercial":
-                if (!that.commercialFilter) continue;
-                color = '#3e43d3';
-                break;
-              default:
-                if (!that.unspecifiedFilter) continue;
-                color = 'black';
-                break;
-            }
-            let newCircle = new that.maps.Circle({
-              type: json[item]["type"],
-              title: json[item]["type"] + ", count: " + json[item]["count"],
-              strokeWeight: 0,
-              fillColor: color,
-              fillOpacity: (radius == 3)?0.9:0.6,
-              map: that.map,
-              center: { lat: json[item]["lat"], lng: json[item]["lng"] },
-              radius: radius
-            });
-            that.circles.push(newCircle);
-            if (json[item]["count"] > 1){
-              var newNumber = new that.maps.Marker({
-                type: json[item]["type"],
-                position: { lat: json[item]["lat"], lng: json[item]["lng"] },
-                icon: {
-                  path: 'M 0,0 z',
-                  strokeWeight: 0,
-                  scale: radius
-                },
-                label: (json[item]["count"]==1)?null:{
-                  text: "" + json[item]["count"],
-                  color: 'white',
-                  fontSize: "10px"
-                },
-                map: that.map
-              });
-              that.circles.push(newNumber);
-            }
-          }
-        });
-      }
-      this.noCirclesFlag = false;
       this.updateData([this.arr.length - 1]);
+      points = polygon.convertToLatLng();
+    } else {
+      if (this.arr.length == 1){
+        points = this.arr[0].convertToLatLng();
+      }
     }
+    if (this.arr.length == 1 && !this.noCirclesFlag){
+      createNotification('loading-units');
+      // Creates a circle for each point, and a marker for the number
+      // Circles are much faster than Markers, so markers are used sparingly
+      // for numbers. It's slower to render squares with Markers despite
+      // squares having far fewer edges.
+      let that = this;
+      HTTPService.getUnits(points)
+      .then(function(json){
+        that.clearCircles();
+        for (var item in json){
+          // radius = 3 @ 1, 6 @ 10, 9 @ 100, 12 @ 1000
+          let radius = (1 + Math.floor(Math.log10(json[item]["count"]))) * 3;
+          var color;
+          switch (json[item]["type"]){
+            case "Residential":
+              if (!that.residenceFilter) continue;
+              color = 'rgb(160, 0, 55)';
+              break;
+            case "Apartment":
+              if (!that.apartmentFilter) continue;
+              color = '#d3882b';
+              break;
+            case "Industrial":
+              if (!that.industrialFilter) continue;
+              color = '#08d312';
+              break;
+            case "Commercial":
+              if (!that.commercialFilter) continue;
+              color = '#3e43d3';
+              break;
+            default:
+              if (!that.unspecifiedFilter) continue;
+              color = 'black';
+              break;
+          }
+          let newCircle = new that.maps.Circle({
+            type: json[item]["type"],
+            title: json[item]["type"] + ", count: " + json[item]["count"],
+            strokeWeight: 0,
+            fillColor: color,
+            fillOpacity: (radius == 3)?0.9:0.6,
+            map: that.map,
+            center: { lat: json[item]["lat"], lng: json[item]["lng"] },
+            radius: radius
+          });
+          that.circles.push(newCircle);
+          if (json[item]["count"] > 1){
+            var newNumber = new that.maps.Marker({
+              type: json[item]["type"],
+              position: { lat: json[item]["lat"], lng: json[item]["lng"] },
+              icon: {
+                path: 'M 0,0 z',
+                strokeWeight: 0,
+                scale: radius
+              },
+              label: (json[item]["count"]==1)?null:{
+                text: "" + json[item]["count"],
+                color: 'white',
+                fontSize: "10px"
+              },
+              map: that.map
+            });
+            that.circles.push(newNumber);
+          }
+        }
+      });
+    }
+    this.noCirclesFlag = false;
   }
 
   setNoCirclesFlag(flag) {
@@ -970,7 +982,7 @@ export class PolygonArray {
 
   pushBasic(googlePoly) {
     let polygon = new Polygon(googlePoly);
-    polygon.setFillColor("0x000000");
+    polygon.setFillColor(googlePoly.fillColor);
     polygon.setFillOpacity(0.1);
     this.push(polygon);
   }
