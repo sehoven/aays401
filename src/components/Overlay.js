@@ -378,6 +378,7 @@ export default class OverlayContainer extends Component {
                     </div>
                   </div>
                   <div id="export-modal-center">
+                    <div className="popup-title">Delivery zone review</div>
                     <img className="modal-image"src={this.state.iterable[this.state.currentImage].image}/>
                   </div>
                   <div id="export-modal-right">
