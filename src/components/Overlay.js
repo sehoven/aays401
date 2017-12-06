@@ -7,6 +7,8 @@ import { STATIC_STYLE, IMAGE_DIMENSIONS } from '../settings';
 import Modal from 'react-modal';
 import jszipUtils from 'jszip-utils';
 import Canvas from './Canvas.js'
+const JSZip = require("jszip");
+const FileSaver = require('file-saver');
 const HTTPService = require('./HTTPService.js');
 const notificationTimer = 2000;
 
@@ -283,15 +285,51 @@ export default class OverlayContainer extends Component {
   }
 
   saveImages(type){
-    var urls;
+    let that = this;
+    var files;
     switch (type) {
       case "color":
-        urls = this.polygonArray.getListIterable().map(function(item){
-          return item.image;
+        files = this.polygonArray.getListIterable().map(function(item) {
+          let total = 0;
+          if(item.values) {
+            let addTotal = false;
+            Object.keys(item.values).forEach(key => {
+              addTotal = false;
+              switch(key) {
+                case "Residential":
+                  addTotal |= that.state.filter.residenceFilter;
+                  break;
+                case "Apartment":
+                  addTotal |= that.state.filter.apartmentFilter;
+                  break;
+                case "Industrial":
+                  addTotal |= that.state.filter.industrialFilter;
+                  break;
+                case "Commercial":
+                  addTotal |= that.state.filter.commercialFilter;
+                  break;
+                case "Other":
+                  addTotal |= that.state.filter.unspecifiedFilter;
+                  break;
+              }
+              if(addTotal) {
+                if(item.values[key].hasOwnProperty("total")) {
+                  total += item.values[key].total;
+                } else if (typeof item.values[key] == "number" &&
+                          (item.values[key] % 1 == 0)) {
+                  total += item.values[key];
+                }
+              }
+            });
+          }
+          return {
+            url: item.image,
+            total: total
+          };
         }).slice(1);
         break;
       case "bw":
-        urls = this.polygonArray.getAllInner().map(function(poly){
+        files = this.polygonArray.getAllInner().map(function(poly) {
           let polygon = poly.convertToLatLng();
           let url = "https://maps.googleapis.com/maps/api/staticmap?"
                   + "key=AIzaSyC2mXFuLvwiASA3mSr2kz79fnXUYRwLKb8"
@@ -304,38 +342,70 @@ export default class OverlayContainer extends Component {
             // Static API doesn't have polygon autocomplete. Close the path manually.
             url += "|" + polygon[0].lat + "," + polygon[0].lng;
           }
-          return url;
+          let total = 0;
+          if(poly.unitCounts) {
+            let addTotal = false;
+            Object.keys(poly.unitCounts).forEach(key => {
+              addTotal = false;
+              switch(key) {
+                case "Residential":
+                  addTotal |= that.state.filter.residenceFilter;
+                  break;
+                case "Apartment":
+                  addTotal |= that.state.filter.apartmentFilter;
+                  break;
+                case "Industrial":
+                  addTotal |= that.state.filter.industrialFilter;
+                  break;
+                case "Commercial":
+                  addTotal |= that.state.filter.commercialFilter;
+                  break;
+                case "Other":
+                  addTotal |= that.state.filter.unspecifiedFilter;
+                  break;
+              }
+              if(addTotal) {
+                if(poly.unitCounts[key].hasOwnProperty("total")) {
+                  total += poly.unitCounts[key].total;
+                } else if (typeof poly.unitCounts[key] == "number" &&
+                          (poly.unitCounts[key] % 1 == 0)) {
+                  total += poly.unitCounts[key];
+                }
+              }
+            });
+          }
+
+          return {
+            url: url,
+            total: total
+          };
         });
         break;
       default:
-        urls = [];
+        files = [];
         break;
     }
 
-    var JSZip = require("jszip");
-    var FileSaver = require('file-saver');
     var zip = new JSZip();
     var count = 0;
     var zipFilename = "Download.zip";
-    urls.forEach(function(url){
-      var filename = "map"+urls.indexOf(url)+".png";
-      jszipUtils.getBinaryContent(url, function (err, data) {
+    files.forEach(function(file){
+      var filename = "map"+files.indexOf(file)+"_" + file.total + ".png";
+      jszipUtils.getBinaryContent(file.url, function (err, data) {
         if(err) {
           throw err; // or handle the error
         }
         zip.file(filename, data, {binary:true});
         count++;
-        if (count == urls.length) {
+        if (count == files.length) {
           var zipFile = zip.generate({type: "blob"});
           FileSaver.saveAs(zipFile, zipFilename);
         }
-      })
-    })
+      });
+    });
   }
 
   render() {
-    //      <ProgressBarView data={this.progressBarData.bind(this)}/>
-
     if (!this.props.active) return null;
     return (
       <div className={"navPanel"}>
@@ -558,7 +628,7 @@ export class Polygon {
   updateUnitCounts(grandparent, parent){
     let that = this;
     return HTTPService.countPolyResidences(
-        { points: that.convertToLatLng() }
+      { points: that.convertToLatLng() }
     ).then(function(json){
       that.unitCounts = json;
       grandparent.setState({ iterable: parent.getListIterable() });
@@ -917,9 +987,7 @@ export class PolygonArray {
   }
 
   pop() {
-    console.log(this.arr);
     let popped = this.arr.pop();
-    console.log(popped);
     popped.delete()
     this.parent.setState({ iterable: this.getListIterable() });
     if (this.arr.length == 0){
