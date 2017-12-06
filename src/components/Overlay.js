@@ -448,6 +448,7 @@ export default class OverlayContainer extends Component {
                     </div>
                   </div>
                   <div id="export-modal-center">
+                    <div className="popup-title">Delivery zone review</div>
                     <img className="modal-image"src={this.state.iterable[this.state.currentImage].image}/>
                   </div>
                   <div id="export-modal-right">
@@ -534,23 +535,23 @@ export default class OverlayContainer extends Component {
                 <div className="navbar-image-box"><a href={itemData.image} download="map">{<img className="image" src= {itemData.image}/>}</a></div>
                 <div className="navbar-count-poly-text">
                   { this.state.filter.residenceFilter &&
-                    <label className="containerButton">Residences: {itemData.values? itemData.values.Residential.total:"?"}
+                    <label className="label-text">Residences: {itemData.values? itemData.values.Residential.total:"?"}
                     </label>
                   }
                   { this.state.filter.apartmentFilter &&
-                    <label className="containerButton">Apartments: {itemData.values? itemData.values.Apartment.total:"?"}
+                    <label className="label-text">Apartments: {itemData.values? itemData.values.Apartment.total:"?"}
                     </label>
                   }
                   { this.state.filter.industrialFilter &&
-                    <label className="containerButton">Industrial: {itemData.values? itemData.values.Industrial.total:"?"}
+                    <label className="label-text">Industrial: {itemData.values? itemData.values.Industrial.total:"?"}
                     </label>
                   }
                   { this.state.filter.commercialFilter &&
-                    <label className="containerButton">Commercial: {itemData.values? itemData.values.Commercial.total:"?"}
+                    <label className="label-text">Commercial: {itemData.values? itemData.values.Commercial.total:"?"}
                     </label>
                   }
                   { this.state.filter.unspecifiedFilter &&
-                    <label className="containerButton">Unspecified: {itemData.values? itemData.values.Other:"?"}
+                    <label className="label-text">Unspecified: {itemData.values? itemData.values.Other:"?"}
                     </label>
                   }
                 </div>
