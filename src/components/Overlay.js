@@ -7,6 +7,8 @@ import { STATIC_STYLE, IMAGE_DIMENSIONS } from '../settings';
 import Modal from 'react-modal';
 import jszipUtils from 'jszip-utils';
 import Canvas from './Canvas.js'
+const JSZip = require("jszip");
+const FileSaver = require('file-saver');
 const HTTPService = require('./HTTPService.js');
 const notificationTimer = 2000;
 
@@ -45,7 +47,6 @@ export class Overlay extends Component {
     if(this.props.confirmClickCallback) {
       callback = this.props.confirmClickCallback();
     }
-
     createNotification('finish');
   }
 
@@ -174,11 +175,16 @@ export default class OverlayContainer extends Component {
   confirmClickCallback() {
     this.lastFlag = false;
     this.polygonArray.saveEdits();
-    this.setState({ isEditing: false, isDrawing: false, buttons: 3 });
-    if(this.polygonArray.getAllInner().length > 0) {
-      this.props.setProgressState(2);
+    if (this.polygonArray.getLength() == 0){
+      this.setState({ isEditing: false, isDrawing: false, buttons: 1 });
+      this.props.setProgressState(0);
     } else {
-      this.props.setProgressState(1);
+      this.setState({ isEditing: false, isDrawing: false, buttons: 3 });
+      if (this.polygonArray.getAllInner().length > 0) {
+        this.props.setProgressState(2);
+      } else {
+        this.props.setProgressState(1);
+      }
     }
   }
 
@@ -283,15 +289,51 @@ export default class OverlayContainer extends Component {
   }
 
   saveImages(type){
-    var urls;
+    let that = this;
+    var files;
     switch (type) {
       case "color":
-        urls = this.polygonArray.getListIterable().map(function(item){
-          return item.image;
+        files = this.polygonArray.getListIterable().map(function(item) {
+          let total = 0;
+          if(item.values) {
+            let addTotal = false;
+            Object.keys(item.values).forEach(key => {
+              addTotal = false;
+              switch(key) {
+                case "Residential":
+                  addTotal |= that.state.filter.residenceFilter;
+                  break;
+                case "Apartment":
+                  addTotal |= that.state.filter.apartmentFilter;
+                  break;
+                case "Industrial":
+                  addTotal |= that.state.filter.industrialFilter;
+                  break;
+                case "Commercial":
+                  addTotal |= that.state.filter.commercialFilter;
+                  break;
+                case "Other":
+                  addTotal |= that.state.filter.unspecifiedFilter;
+                  break;
+              }
+              if(addTotal) {
+                if(item.values[key].hasOwnProperty("total")) {
+                  total += item.values[key].total;
+                } else if (typeof item.values[key] == "number" &&
+                          (item.values[key] % 1 == 0)) {
+                  total += item.values[key];
+                }
+              }
+            });
+          }
+          return {
+            url: item.image,
+            total: total
+          };
         }).slice(1);
         break;
       case "bw":
-        urls = this.polygonArray.getAllInner().map(function(poly){
+        files = this.polygonArray.getAllInner().map(function(poly) {
           let polygon = poly.convertToLatLng();
           let url = "https://maps.googleapis.com/maps/api/staticmap?"
                   + "key=AIzaSyC2mXFuLvwiASA3mSr2kz79fnXUYRwLKb8"
@@ -304,38 +346,70 @@ export default class OverlayContainer extends Component {
             // Static API doesn't have polygon autocomplete. Close the path manually.
             url += "|" + polygon[0].lat + "," + polygon[0].lng;
           }
-          return url;
+          let total = 0;
+          if(poly.unitCounts) {
+            let addTotal = false;
+            Object.keys(poly.unitCounts).forEach(key => {
+              addTotal = false;
+              switch(key) {
+                case "Residential":
+                  addTotal |= that.state.filter.residenceFilter;
+                  break;
+                case "Apartment":
+                  addTotal |= that.state.filter.apartmentFilter;
+                  break;
+                case "Industrial":
+                  addTotal |= that.state.filter.industrialFilter;
+                  break;
+                case "Commercial":
+                  addTotal |= that.state.filter.commercialFilter;
+                  break;
+                case "Other":
+                  addTotal |= that.state.filter.unspecifiedFilter;
+                  break;
+              }
+              if(addTotal) {
+                if(poly.unitCounts[key].hasOwnProperty("total")) {
+                  total += poly.unitCounts[key].total;
+                } else if (typeof poly.unitCounts[key] == "number" &&
+                          (poly.unitCounts[key] % 1 == 0)) {
+                  total += poly.unitCounts[key];
+                }
+              }
+            });
+          }
+
+          return {
+            url: url,
+            total: total
+          };
         });
         break;
       default:
-        urls = [];
+        files = [];
         break;
     }
 
-    var JSZip = require("jszip");
-    var FileSaver = require('file-saver');
     var zip = new JSZip();
     var count = 0;
     var zipFilename = "Download.zip";
-    urls.forEach(function(url){
-      var filename = "map"+urls.indexOf(url)+".png";
-      jszipUtils.getBinaryContent(url, function (err, data) {
+    files.forEach(function(file){
+      var filename = "map"+files.indexOf(file)+"_" + file.total + ".png";
+      jszipUtils.getBinaryContent(file.url, function (err, data) {
         if(err) {
           throw err; // or handle the error
         }
         zip.file(filename, data, {binary:true});
         count++;
-        if (count == urls.length) {
+        if (count == files.length) {
           var zipFile = zip.generate({type: "blob"});
           FileSaver.saveAs(zipFile, zipFilename);
         }
-      })
-    })
+      });
+    });
   }
 
   render() {
-    //      <ProgressBarView data={this.progressBarData.bind(this)}/>
-
     if (!this.props.active) return null;
     return (
       <div className={"navPanel"}>
@@ -378,6 +452,7 @@ export default class OverlayContainer extends Component {
                     </div>
                   </div>
                   <div id="export-modal-center">
+                    <div className="popup-title">Delivery zone review</div>
                     <img className="modal-image"src={this.state.iterable[this.state.currentImage].image}/>
                   </div>
                   <div id="export-modal-right">
@@ -464,23 +539,23 @@ export default class OverlayContainer extends Component {
                 <div className="navbar-image-box"><a href={itemData.image} download="map">{<img className="image" src= {itemData.image}/>}</a></div>
                 <div className="navbar-count-poly-text">
                   { this.state.filter.residenceFilter &&
-                    <label className="containerButton">Residences: {itemData.values? itemData.values.Residential.total:"?"}
+                    <label className="label-text">Residences: {itemData.values? itemData.values.Residential.total:"?"}
                     </label>
                   }
                   { this.state.filter.apartmentFilter &&
-                    <label className="containerButton">Apartments: {itemData.values? itemData.values.Apartment.total:"?"}
+                    <label className="label-text">Apartments: {itemData.values? itemData.values.Apartment.total:"?"}
                     </label>
                   }
                   { this.state.filter.industrialFilter &&
-                    <label className="containerButton">Industrial: {itemData.values? itemData.values.Industrial.total:"?"}
+                    <label className="label-text">Industrial: {itemData.values? itemData.values.Industrial.total:"?"}
                     </label>
                   }
                   { this.state.filter.commercialFilter &&
-                    <label className="containerButton">Commercial: {itemData.values? itemData.values.Commercial.total:"?"}
+                    <label className="label-text">Commercial: {itemData.values? itemData.values.Commercial.total:"?"}
                     </label>
                   }
                   { this.state.filter.unspecifiedFilter &&
-                    <label className="containerButton">Unspecified: {itemData.values? itemData.values.Other:"?"}
+                    <label className="label-text">Unspecified: {itemData.values? itemData.values.Other:"?"}
                     </label>
                   }
                 </div>
@@ -533,7 +608,7 @@ export class Polygon {
   }
 
   setFillColor(color){
-    this.polygon.setOptions({fillColor: color});
+    this.polygon.setOptions({ fillColor: color });
     this.updateUrls();
   }
 
@@ -558,7 +633,7 @@ export class Polygon {
   updateUnitCounts(grandparent, parent){
     let that = this;
     return HTTPService.countPolyResidences(
-        { points: that.convertToLatLng() }
+      { points: that.convertToLatLng() }
     ).then(function(json){
       that.unitCounts = json;
       grandparent.setState({ iterable: parent.getListIterable() });
@@ -716,6 +791,11 @@ export class PolygonArray {
       indices.push(i);
     }
     this.updateData(indices);
+    this.push(null);
+    if (this.arr.length == 0){
+      this.clearCircles();
+    }
+    this.parent.setState({ iterable: this.getListIterable() });
   }
 
   updateData(indices){
@@ -816,82 +896,87 @@ export class PolygonArray {
   }
 
   push(polygon) {
+    var points;
     if(polygon != null) {
       this.arr.push(polygon);
       polygon.setClickListener(this.maps);
       this.deselectAll();
-      if (this.arr.length == 1 && !this.noCirclesFlag){
-        createNotification('loading-units');
-        // Creates a circle for each point, and a marker for the number
-        // Circles are much faster than Markers, so markers are used sparingly
-        // for numbers. It's slower to render squares with Markers despite
-        // squares having far fewer edges.
-        let that = this;
-        let points = polygon.convertToLatLng();
-        HTTPService.getUnits(points)
-        .then(function(json){
-          that.clearCircles();
-          for (var item in json){
-            // radius = 3 @ 1, 6 @ 10, 9 @ 100, 12 @ 1000
-            let radius = (1 + Math.floor(Math.log10(json[item]["count"]))) * 3;
-            var color;
-            switch (json[item]["type"]){
-              case "Residential":
-                if (!that.residenceFilter) continue;
-                color = 'rgb(160, 0, 55)';
-                break;
-              case "Apartment":
-                if (!that.apartmentFilter) continue;
-                color = '#d3882b';
-                break;
-              case "Industrial":
-                if (!that.industrialFilter) continue;
-                color = '#08d312';
-                break;
-              case "Commercial":
-                if (!that.commercialFilter) continue;
-                color = '#3e43d3';
-                break;
-              default:
-                if (!that.unspecifiedFilter) continue;
-                color = 'black';
-                break;
-            }
-            let newCircle = new that.maps.Circle({
-              type: json[item]["type"],
-              title: json[item]["type"] + ", count: " + json[item]["count"],
-              strokeWeight: 0,
-              fillColor: color,
-              fillOpacity: (radius == 3)?0.9:0.6,
-              map: that.map,
-              center: { lat: json[item]["lat"], lng: json[item]["lng"] },
-              radius: radius
-            });
-            that.circles.push(newCircle);
-            if (json[item]["count"] > 1){
-              var newNumber = new that.maps.Marker({
-                type: json[item]["type"],
-                position: { lat: json[item]["lat"], lng: json[item]["lng"] },
-                icon: {
-                  path: 'M 0,0 z',
-                  strokeWeight: 0,
-                  scale: radius
-                },
-                label: (json[item]["count"]==1)?null:{
-                  text: "" + json[item]["count"],
-                  color: 'white',
-                  fontSize: "10px"
-                },
-                map: that.map
-              });
-              that.circles.push(newNumber);
-            }
-          }
-        });
-      }
-      this.noCirclesFlag = false;
       this.updateData([this.arr.length - 1]);
+      points = polygon.convertToLatLng();
+    } else {
+      if (this.arr.length == 1){
+        points = this.arr[0].convertToLatLng();
+      }
     }
+    if (this.arr.length == 1 && !this.noCirclesFlag){
+      createNotification('loading-units');
+      // Creates a circle for each point, and a marker for the number
+      // Circles are much faster than Markers, so markers are used sparingly
+      // for numbers. It's slower to render squares with Markers despite
+      // squares having far fewer edges.
+      let that = this;
+      HTTPService.getUnits(points)
+      .then(function(json){
+        that.clearCircles();
+        for (var item in json){
+          // radius = 3 @ 1, 6 @ 10, 9 @ 100, 12 @ 1000
+          let radius = (1 + Math.floor(Math.log10(json[item]["count"]))) * 3;
+          var color;
+          switch (json[item]["type"]){
+            case "Residential":
+              if (!that.residenceFilter) continue;
+              color = 'rgb(160, 0, 55)';
+              break;
+            case "Apartment":
+              if (!that.apartmentFilter) continue;
+              color = '#d3882b';
+              break;
+            case "Industrial":
+              if (!that.industrialFilter) continue;
+              color = '#08d312';
+              break;
+            case "Commercial":
+              if (!that.commercialFilter) continue;
+              color = '#3e43d3';
+              break;
+            default:
+              if (!that.unspecifiedFilter) continue;
+              color = 'black';
+              break;
+          }
+          let newCircle = new that.maps.Circle({
+            type: json[item]["type"],
+            title: json[item]["type"] + ", count: " + json[item]["count"],
+            strokeWeight: 0,
+            fillColor: color,
+            fillOpacity: (radius == 3)?0.9:0.6,
+            map: that.map,
+            center: { lat: json[item]["lat"], lng: json[item]["lng"] },
+            radius: radius
+          });
+          that.circles.push(newCircle);
+          if (json[item]["count"] > 1){
+            var newNumber = new that.maps.Marker({
+              type: json[item]["type"],
+              position: { lat: json[item]["lat"], lng: json[item]["lng"] },
+              icon: {
+                path: 'M 0,0 z',
+                strokeWeight: 0,
+                scale: radius
+              },
+              label: (json[item]["count"]==1)?null:{
+                text: "" + json[item]["count"],
+                color: 'white',
+                fontSize: "10px"
+              },
+              map: that.map
+            });
+            that.circles.push(newNumber);
+          }
+        }
+      });
+    }
+    this.noCirclesFlag = false;
   }
 
   setNoCirclesFlag(flag) {
@@ -900,7 +985,7 @@ export class PolygonArray {
 
   pushBasic(googlePoly) {
     let polygon = new Polygon(googlePoly);
-    polygon.setFillColor("0x000000");
+    polygon.setFillColor(googlePoly.fillColor);
     polygon.setFillOpacity(0.1);
     this.push(polygon);
   }
@@ -917,9 +1002,7 @@ export class PolygonArray {
   }
 
   pop() {
-    console.log(this.arr);
     let popped = this.arr.pop();
-    console.log(popped);
     popped.delete()
     this.parent.setState({ iterable: this.getListIterable() });
     if (this.arr.length == 0){
